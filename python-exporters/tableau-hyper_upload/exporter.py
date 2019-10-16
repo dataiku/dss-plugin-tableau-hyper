@@ -102,7 +102,7 @@ class CustomExporter(Exporter):
             if self.datasource:
                 server.datasources.publish(self.datasource, self.output_file, 'Overwrite', connection_credentials=None)
             else:
-                new_datasource = TSC.DatasourceItem(self.project.id, name=self.output_table)
+                new_datasource = TSC.DatasourceItem(self.project.id, name=self.output_table_utf8)
                 new_datasource = server.datasources.publish(new_datasource, self.output_file, 'CreateNew')
         except:
             raise
