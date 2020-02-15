@@ -48,3 +48,24 @@ $DIP_HOME/code-envs/python/plugin_tableau-hyper-export_managed/bin/python setup.
 ```
 
 where $DIP_HOME stands for your DSS home directory
+
+## Known issues
+
+### Issue with GLIBCXX library
+
+On some distributions (centOS and RHEL) the Tableau SDK used in the plugin is known to be incompatible with the OS distribution packaged libstdc++
+
+https://help.tableau.com/current/api/extract_api/en-us/Extract/extract_api_troubleshooting.htm#gcc-ver
+
+To workaround this issue with DSS:
+
+* edit the $DSS_HOME/bin/env-site.sh
+* add an entry to the file:
+
+```
+export LD_LIBRARY_PATH=$DSS_HOME/code-envs/python/plugin_tableau-hyper-export_managed/lib/python2.7/site-packages/tableausdk/lib
+```
+
+where $DSS_HOME stands for your DSS home directory
+
+* restart DSS
