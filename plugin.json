@@ -1,6 +1,6 @@
 {
     // Plugin identifiers are globally unique and only contain A-Za-z0-9_-
-    "id": "tableau-plugin-dev",
+    "id": "tableau-hyper-export",
 
     // It is highly recommended to use Semantic Versioning
     "version": "0.0.1",
