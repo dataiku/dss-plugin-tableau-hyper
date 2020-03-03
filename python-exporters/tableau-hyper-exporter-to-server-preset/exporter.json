@@ -1,0 +1,52 @@
+{
+    "meta" : {
+        "label" : "To Tableau server",
+        "description": "Export a DSS dataset to a Tableau Server"
+    },
+
+    "exportBehavior" : "OUTPUT_TO_FILE",
+
+    "exportOptions": [
+        {
+            "label" : "+++ To Server (Preset)"
+        }
+    ],
+
+    "params": [
+        {
+            "label":"Tableau Server",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "connection",
+            "label": "Define a connection",
+            "description": "Enter here a Google connection to use the macro.",
+            "type": "PRESET",
+            "parameterSetId": "TableauServer"
+        },
+
+        {
+            "label":"Destination",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "project_name",
+            "label":"project_name",
+            "type": "TEXTAREA",
+            "defaultValue": "default_project",
+            "description":"Upload the TDE file to this project."
+        },
+        {
+            "name": "table_name",
+            "label":"table_name",
+            "type": "STRING",
+            "defaultValue": "dss_table"
+        },
+        {
+            "name": "schema_name",
+            "label": "schema_name",
+            "type": "STRING",
+            "defaultValue": "dss_schema"
+        }
+    ]
+}
