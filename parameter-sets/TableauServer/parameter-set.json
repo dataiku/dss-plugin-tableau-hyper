@@ -1,0 +1,43 @@
+{
+    "meta" : {
+        "label": "Tableau Server Preset Login",
+        "description": "Parameter set for the Tableau Server Login",
+        "icon": "icon-puzzle-piece"
+    },
+    "defaultDefinableInline": true,
+    "defaultDefinableAtProjectLevel": true,
+
+    // Do not use plugin parameters for now
+    "pluginParams": [],
+
+    "params": [
+        {
+            "name": "tableau_server",
+            "label": "server",
+            "type": "STRING",
+            "description": "Tableau Server Url",
+            "mandatory": true
+        },
+        {
+            "name": "tableau_site",
+            "label": "site",
+            "type": "STRING",
+            "description": "Site",
+            "mandatory": true
+        },
+        {
+            "name": "username",
+            "label": "username",
+            "type": "STRING",
+            "description": "Username",
+            "mandatory": true
+        },
+        {
+            "name": "password",
+            "label": "password",
+            "type": "PASSWORD",
+            "description": "Password",
+            "mandatory": true
+        }
+    ]
+}

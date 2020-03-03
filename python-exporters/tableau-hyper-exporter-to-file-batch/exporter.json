@@ -1,0 +1,35 @@
+{
+    "meta" : {
+        "label": "Export Tableau Hyper File",
+        "description": "Hyper file format downloader",
+        "icon": "icon-puzzle-piece"
+    },
+
+    "exportBehavior" : "OUTPUT_TO_FILE",
+
+    "mime" : {
+        "mimeType": "text/plain",
+        "extension": ".hyper"
+    },
+
+    "exportOptions": [
+        {
+            "label" : "+++ Hyper To File - Batch"
+        }
+    ],
+
+    "params": [
+        {
+            "name": "table_name",
+            "label":"table_name",
+            "type": "STRING",
+            "defaultValue": "dss_table"
+        },
+        {
+            "name": "schema_name",
+            "label": "schema_name",
+            "type": "STRING",
+            "defaultValue": "dss_schema"
+        }
+    ]
+}

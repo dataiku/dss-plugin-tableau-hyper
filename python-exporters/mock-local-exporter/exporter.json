@@ -1,0 +1,33 @@
+/* This file is the descriptor for the Custom python exporter mock-local-exporter */
+{
+    "meta" : {
+        "label": "Custom exporter mock-local-exporter",
+        "description": "",
+        "icon": "icon-puzzle-piece"
+    },
+
+    "exportBehavior": "OUTPUT_TO_FILE",
+
+    "mime" : {
+        "mimeType": "text/plain",
+        "extension": ".csv"
+    },
+
+    "exportOptions": [
+        {
+            "id": "myMockExporter",
+            "label": "(dev) Mock csv exporter (*.csv) ", //This is the label appearing in the downloading menu in DSS export
+            "config" : {},
+            "compression": "NONE"
+        }
+    ],
+
+    "params": [
+        {
+            "name": "tableau_server",
+            "label": "tableau preset",
+            "type": "PRESET",
+            "parameterSetId": "tableau-local-login"
+        }
+    ]
+}
