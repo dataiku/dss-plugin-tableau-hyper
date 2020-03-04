@@ -5,6 +5,7 @@ MockDataset <|-- SchemaConversionDSSHyper
 TableauHyperExporter <|-- SchemaConversionDSSHyper
 
 class TableauHyperExporter {
+
     row_index
     data
     schema_converter

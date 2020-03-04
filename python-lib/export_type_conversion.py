@@ -11,6 +11,12 @@ import logging
 from tableauhyperapi import SqlType
 from tableauhyperapi import TableDefinition
 
+from type_casting import enforce_bool
+from type_casting import enforce_float
+from type_casting import enforce_int
+from type_casting import enforce_string
+
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
 
@@ -42,12 +48,12 @@ class TypeConversionDSSHyper:
         }
 
         self.mapping_hyper_type_enforcement = {
-            'bigint': self.enforce_int,
-            'double': self.enforce_double,
-            'string': self.enforce_string,
+            'bigint': enforce_int,
+            'double': enforce_float,
+            'string': enforce_string,
+            'bool': self.enforce_bool,
             'date': self.enforce_date,
-            'geopoint': self.enforce_geography,
-            'bool': self.enforce_bool
+            'geopoint': self.enforce_geography
         }
 
     def translate(self, dss_type):
