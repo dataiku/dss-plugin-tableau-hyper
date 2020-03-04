@@ -4,11 +4,15 @@
 
 from tableauhyperapi import SqlType
 
+from type_casting import enforce_bool
+from type_casting import enforce_float
+from type_casting import enforce_int
+from type_casting import enforce_string
+
+
 class TypeConversionHyperDSS:
     """
-        Conversion between the hyper format and the dss schema format.
-        Through the text object of the hyper Sql.Type()
-
+        Convert the types available in Hyper format into a compliant dss types.
         Based on the following consideration for Hyper Type naming convention:
         >>> assert(str(SqlType.text())) == 'TEXT'
         >>> assert(str(SqlType.bool())) == 'BOOL'
@@ -19,14 +23,16 @@ class TypeConversionHyperDSS:
             'INT': 'bigint',
             'DOUBLE': 'double'
         }
-        self.mapping_hyper_type_enforcement = {
-            'INT': self.enforce_int,
-            'DOUBLE': self.enforce_double,
-            'STRING': self.enforce_string
+
+        self.mapping_dss_compliant = {
+            'INT': enforce_int,
+            'FLOAT': enforce_float,
+            'BOOL': enforce_bool,
+            'STRING': enforce_string,
+            ''
         }
 
-    def __str__(self):
-        return "Type Converter from Hyper format to DSS."
+
 
 if __name__ == "__main__":
     type_converter = TypeConversionHyperDSS()
