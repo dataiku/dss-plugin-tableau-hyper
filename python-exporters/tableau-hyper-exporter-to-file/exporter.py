@@ -1,27 +1,10 @@
-from dataiku.exporter import Exporter
-from dataiku.exporter import SchemaHelper
+"""
+    Contains only the class TableauHyperExporter.
+"""
 
-import joblib
 import logging
-import tempfile
-import os
 
-import tableauserverclient as TSC
-
-from export_schema_conversion import SchemaConversionDSSHyper
-
-from hyper_connection_wrapper import write_regular_table
-from hyper_connection_wrapper import write_geo_table
-from mock_dss_generator import MockDataset
-
-from tableauhyperapi import TableDefinition
-from tableauhyperapi import HyperProcess
-from tableauhyperapi import Telemetry
-from tableauhyperapi import Connection
-from tableauhyperapi import CreateMode
-from tableauhyperapi import Inserter
-from tableauhyperapi import TableName
-
+from dataiku.exporter import Exporter
 from tableau_table_writer import TableauTableWriter
 
 logger = logging.getLogger(__name__)
@@ -30,8 +13,14 @@ logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s -
 
 class TableauHyperExporter(Exporter):
     """
-        DSS exporter class.
-        Export a DSS dataset to a Hyper file.
+        Plugin component (Exporter) to export a dataset in dss to a hyper file format. Based on the TableauTableWriter
+        wrapper for the read/write to hyper file Tableau APIs.
+
+        Test location:
+            - (DSS flow) dku17: Should be tested on different scenarios
+            - (Mock execution) local: Can be tested on mock run locally
+
+        >>> print(3)
     """
 
     def __init__(self, config, plugin_config):
@@ -41,19 +30,25 @@ class TableauHyperExporter(Exporter):
         """
         self.config = config
         self.plugin_config = plugin_config
+        # Instantiate the Tableau custom writer
         self.writer = TableauTableWriter()
-
+        # Retrieve the hyper table configuration
         if 'table_name' not in self.config:
             self.config['table_name'] = 'my_dss_table'
         if 'schema_name' not in self.config:
             self.config['schema_name'] = 'my_dss_schema'
+        # TODO: Should we checked the configuration for the table and schema ?
+        # Will be filled via DSS
+        self.output_file = None
 
     def open(self, schema):
+        # Leave method empty here
         return None
 
     def open_to_file(self, schema, destination_file_path):
         """
-        Start exporting. Only called for exportsers with behavior OUTPUT_TO_FILE
+            Initial actions for the opening of the output file.
+
         :param schema: the column names and types of the data that will be streamed
                        in the write_row() calls
         :param destination_file_path: the path where the exported data should be put
@@ -64,7 +59,8 @@ class TableauHyperExporter(Exporter):
 
     def write_row(self, row):
         """
-        Handle one row of data to export
+            Handle one row of data to export
+
         :param row: a tuple with N strings matching the schema passed to open.
         """
         self.writer.write_row(row)

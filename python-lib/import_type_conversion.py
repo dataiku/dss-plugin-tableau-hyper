@@ -28,11 +28,8 @@ class TypeConversionHyperDSS:
             'INT': enforce_int,
             'FLOAT': enforce_float,
             'BOOL': enforce_bool,
-            'STRING': enforce_string,
-            ''
+            'STRING': enforce_string
         }
-
-
 
 if __name__ == "__main__":
     type_converter = TypeConversionHyperDSS()
