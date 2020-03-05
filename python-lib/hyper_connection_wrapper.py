@@ -120,24 +120,6 @@ def write_regular_table(hyper_file, regular_table, schema, data):
     :return:
 
     Usage:
-
-    >>> path_to_hyper = './data/test_write_regular_table.hyper'
-
-    >>> if os.path.exists(path_to_hyper):
-    >>>     os.remove(path_to_hyper)
-
-    >>> dataset = MockDataset(include_geo=False, rows_number=100)
-
-    >>> schema_converter = SchemaConversionDSSHyper(debug=True)
-
-    >>> regular_schema = dataset.schema
-    >>> regular_table = TableDefinition('myRegularTable', schema_converter.convert_schema_dss_to_hyper(regular_schema))
-
-    >>> schema_converter.set_dss_type_array(regular_schema)
-
-    >>> row = schema_converter.enforce_hyper_type_on_row(dataset.data[0])
-    >>> write_regular_table(path_to_hyper, regular_table, regular_schema, [row])
-
     """
     logger.info("Writing a regular hyper table.")
     with HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU) as hyper:
