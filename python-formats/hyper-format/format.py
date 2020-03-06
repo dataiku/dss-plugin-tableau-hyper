@@ -108,6 +108,7 @@ class MyFormatExtractor(FormatExtractor):
         Get the schema of the data in the stream, if the schema can be known upfront.
         """
         first = self.stream.readline()
+        print(hekki)
         if len(first) > 0 and first[0] == ' ':
             columns = json.loads(base64.b64decode(first[1:-1]))
             self.columns = [c['name'] for c in columns]
