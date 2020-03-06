@@ -1,4 +1,2 @@
 tableauhyperapi
 tableauserverclient
-requests
-numpy
