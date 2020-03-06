@@ -4,6 +4,11 @@
 from dataiku.customformat import Formatter, OutputFormatter, FormatExtractor
 
 import json, base64, pandas, datetime
+import logging
+import joblib
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
 
 """
 A custom Python format is a subclass of Formatter, with the logic split into
@@ -14,6 +19,8 @@ The parameters it expects are specified in the format.json file.
 
 Note: the name of the class itself is not relevant.
 """
+
+
 class MyFormatter(Formatter):
 
     def __init__(self, config, plugin_config):
@@ -33,7 +40,7 @@ class MyFormatter(Formatter):
         :param schema: the schema of the rows that will be formatted (never None)
         """
         return MyOutputFormatter(stream, schema)
-        
+
     def get_format_extractor(self, stream, schema=None):
         """
         Return a FormatExtractor for this format
@@ -46,14 +53,15 @@ class MyFormatter(Formatter):
 class MyOutputFormatter(OutputFormatter):
     """
     Writes a stream of rows to a stream in a format. The calls will be:
-    
+
     * write_header()
-    * write_row(row_1)  
+    * write_row(row_1)
       ...
-    * write_row(row_N)  
-    * write_footer()  
-    
+    * write_row(row_N)
+    * write_footer()
+
     """
+
     def __init__(self, stream, schema):
         """
         Initialize the formatter
@@ -61,7 +69,7 @@ class MyOutputFormatter(OutputFormatter):
         """
         OutputFormatter.__init__(self, stream)
         self.schema = schema
-        
+
     def write_header(self):
         """
         Write the header of the format (if any)
@@ -83,18 +91,19 @@ class MyOutputFormatter(OutputFormatter):
             else:
                 clean_row.append(x)
         self.stream.write(base64.b64encode(json.dumps(clean_row)) + '\n')
-    
+
     def write_footer(self):
         """
         Write the footer of the format (if any)
         """
         pass
-        
+
 
 class MyFormatExtractor(FormatExtractor):
     """
     Reads a stream in a format to a stream of rows
     """
+
     def __init__(self, stream, schema):
         """
         Initialize the extractor
@@ -102,20 +111,21 @@ class MyFormatExtractor(FormatExtractor):
         """
         FormatExtractor.__init__(self, stream)
         self.columns = [c['name'] for c in schema['columns']] if schema is not None else None
-        
+
     def read_schema(self):
         """
         Get the schema of the data in the stream, if the schema can be known upfront.
         """
         first = self.stream.readline()
-        print(hekki)
+        joblib.dump(first, "/Users/thibaultdesfontaines/Desktop/tmp_var")
+        raise TypeError
         if len(first) > 0 and first[0] == ' ':
             columns = json.loads(base64.b64decode(first[1:-1]))
             self.columns = [c['name'] for c in columns]
             return columns
         else:
             return None
-    
+
     def read_row(self):
         """
         Read one row from the formatted stream
@@ -131,8 +141,7 @@ class MyFormatExtractor(FormatExtractor):
             return self.read_row()
         values = json.loads(base64.b64decode(line[:-1]))
         row = {}
-        for i in range(0,len(values)):
+        for i in range(0, len(values)):
             name = self.columns[i] if self.columns is not None and i < len(self.columns) else 'col_%i' % i
             row[name] = values[i]
         return row
-        
