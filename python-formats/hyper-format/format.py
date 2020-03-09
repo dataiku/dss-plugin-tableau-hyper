@@ -1,11 +1,22 @@
 # This file is the actual code for the custom Python format tttest_tf
 
 # import the base class for the custom format
+from typing import List
+
 from dataiku.customformat import Formatter, OutputFormatter, FormatExtractor
 
 import json, base64, pandas, datetime
 import logging
-import joblib
+import os
+
+from tableauhyperapi import TableDefinition
+from tableauhyperapi import HyperProcess
+from tableauhyperapi import Telemetry
+from tableauhyperapi import Connection
+from tableauhyperapi import CreateMode
+from tableauhyperapi import Inserter
+from tableauhyperapi import TableName
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
@@ -47,6 +58,7 @@ class MyFormatter(Formatter):
         :param stream: the stream to read the formatted data from
         :param schema: the schema of the rows that will be extracted. None when the extractor is used to detect the format.
         """
+        print("Using the format extractor with schema: {}".format(schema))
         return MyFormatExtractor(stream, schema)
 
 
@@ -111,37 +123,76 @@ class MyFormatExtractor(FormatExtractor):
         """
         FormatExtractor.__init__(self, stream)
         self.columns = [c['name'] for c in schema['columns']] if schema is not None else None
+        self.table_name = None
+        self.schema = None
+        self.path_to_hyper = ''
+        self.result = None
+        self.row_index = 0
 
     def read_schema(self):
         """
         Get the schema of the data in the stream, if the schema can be known upfront.
         """
-        first = self.stream.readline()
-        joblib.dump(first, "/Users/thibaultdesfontaines/Desktop/tmp_var")
-        raise TypeError
-        if len(first) > 0 and first[0] == ' ':
-            columns = json.loads(base64.b64decode(first[1:-1]))
-            self.columns = [c['name'] for c in columns]
-            return columns
-        else:
-            return None
+        self.path_to_hyper = "./stream_trace.hyper"
+
+        if os.path.exists(self.path_to_hyper):
+            os.remove(self.path_to_hyper)
+
+        lines = self.stream.readlines()
+
+        first = lines[0]
+
+        print("Plugin execution path: {}".format(os.getcwd()))
+        for line in lines:
+            with open(self.path_to_hyper, "ab") as f:
+                f.write(line)
+
+        with HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU) as hyper:
+            with Connection(hyper.endpoint, self.path_to_hyper) as connection:
+                tables = []
+                schema_names = connection.catalog.get_schema_names()
+                for schema in schema_names:
+                    for table in connection.catalog.get_table_names(schema):
+                        tables.append(table)
+
+        self.table_name = tables[0]
+
+        with HyperProcess(Telemetry.SEND_USAGE_DATA_TO_TABLEAU) as hyper:
+            print("The HyperProcess has started.")
+            with Connection(hyper.endpoint, self.path_to_hyper) as connection:
+                var = connection.catalog.get_table_definition(self.table_name)
+            print("The connection to the Hyper extract file is closed.")
+        print("The HyperProcess has shut down.")
+
+        columns: List[str] = [column.name.unescaped for column in var.columns]
+        self.columns = columns
+
+        with HyperProcess(Telemetry.SEND_USAGE_DATA_TO_TABLEAU) as hyper:
+            print("The HyperProcess has started.")
+            with Connection(hyper.endpoint, self.path_to_hyper) as connection:
+                with connection.execute_query(f'SELECT * FROM {self.table_name}') as result:
+                    self.result = result
+                    print("The connection to the Hyper extract file is closed.")
+        print("The HyperProcess has shut down.")
+
+        print("Initial loading of columns: {}".format(columns))
+
+        return columns
 
     def read_row(self):
         """
         Read one row from the formatted stream
         :returns: a dict of the data (name, value), or None if reading is finished
         """
-        if self.stream.closed:
+        logger.debug("Reading row at row_index: {}".format(self.row_index))
+        if self.row_index == len(self.result)-1:
+            logger.info("No more rows to read.")
             return None
-        line = self.stream.readline()
-        if len(line) == 0:
-            return None
-        # header line with the schema => skip
-        if line[0] == ' ':
-            return self.read_row()
-        values = json.loads(base64.b64decode(line[:-1]))
+        line = self.result[self.row_index]
+        logger.info("Reading line: {}".format(line))
         row = {}
-        for i in range(0, len(values)):
-            name = self.columns[i] if self.columns is not None and i < len(self.columns) else 'col_%i' % i
-            row[name] = values[i]
+        for column, value in zip(self.columns, line):
+            row[column] = value
+        self.row_index += 1
+        logger.info("Inserting the following row: {}".format(row))
         return row
