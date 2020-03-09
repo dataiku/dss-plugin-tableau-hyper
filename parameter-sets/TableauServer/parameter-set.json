@@ -7,7 +7,6 @@
     "defaultDefinableInline": true,
     "defaultDefinableAtProjectLevel": true,
 
-    // Do not use plugin parameters for now
     "pluginParams": [],
 
     "params": [

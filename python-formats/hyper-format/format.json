@@ -1,5 +1,6 @@
 {
     "meta" : {
+        "id": "Hyper",
         "label": "Custom format hyper-format",
         "description": "My plugin formatter",
         "icon": "icon-puzzle-piece"
@@ -9,11 +10,20 @@
     "canRead": true,
     "canWrite": true,
     "canExtractSchema": true,
-    "exportOptions": [],
+    "exportOptions": [{
+            "id": "option1",
+            "label": "export using the hyper plugin"
+        }],
     "mime" : {
         "mimeType": "text/plain",
         "extension": ".csv"
     },
 
-    "params": []
+    "params": [{
+            "name": "parameter",
+            "label": "User-readable name",
+            "type": "STRING",
+            "description": "Some documentation for parameter1",
+            "mandatory": true
+        }]
 }

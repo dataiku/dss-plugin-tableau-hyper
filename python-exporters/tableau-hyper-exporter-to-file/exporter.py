@@ -30,13 +30,13 @@ class TableauHyperExporter(Exporter):
         """
         self.config = config
         self.plugin_config = plugin_config
-        # Instantiate the Tableau custom writer
-        self.writer = TableauTableWriter()
         # Retrieve the hyper table configuration
         if 'table_name' not in self.config:
             self.config['table_name'] = 'my_dss_table'
         if 'schema_name' not in self.config:
             self.config['schema_name'] = 'my_dss_schema'
+        # Instantiate the Tableau custom writer
+        self.writer = TableauTableWriter(table_name=self.config['table_name'], schema_name=self.config['schema_name'])
         # TODO: Should we checked the configuration for the table and schema ?
         # Will be filled via DSS
         self.output_file = None
