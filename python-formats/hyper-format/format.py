@@ -17,7 +17,6 @@ from tableauhyperapi import CreateMode
 from tableauhyperapi import Inserter
 from tableauhyperapi import TableName
 
-
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
 
@@ -42,7 +41,10 @@ class MyFormatter(Formatter):
         file settings.json at the root of the plugin directory are passed as a json
         object 'plugin_config' to the constructor
         """
-        Formatter.__init__(self, config, plugin_config)  # pass the parameters to the base class
+        print("Config: {}".format(config))
+        logger.info("Config: {}".format(config))
+        print("Plugin Config: {}".format(plugin_config))
+        Formatter.__init__(self, config, plugin_config)
 
     def get_output_formatter(self, stream, schema):
         """
@@ -122,17 +124,13 @@ class MyFormatExtractor(FormatExtractor):
         :param stream: the stream to read the formatted data from
         """
         FormatExtractor.__init__(self, stream)
-        self.columns = [c['name'] for c in schema['columns']] if schema is not None else None
+        self.columns = []
         self.table_name = None
         self.schema = None
         self.path_to_hyper = ''
-        self.result = None
         self.row_index = 0
+        self.rows = []
 
-    def read_schema(self):
-        """
-        Get the schema of the data in the stream, if the schema can be known upfront.
-        """
         self.path_to_hyper = "./stream_trace.hyper"
 
         if os.path.exists(self.path_to_hyper):
@@ -165,34 +163,42 @@ class MyFormatExtractor(FormatExtractor):
         print("The HyperProcess has shut down.")
 
         columns: List[str] = [column.name.unescaped for column in var.columns]
-        self.columns = columns
+        self.columns = [{'name': name, 'type': 'string'} for name in columns]
 
-        with HyperProcess(Telemetry.SEND_USAGE_DATA_TO_TABLEAU) as hyper:
-            print("The HyperProcess has started.")
-            with Connection(hyper.endpoint, self.path_to_hyper) as connection:
-                with connection.execute_query(f'SELECT * FROM {self.table_name}') as result:
-                    self.result = result
-                    print("The connection to the Hyper extract file is closed.")
-        print("The HyperProcess has shut down.")
-
-        print("Initial loading of columns: {}".format(columns))
-
-        return columns
+    def read_schema(self):
+        """
+        Get the schema of the data in the stream, if the schema can be known upfront.
+        """
+        return self.columns
 
     def read_row(self):
         """
         Read one row from the formatted stream
         :returns: a dict of the data (name, value), or None if reading is finished
         """
-        logger.debug("Reading row at row_index: {}".format(self.row_index))
-        if self.row_index == len(self.result)-1:
+
+        if not self.rows:
+            with HyperProcess(Telemetry.SEND_USAGE_DATA_TO_TABLEAU) as hyper:
+                print("The HyperProcess has started.")
+                with Connection(hyper.endpoint, self.path_to_hyper) as connection:
+                    with connection.execute_query(f'SELECT * FROM {self.table_name}') as result:
+                        for row in result:
+                            self.rows.append(row)
+                        print("The connection to the Hyper extract file is closed.")
+            print("The HyperProcess has shut down.")
+
+            print("Initial loading of columns: {}".format(self.columns))
+            print("Number of rows to write: {}".format(len(self.rows)))
+
+        if self.row_index == len(self.rows):
             logger.info("No more rows to read.")
             return None
-        line = self.result[self.row_index]
+
+        line = self.rows[self.row_index]
         logger.info("Reading line: {}".format(line))
         row = {}
         for column, value in zip(self.columns, line):
-            row[column] = value
+            row[column['name']] = value
         self.row_index += 1
         logger.info("Inserting the following row: {}".format(row))
         return row
