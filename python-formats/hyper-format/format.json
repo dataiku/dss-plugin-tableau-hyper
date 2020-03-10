@@ -8,22 +8,37 @@
 
     "canBeDatasetFormat": true,
     "canRead": true,
-    "canWrite": true,
+    "canWrite": false,
     "canExtractSchema": true,
-    "exportOptions": [{
+
+    "exportOptions": [
+        {
             "id": "option1",
-            "label": "export using the hyper plugin"
-        }],
+            "label": "export using this plugin",
+            "config" : { "parameter1": "d" },
+            "compression": "NONE"
+        }
+    ],
+
     "mime" : {
         "mimeType": "text/plain",
         "extension": ".csv"
     },
 
-    "params": [{
-            "name": "parameter",
-            "label": "User-readable name",
+    "params": [
+        {
+            "name": "table_name",
+            "label": "Table name",
             "type": "STRING",
-            "description": "Some documentation for parameter1",
+            "description": "The name of the Table contained in the Hyper File",
             "mandatory": true
-        }]
+        },
+        {
+            "name": "schema_name",
+            "label": "Schema name",
+            "type": "STRING",
+            "description": "The name of the Schema contained in the Hyper File",
+            "mandatory": true
+        }
+    ]
 }
