@@ -33,3 +33,4 @@ class TypeConversionHyperDSS:
 
 if __name__ == "__main__":
     type_converter = TypeConversionHyperDSS()
+

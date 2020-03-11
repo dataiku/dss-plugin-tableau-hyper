@@ -1,5 +1,8 @@
 """
     Contains only the SchemaConversionDSSHyper class for conversion of the schemas
+
+    This code is tested in the following test files:
+    ./tableau-hyper-export/test/
 """
 
 from export_type_conversion import TypeConversionDSSHyper

@@ -19,8 +19,6 @@ class TableauHyperExporter(Exporter):
         Test location:
             - (DSS flow) dku17: Should be tested on different scenarios
             - (Mock execution) local: Can be tested on mock run locally
-
-        >>> print(3)
     """
 
     def __init__(self, config, plugin_config):
