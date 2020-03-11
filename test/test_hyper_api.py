@@ -1,6 +1,5 @@
 """
     Make a test of write for the export in the python-lib/data/ folder.
-    TODO: Instead of bad names, fill with DSS symbolic type meaning and generate mock data
 """
 
 import datetime

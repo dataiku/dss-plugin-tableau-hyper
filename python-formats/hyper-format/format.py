@@ -41,9 +41,6 @@ class MyFormatter(Formatter):
         file settings.json at the root of the plugin directory are passed as a json
         object 'plugin_config' to the constructor
         """
-        print("Config: {}".format(config))
-        logger.info("Config: {}".format(config))
-        print("Plugin Config: {}".format(plugin_config))
         Formatter.__init__(self, config, plugin_config)
 
     def get_output_formatter(self, stream, schema):
