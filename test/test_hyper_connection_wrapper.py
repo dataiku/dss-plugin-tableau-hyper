@@ -6,11 +6,8 @@
 
 import logging
 import os
-import pdb
-import pytest
-import time
 
-from export_schema_conversion import SchemaConversionDSSHyper
+from schema_conversion import SchemaConversionDSSHyper
 from hyper_connection_wrapper import write_geo_table
 from hyper_connection_wrapper import write_regular_table
 from mock_dss_generator import MockDataset

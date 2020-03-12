@@ -1,11 +1,10 @@
-from export_schema_conversion import SchemaConversionDSSHyper
-from export_schema_conversion import is_geo
-from export_schema_conversion import dss_schema_geo_to_text
+from schema_conversion import SchemaConversionDSSHyper
+from schema_conversion import is_geo
+from schema_conversion import dss_schema_geo_to_text
 
 from mock_dss_generator import MockDataset
 
 import logging
-import pdb
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
