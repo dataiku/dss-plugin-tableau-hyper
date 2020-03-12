@@ -20,7 +20,6 @@ class TableauHyperExporter(Exporter):
             - (DSS flow) dku17: Should be tested on different scenarios
             - (Mock execution) local: Can be tested on mock run locally
     """
-
     def __init__(self, config, plugin_config):
         """
         :param config: the dict of the configuration of the object
@@ -34,7 +33,7 @@ class TableauHyperExporter(Exporter):
         if 'schema_name' not in self.config:
             self.config['schema_name'] = 'my_dss_schema'
         # Instantiate the Tableau custom writer
-        self.writer = TableauTableWriter(table_name=self.config['table_name'], schema_name=self.config['schema_name'])
+        self.writer = TableauTableWriter(schema_name=self.config['schema_name'], table_name=self.config['table_name'], )
         # TODO: Should we checked the configuration for the table and schema ?
         # Will be filled via DSS
         self.output_file = None
@@ -52,8 +51,8 @@ class TableauHyperExporter(Exporter):
         :param destination_file_path: the path where the exported data should be put
         """
         self.output_file = destination_file_path
-        self.writer.schema_converter.set_dss_type_array(schema)
-        self.writer.create_schema(schema)
+        self.writer.schema_converter.set_dss_storage_types(schema)
+        self.writer.create_schema(schema, self.output_file)
 
     def write_row(self, row):
         """

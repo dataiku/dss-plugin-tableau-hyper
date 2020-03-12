@@ -1,13 +1,25 @@
-# This file is the actual code for the custom Python format tttest_tf
+"""
+A custom Python format is a subclass of Formatter, with the logic split into
+OutputFormatter for outputting to a format, and FormatExtractor for reading
+from a format
 
-# import the base class for the custom format
+The parameters it expects are specified in the format.json file.
+
+Note: the name of the class itself is not relevant.
+
+"""
+
 from typing import List
 
 from dataiku.customformat import Formatter, OutputFormatter, FormatExtractor
 
-import json, base64, pandas, datetime
+import base64
+import datetime
+import json
 import logging
 import os
+import pandas
+import tempfile
 
 from tableauhyperapi import TableDefinition
 from tableauhyperapi import HyperProcess
@@ -20,16 +32,6 @@ from tableauhyperapi import TableName
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
 
-"""
-A custom Python format is a subclass of Formatter, with the logic split into
-OutputFormatter for outputting to a format, and FormatExtractor for reading
-from a format
-
-The parameters it expects are specified in the format.json file.
-
-Note: the name of the class itself is not relevant.
-"""
-
 
 class MyFormatter(Formatter):
 
@@ -41,6 +43,7 @@ class MyFormatter(Formatter):
         file settings.json at the root of the plugin directory are passed as a json
         object 'plugin_config' to the constructor
         """
+        print("Plugin init config: {}".format(config))
         Formatter.__init__(self, config, plugin_config)
 
     def get_output_formatter(self, stream, schema):
@@ -58,7 +61,8 @@ class MyFormatter(Formatter):
         :param schema: the schema of the rows that will be extracted. None when the extractor is used to detect the format.
         """
         print("Using the format extractor with schema: {}".format(schema))
-        return MyFormatExtractor(stream, schema)
+        print("Plugin config MyFormatter: {}".format(self.config))
+        return MyFormatExtractor(stream, schema, self.config.get("table_name", ""), self.config.get("schema_name", ""))
 
 
 class MyOutputFormatter(OutputFormatter):
@@ -112,55 +116,73 @@ class MyOutputFormatter(OutputFormatter):
 
 class MyFormatExtractor(FormatExtractor):
     """
-    Reads a stream in a format to a stream of rows
+        Read the input format in DSS
+
+    TODO: Remove the test path:
+    /Users/thibaultdesfontaines/superstore_sample.hyper
     """
 
-    def __init__(self, stream, schema):
+    def __init__(self, stream, schema, table_name = None, schema_name = None):
         """
         Initialize the extractor
         :param stream: the stream to read the formatted data from
         """
         FormatExtractor.__init__(self, stream)
+
         self.columns = []
-        self.table_name = None
         self.schema = None
-        self.path_to_hyper = ''
         self.row_index = 0
         self.rows = []
 
-        self.path_to_hyper = "./stream_trace.hyper"
+        self.hyper_table = None
 
-        if os.path.exists(self.path_to_hyper):
-            os.remove(self.path_to_hyper)
+        self.table_name = table_name
+        self.schema_name = schema_name
 
+        self.path_to_hyper = tempfile.NamedTemporaryFile(prefix='output', suffix=".hyper", dir=os.getcwd()).name
+        print("Creating a temporary hyper file for temporary buffer storage")
+        print("Name of the file: {}".format(self.path_to_hyper))
+
+        print("Input table name: {}".format(self.table_name))
+        print("Input schema name: {}".format(self.schema_name))
+
+        # Store the lines from the stream in the temp hyper file
         lines = self.stream.readlines()
-
-        first = lines[0]
-
-        print("Plugin execution path: {}".format(os.getcwd()))
         for line in lines:
             with open(self.path_to_hyper, "ab") as f:
                 f.write(line)
 
-        with HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU) as hyper:
-            with Connection(hyper.endpoint, self.path_to_hyper) as connection:
-                tables = []
-                schema_names = connection.catalog.get_schema_names()
-                for schema in schema_names:
-                    for table in connection.catalog.get_table_names(schema):
-                        tables.append(table)
+        print("Plugin execution path: {}".format(os.getcwd()))
 
-        self.table_name = tables[0]
+        hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
+        connection = Connection(hyper.endpoint, self.path_to_hyper)
 
-        with HyperProcess(Telemetry.SEND_USAGE_DATA_TO_TABLEAU) as hyper:
-            print("The HyperProcess has started.")
-            with Connection(hyper.endpoint, self.path_to_hyper) as connection:
-                var = connection.catalog.get_table_definition(self.table_name)
-            print("The connection to the Hyper extract file is closed.")
-        print("The HyperProcess has shut down.")
+        tables_in_hyper = []
+        schema_names = connection.catalog.get_schema_names()
+        detected_target_table = False
+        for schema_name_ in schema_names:
+            for table_name_ in connection.catalog.get_table_names(schema_name_):
+                if table_name_.name.unescaped == self.table_name and table_name_.schema_name.name.unescaped == self.schema_name:
+                    detected_target_table = True
+                tables_in_hyper.append(table_name_)
 
+        print("Detected following tables previously written in Hyper file: {}".format(tables_in_hyper))
+        print("The input target table is in the hyper file: {}".format(detected_target_table))
+
+        self.hyper_table = TableName(self.schema_name, self.table_name)
+
+        var = connection.catalog.get_table_definition(self.hyper_table)
         columns: List[str] = [column.name.unescaped for column in var.columns]
         self.columns = [{'name': name, 'type': 'string'} for name in columns]
+        print("Read schema format: {}".format(self.columns))
+        logger.info("Read schema format: {}".format(self.columns))
+
+        result = connection.execute_query(f'SELECT * FROM {self.hyper_table}')
+        for row in result:
+            self.rows.append(row)
+
+        connection.close()
+        hyper.close()
 
     def read_schema(self):
         """
@@ -173,29 +195,11 @@ class MyFormatExtractor(FormatExtractor):
         Read one row from the formatted stream
         :returns: a dict of the data (name, value), or None if reading is finished
         """
-
-        if not self.rows:
-            with HyperProcess(Telemetry.SEND_USAGE_DATA_TO_TABLEAU) as hyper:
-                print("The HyperProcess has started.")
-                with Connection(hyper.endpoint, self.path_to_hyper) as connection:
-                    with connection.execute_query(f'SELECT * FROM {self.table_name}') as result:
-                        for row in result:
-                            self.rows.append(row)
-                        print("The connection to the Hyper extract file is closed.")
-            print("The HyperProcess has shut down.")
-
-            print("Initial loading of columns: {}".format(self.columns))
-            print("Number of rows to write: {}".format(len(self.rows)))
-
         if self.row_index == len(self.rows):
-            logger.info("No more rows to read.")
             return None
-
         line = self.rows[self.row_index]
-        logger.info("Reading line: {}".format(line))
         row = {}
         for column, value in zip(self.columns, line):
             row[column['name']] = value
         self.row_index += 1
-        logger.info("Inserting the following row: {}".format(row))
         return row

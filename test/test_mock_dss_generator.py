@@ -1,5 +1,3 @@
-import pytest
-
 from mock_dss_generator import MockDataset
 
 def test_table_creation():

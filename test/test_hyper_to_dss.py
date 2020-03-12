@@ -3,26 +3,10 @@
 """
 
 import pdb
-import pytest
 
-from mock_dss_generator import MockDataset
-from export_schema_conversion import SchemaConversionDSSHyper
-
-from tableauhyperapi import TableDefinition
-
-import logging
-
-import pdb
-
-import time
-
-from tableauhyperapi import TableDefinition
 from tableauhyperapi import HyperProcess
 from tableauhyperapi import Telemetry
 from tableauhyperapi import Connection
-from tableauhyperapi import CreateMode
-from tableauhyperapi import Inserter
-from tableauhyperapi import SqlType
 from tableauhyperapi import TableName
 
 path_to_hyper = "./data/superstore_sample_denormalized.hyper"
