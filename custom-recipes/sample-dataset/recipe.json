@@ -1,9 +1,9 @@
-// This file is the descriptor for the Custom code recipe geenrate-dataset
+// This file is the descriptor for the Custom code recipe sample-dataset
 {
     // Meta data for display purposes
     "meta": {
         // label: name of the recipe as displayed, should be short
-        "label": "Geenrate dataset",
+        "label": "Sample dataset",
         // description: longer string to help end users understand what this recipe does
         "description": "",
         // icon: must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/
