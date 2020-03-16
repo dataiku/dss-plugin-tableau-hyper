@@ -43,7 +43,9 @@ class MyFormatter(Formatter):
         file settings.json at the root of the plugin directory are passed as a json
         object 'plugin_config' to the constructor
         """
-        print("Plugin init config: {}".format(config))
+        logger.info("Plugin init config: {}".format(config))
+        if config is None:
+            raise "Invalid configurationm should not be empty."
         Formatter.__init__(self, config, plugin_config)
 
     def get_output_formatter(self, stream, schema):
@@ -60,9 +62,12 @@ class MyFormatter(Formatter):
         :param stream: the stream to read the formatted data from
         :param schema: the schema of the rows that will be extracted. None when the extractor is used to detect the format.
         """
-        print("Using the format extractor with schema: {}".format(schema))
-        print("Plugin config MyFormatter: {}".format(self.config))
-        return MyFormatExtractor(stream, schema, self.config.get("table_name", ""), self.config.get("schema_name", ""))
+        logger.info("Retrieving the input parameters for this plugin.")
+        logger.info("Detected input MyFormatter schema: {}".format(schema))
+        logger.info("Plugin config of formatter class: {}".format(self.config))
+        input_table_name = self.config.get("table_name", "")
+        input_schema_name = self.config.get("schema_name", "")
+        return MyFormatExtractor(stream, schema, table_name=input_table_name, schema_name=input_schema_name)
 
 
 class MyOutputFormatter(OutputFormatter):
@@ -139,12 +144,15 @@ class MyFormatExtractor(FormatExtractor):
         self.table_name = table_name
         self.schema_name = schema_name
 
-        self.path_to_hyper = tempfile.NamedTemporaryFile(prefix='output', suffix=".hyper", dir=os.getcwd()).name
-        print("Creating a temporary hyper file for temporary buffer storage")
-        print("Name of the file: {}".format(self.path_to_hyper))
+        self.table_name = 'dss_table'
+        self.schema_name = 'dss_schema'
 
         print("Input table name: {}".format(self.table_name))
         print("Input schema name: {}".format(self.schema_name))
+
+        self.path_to_hyper = tempfile.NamedTemporaryFile(prefix='output', suffix=".hyper", dir=os.getcwd()).name
+        print("Creating a temporary hyper file for temporary buffer storage")
+        print("Name of the file: {}".format(self.path_to_hyper))
 
         # Store the lines from the stream in the temp hyper file
         lines = self.stream.readlines()

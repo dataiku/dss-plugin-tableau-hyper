@@ -14,22 +14,22 @@
 
     "exportOptions": [
         {
-            "label" : "+++ Hyper To File - Batch"
+            "label" : "+++ hyper file"
         }
     ],
 
     "params": [
         {
-            "name": "table_name",
-            "label":"table_name",
-            "type": "STRING",
-            "defaultValue": "dss_table"
-        },
-        {
             "name": "schema_name",
             "label": "schema_name",
             "type": "STRING",
             "defaultValue": "dss_schema"
+        },
+        {
+            "name": "table_name",
+            "label":"table_name",
+            "type": "STRING",
+            "defaultValue": "dss_table"
         }
     ]
 }
