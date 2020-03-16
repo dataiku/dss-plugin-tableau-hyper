@@ -11,14 +11,7 @@
     "canWrite": false,
     "canExtractSchema": true,
 
-    "exportOptions": [
-        {
-            "id": "option1",
-            "label": "export using this plugin",
-            "config" : { "parameter1": "d" },
-            "compression": "NONE"
-        }
-    ],
+    "exportOptions": [],
 
     "mime" : {
         "mimeType": "text/plain",
