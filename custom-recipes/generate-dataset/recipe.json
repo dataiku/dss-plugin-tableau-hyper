@@ -1,0 +1,23 @@
+{
+    "meta": {
+        "label": "Generate dataset",
+        "description": "Facilities for creating a dataset with every dss types and with as many row as needed",
+        "icon": "icon-puzzle-piece"
+    },
+
+    "kind": "PYTHON",
+    
+
+    "inputRoles": [],
+
+    "outputRoles": [
+        {
+
+        }
+    ],
+
+    "params": [],
+
+    "resourceKeys": []
+
+}

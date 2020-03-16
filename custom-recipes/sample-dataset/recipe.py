@@ -1,4 +1,4 @@
-# Code for custom code recipe geenrate-dataset (imported from a Python recipe)
+# Code for custom code recipe sample-dataset (imported from a Python recipe)
 
 # To finish creating your custom recipe from your original PySpark recipe, you need to:
 #  - Declare the input and output roles in recipe.json
@@ -54,22 +54,10 @@ my_variable = get_recipe_config().get('parameter_name', None)
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 import dataiku
 import pandas as pd, numpy as np
-from dataiku import pandasutils as pdu
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-N = int(1e6)
+output = {"A": np.random.randint(0, 100, size=100)}
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-serie_float = np.random.uniform(low=-10, high=10, size=N)
-serie_int = np.random.randint(0, high=1000, size=N)
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-exhaustive_types_1e6_df = pd.DataFrame({
-    'serie_float': serie_float,
-    'serie_int': serie_int
-})
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-# Write recipe outputs
-exhaustive_types_1e6 = dataiku.Dataset("exhaustive_types_1e6")
-exhaustive_types_1e6.write_with_schema(exhaustive_types_1e6_df)
+output_dataset =  dataiku.Dataset("my_dataset")
+output_dataset.write_with_schema(pd.DataFrame(output))
