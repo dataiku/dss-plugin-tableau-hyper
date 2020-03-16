@@ -27,6 +27,22 @@
             "type": "INT",
             "description": "Some documentation for parameter1",
             "mandatory": true
+        },
+        {
+            "name": "geo_bool",
+            "label": "GeoPoint allowed",
+            "type": "INT",
+            "description": "Allow geopoint column in the dataset",
+            "mandatory": true,
+            "default": 0,
+        },
+        {
+            "name": "date_bool",
+            "label": "Date allowed",
+            "type": "INT",
+            "description": "Allow date column in the dataset",
+            "mandatory": true,
+            "default": 0,
         }
     ],
 
