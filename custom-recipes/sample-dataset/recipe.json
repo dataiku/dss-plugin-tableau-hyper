@@ -24,7 +24,7 @@
         {
             "name": "n_rows",
             "label": "User-readable label",
-            "type": "STRING",
+            "type": "INT",
             "description": "Some documentation for parameter1",
             "mandatory": true
         }
