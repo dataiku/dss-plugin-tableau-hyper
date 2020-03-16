@@ -34,7 +34,7 @@
             "type": "INT",
             "description": "Allow geopoint column in the dataset",
             "mandatory": true,
-            "default": 0,
+            "default": 0
         },
         {
             "name": "date_bool",
@@ -42,7 +42,7 @@
             "type": "INT",
             "description": "Allow date column in the dataset",
             "mandatory": true,
-            "default": 0,
+            "default": 0
         }
     ],
 
