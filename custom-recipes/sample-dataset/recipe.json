@@ -1,7 +1,7 @@
 {
     "meta": {
         "label": "Sample dataset",
-        "description": "",
+        "description": "My sample_dataset",
         "icon": "icon-puzzle-piece"
     },
 
@@ -22,7 +22,7 @@
 
     "params": [
         {
-            "name": "parameter1",
+            "name": "n_rows",
             "label": "User-readable label",
             "type": "STRING",
             "description": "Some documentation for parameter1",
