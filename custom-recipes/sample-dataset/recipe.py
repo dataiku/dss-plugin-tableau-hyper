@@ -4,6 +4,10 @@ import pandas as pd
 import numpy as np
 import datetime
 import random
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
 
 output_names = get_output_names_for_role('main_output')
 output_dataset = dataiku.Dataset(output_names[0])
@@ -28,6 +32,7 @@ def generate_geopoint():
         lat = round(-73.98 + random.random()*0.2, 2)
         long = round(40.75 + random.random()*0.2, 2)
         return "POINT({} {})".format(lat, long)
+
 
 dataset = {}
 dataset['int_serie'] = np.random.randint(0, 1000, size=N)

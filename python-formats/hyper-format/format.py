@@ -62,12 +62,9 @@ class MyFormatter(Formatter):
         :param stream: the stream to read the formatted data from
         :param schema: the schema of the rows that will be extracted. None when the extractor is used to detect the format.
         """
-        logger.info("Retrieving the input parameters for this plugin.")
-        logger.info("Detected input MyFormatter schema: {}".format(schema))
-        logger.info("Plugin config of formatter class: {}".format(self.config))
-        input_table_name = self.config.get("table_name", "")
-        input_schema_name = self.config.get("schema_name", "")
-        return MyFormatExtractor(stream, schema, table_name=input_table_name, schema_name=input_schema_name)
+        table_name = self.config['table_name']
+        schema_name = self.config['schema_name']
+        return MyFormatExtractor(stream, schema, table_name=table_name, schema_name=schema_name)
 
 
 class MyOutputFormatter(OutputFormatter):
@@ -143,9 +140,6 @@ class MyFormatExtractor(FormatExtractor):
 
         self.table_name = table_name
         self.schema_name = schema_name
-
-        self.table_name = 'dss_table'
-        self.schema_name = 'dss_schema'
 
         print("Input table name: {}".format(self.table_name))
         print("Input schema name: {}".format(self.schema_name))

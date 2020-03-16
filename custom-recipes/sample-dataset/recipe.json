@@ -23,9 +23,9 @@
     "params": [
         {
             "name": "n_rows",
-            "label": "User-readable label",
+            "label": "Number of rows = 10^n_rows",
             "type": "INT",
-            "description": "Some documentation for parameter1",
+            "description": "Exponent for the number of rows",
             "mandatory": true
         },
         {
