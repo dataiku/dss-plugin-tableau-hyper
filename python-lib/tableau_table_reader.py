@@ -97,10 +97,12 @@ class TableauTableReader(object):
         logger.info("Read schema from the hyper table: {}".format(hyper_columns))
         hyper_storage_types = [hyper_column['type'] for hyper_column in hyper_columns]
         dss_storage_types = self.schema_converter.hyper_columns_to_dss_columns(hyper_columns)
-        logger.info("Conversion to the following dss storage types: {}".format(dss_storage_types))
+        dss_storage_types = [column['type'] for column in dss_storage_types]
+        self.dss_storage_types = dss_storage_types
+        print("Conversion to the following dss storage types: {}".format(dss_storage_types))
         dss_columns = [{'name': column.name.unescaped, 'type': type_} for column, type_ in zip(table_def.columns, dss_storage_types)]
         self.dss_columns = dss_columns
-        logger.info("Create the following schema in DSS: {}".format(dss_columns))
+        print("Create the following schema in DSS: {}".format(dss_columns))
         self.schema_converter.set_dss_storage_types(dss_storage_types)
         self.schema_converter.set_hyper_storage_types(hyper_storage_types)
         return hyper_storage_types
@@ -111,9 +113,11 @@ class TableauTableReader(object):
         """
         result = self.connection.execute_query(f'SELECT * FROM {self.hyper_table}')
         for row in result:
-            self.schema_converter.prepare_row_to_dss(row)
-            self.rows.append(row)
-
+            # TODO: Change name of the prepare_row_to_dss
+            dss_row = self.schema_converter.prepare_row_to_dss(row)
+            print("Fetch rows: {}".format(row))
+            print("Prepared DSS rows: {}".format(dss_row))
+            self.rows.append(dss_row)
         return True
 
     def close_connection(self):
@@ -128,6 +132,7 @@ class TableauTableReader(object):
         """
         Send the columns for setting the dss dataset schema
         """
+        print("Send to dss during read_schema: {}".format(self.dss_columns))
         return self.dss_columns
 
     def read_row(self):
@@ -135,11 +140,14 @@ class TableauTableReader(object):
         Read one row from the stored data
         :return:
         """
+        print("DSS storage types: {}".format(self.dss_storage_types))
         if self.row_index == len(self.rows):
             return None
         line = self.rows[self.row_index]
+        print("Row number {} is {}".format(self.row_index, line))
         row = {}
-        for column, value in zip(self.dss_storage_types, line):
-            row[column['name']] = value
+        for column, value in zip(self.dss_columns, line):
+            row[column["name"]] = value
         self.row_index += 1
+        print("Send to dss during read_row: {}".format(row))
         return row
