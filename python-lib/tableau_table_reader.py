@@ -15,10 +15,13 @@ from tableauhyperapi import Connection
 from tableauhyperapi import CreateMode
 from tableauhyperapi import Inserter
 from tableauhyperapi import TableName
+from tableauhyperapi import HyperException
+from tableauhyperapi import TypeTag
 
 from schema_conversion import dss_is_geo
 from schema_conversion import geo_to_text
 from schema_conversion import SchemaConversion
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
@@ -26,12 +29,12 @@ logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s -
 
 class TableauTableReader(object):
 
-    def __init__(self):
+    def __init__(self, schema_name, table_name):
         """
-            Read the Tableau Hyper file and
+        Wrapper for the format exporter.
         """
-        self.table_name = None
-        self.schema_name = None
+        self.table_name = table_name
+        self.schema_name = schema_name
         self.path_to_hyper = None
         self.rows = []
         self.hyper = None
@@ -40,11 +43,15 @@ class TableauTableReader(object):
         self.hyper_table = None
         self.row_index = 0
         self.schema_converter = SchemaConversion()
+        self.hyper_storage_types = None
+        self.dss_storage_types = None
+        self.dss_columns = None
 
     def create_tmp_hyper(self):
         """
-            Create a temporary file for stream buffer storage
-        :return: name of the temporary file
+        Create a temporary file for the stream buffer storage
+
+        :return: self.path_to_hyper : The path to the temporary file
         """
         self.path_to_hyper = tempfile.NamedTemporaryFile(prefix='output', suffix=".hyper", dir=os.getcwd()).name
         logger.info("Create a temporary hyper file at location: {}".format(self.path_to_hyper))
@@ -52,7 +59,7 @@ class TableauTableReader(object):
 
     def read_buffer(self, stream):
         """
-            Read the full stream for storage and hyper file filling
+        Read the full stream for storage and hyper file filling
         :param stream:
         :return:
         """
@@ -63,40 +70,51 @@ class TableauTableReader(object):
         logger.info("Store the full storage bytes")
 
     def open_connection(self):
+        """
+        Open the connection to the hyper file and the database
+        """
         self.hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
         self.connection = Connection(self.hyper.endpoint, self.path_to_hyper)
         logger.info("Open the connection to Hyper File")
 
-    def check_table_exists(self, table_name, schema_name):
-        hyper_tables = []
-        schema_names = self.connection.catalog.get_schema_names()
-        table_exists = False
-        for schema_name_ in schema_names:
-            for table_name_ in self.connection.catalog.get_table_names(schema_name_):
-                if table_name_.unescaped == table_name and table_name_.schema_name.name.unescaped == schema_name:
-                    detected_target_table = True
-                hyper_tables.append(table_name_)
-        logger.info("Detected the following tables in the hyper files:")
-        for hyper_table_ in hyper_tables:
-            logger.info("Table: {}".format(hyper_table_))
-        return table_exists
-
     def read_hyper_columns(self):
+        """
+        Retrieve the target table from the Hyper file.
+
+        :return: self.hyper_storage_types
+        """
+        logger.info("Trying to read Hyper Table {}.{}".format(self.schema_name, self.table_name))
         hyper_table = TableName(self.schema_name, self.table_name)
         self.hyper_table = hyper_table
-        var = self.connection.catalog.get_table_definition(hyper_table)
-        columns = [{'name': column.name.unescaped, 'type': str(column.type)} for column in var.columns]
-        logger.info("Read schema from the hyper table: {}".format(columns))
-        self.columns = columns
+        try:
+            table_def = self.connection.catalog.get_table_definition(hyper_table)
+        except HyperException as e:
+            logger.warning("The target table does not exists in this hyper file. Requested table: {}.{}"
+                           .format(self.table_name, self.schema_name))
+            raise Exception("Table does not exist: {}.{}".format(self.schema_name, self.table_name))
+
+        hyper_columns = [{'name': column.name.unescaped, 'type': column.type.tag} for column in table_def.columns]
+        logger.info("Read schema from the hyper table: {}".format(hyper_columns))
+        hyper_storage_types = [hyper_column['type'] for hyper_column in hyper_columns]
+        dss_storage_types = self.schema_converter.hyper_columns_to_dss_columns(hyper_columns)
+        logger.info("Conversion to the following dss storage types: {}".format(dss_storage_types))
+        dss_columns = [{'name': column.name.unescaped, 'type': type_} for column, type_ in zip(table_def.columns, dss_storage_types)]
+        self.dss_columns = dss_columns
+        logger.info("Create the following schema in DSS: {}".format(dss_columns))
+        self.schema_converter.set_dss_storage_types(dss_storage_types)
+        self.schema_converter.set_hyper_storage_types(hyper_storage_types)
+        return hyper_storage_types
 
     def fetch_rows(self):
         """
-            Execute query on the hyper table
-        :return:
+        Retrieve all the rows from the Hyper file db
         """
         result = self.connection.execute_query(f'SELECT * FROM {self.hyper_table}')
         for row in result:
+            self.schema_converter.prepare_row_to_dss(row)
             self.rows.append(row)
+
+        return True
 
     def close_connection(self):
         """
@@ -108,16 +126,20 @@ class TableauTableReader(object):
 
     def read_schema(self):
         """
-            Wrapper for the format extractor.
+        Send the columns for setting the dss dataset schema
         """
-        return self.columns
+        return self.dss_columns
 
     def read_row(self):
+        """
+        Read one row from the stored data
+        :return:
+        """
         if self.row_index == len(self.rows):
             return None
         line = self.rows[self.row_index]
         row = {}
-        for column, value in zip(self.columns, line):
+        for column, value in zip(self.dss_storage_types, line):
             row[column['name']] = value
         self.row_index += 1
         return row

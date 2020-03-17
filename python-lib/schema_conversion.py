@@ -1,8 +1,14 @@
 """
-TODO: Remove
-1. Create mock dataset and load true datasets and schemas in Tableau Hyper
-2. Test the schema conversion and the type enforcement in both ways
-3. Validate on the
+    Schema Conversion:
+
+    Main class and helpers functions for the conversion from a dss schema to a hyper schema
+    and the other way around.
+
+    Concepts:
+        dss_columns
+        hyper_columns
+        dss_storage_types
+        hyper_storage_types
 """
 
 
@@ -19,99 +25,129 @@ logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s -
 
 def dss_is_geo(dss_schema):
     """
-        Check if the input dss_schema contains a geopoint column in the input.
+    Return True if the schema `dss_schema` of the input dss dataset contains a geopoint column.
 
-    :param dss_schema: [{"name": foo, "type": bar}, ...]
-    :return: bool{The dss_schema contains a geopoint column}
+    :param dss_schema: The schema of a dss dataset
+        :example: [{"columns": [{"name": "customer_id", "type": "bigint"}, ...]}, ...]
+
+    :return: contains_geo
     """
-    if "columns" not in dss_schema:
-        logger.warning("Input object has not the expected format")
-        raise TypeError
+    contains_geo = False
     for column in dss_schema['columns']:
         if column['type'] == 'geopoint':
-            return True
-    return False
+            contains_geo = True
+            return contains_geo
+    return contains_geo
 
 
 def geo_to_text(dss_schema):
     """
-        Transform the input dss schema into a non geotable (regular table) in order to create a temporary table.
+    Transform the input dss schema `dss_schema` in order to set the `geopoint` storage type column to `string`.
 
-    :param dss_schema: The input schema in dss
-    :return: The same dss schema as input but with all its geopoint columns as text columnss
+    This function is used when writing geo-data in a hyper file. A temporary table must be created with
+    no geopoint in it.
+
+    :param dss_schema: The schema of a dss dataset
+        :example: [{"columns": [{"name": "customer_id", "type": "bigint"}, ...]}, ...]
+
+    :return: regular_schema : The schema after the change of type of the `geopoint` type to `string`
     """
-    mirror_schema = copy.deepcopy(dss_schema)
-    for typed_column in mirror_schema['columns']:
+    regular_schema = copy.deepcopy(dss_schema)
+    for typed_column in regular_schema['columns']:
         name, dss_type = typed_column['name'], typed_column['type']
         if dss_type == 'geopoint':
             typed_column['type'] = 'string'
-    return mirror_schema
+    return regular_schema
 
 
 class SchemaConversion:
     """
-
-        Convert the schema of a DSS table into a valid Tableau Schema.
-        TODO: Add a DSS schema and a Hyper schema to show the difference
+        Main class for conversion of the schema from DSS to Tableau Hyper. (Both ways are supported)
+        This class exhibits some basic conversion and interaction with schemas, in dss or tableau.
     """
 
     def __init__(self):
+        # handle the conversion between the types of dss and tableau hyper
         self.type_converter = TypeConversion()
-        # will store the schema types of the future dataset (dss or tableau)
+        # store the ordered storage types of the dss dataset
         self.dss_storage_types = []
+        # store the ordered storage types (tags) of the hyper dataset
         self.hyper_storage_types = []
 
-    def dss_schema_to_hyper_table(self, dss_schema):
+    def dss_columns_to_hyper_columns(self, dss_columns):
         """
-            Return the schema of the hyper files under the form of the hyper columns.
-            Return the sequence of Tableau Column.
+        Convert the columns of the dss dataset to hyper columns
 
-        :param dss_schema:
-        :return:
+        :param dss_columns: The columns the dss dataset
+            :example: [{"name": "customer_id", "type": "bigint"}, ...]
+
+        :return: hyper_columns: The hyper columns of the Hyper Table
         """
         hyper_columns = []
-        for dss_column in dss_schema['columns']:
-            column_name, column_type = dss_column['name'], dss_column['type']
-            hyper_type = self.type_converter.dss_type_to_hyper(column_type)
-            hyper_columns.append(TableDefinition.Column(column_name, hyper_type))
+        for dss_column in dss_columns:
+            dss_column_name, dss_column_type = dss_column['name'], dss_column['type']
+            hyper_type = self.type_converter.dss_type_to_hyper(dss_column_type)
+            hyper_columns.append(TableDefinition.Column(dss_column_name, hyper_type))
         return hyper_columns
 
-    def hyper_table_to_dss_schema(self, hyper_table):
+    def hyper_columns_to_dss_columns(self, hyper_columns):
         """
-            Convert the hyper table to the dss schema.
-            TODO: Check with isolated working examples
+        Convert the hyper columns of the Hyper Table to dss columns
 
-        :param hyper_table: Should come from connection.catalog.get_table_definition(table_name)
-        :return:
+        :param hyper_columns:
+        Should support the following methods:
+            >>> column = hyper_columns[0]
+            >>> print(column.type.tag)
+
+        :return: The dss_columns in a schema format, list of dict
+            :example [{"name": "customer_name", "type": "string"}, ...]
         """
         dss_columns = []
-        for column_ in hyper_table.columns:
-            dss_columns.append({"name": column_.name, "type": column_.type})
+        for hyper_column in hyper_columns:
+            hyper_name, hyper_type_tag = hyper_column.name, hyper_column.type.tag
+            dss_type = self.type_converter.hyper_type_to_dss(hyper_type_tag)
+            dss_columns.append({"name": hyper_name, "type": hyper_type_tag})
         return dss_columns
 
     def set_dss_storage_types(self, dss_storage_types):
         """
-            Expect a list of types identifiers.
+        Store the storage types in the format the dss dataset
+
         :param dss_storage_types:
-        :return:
+            :example ['bigint', 'double', ...]
         """
         self.dss_storage_types = dss_storage_types
 
     def set_hyper_storage_types(self, hyper_storage_types):
+        """
+        Store the storage types in the format of Hyper Table
+
+        :param hyper_storage_types: Array containing the tags of the types in the Hyper file
+        >>> from tableauhyperapi import SqlType
+        >>> from tableauhyperapi import TypeTag
+        >>> assert SqlType.double().tag == TypeTag.DOUBLE
+
+        """
         self.hyper_storage_types = hyper_storage_types
 
     def prepare_row_to_dss(self, hyper_row):
-        # TODO: Check conventions, should we have
-        if not self.hyper_storage_types:
-            logger.warning("Premature type casting on the input hyper row, set the types to cast to before.")
-            return False
-        dss_row = [self.type_converter.hyper_value_to_dss(value_, type_) for
-                            value_, type_ in zip(hyper_row, self.hyper_storage_types)]
+        """
+        Enforce the types of the values for the compliance to the defined types in the DSS dataset
+
+        :param hyper_row:
+
+        :return:
+        """
+        dss_row = [self.type_converter.hyper_value_to_dss(value_, type_) for value_, type_ in zip(hyper_row, self.hyper_storage_types)]
         return dss_row
 
     def prepare_row_to_hyper(self, dss_row):
-        if not self.dss_storage_types:
-            logger.warning("Premature type casting on the input dss row, set the types to cast to before.")
-            return False
+        """
+        Convert every values of the dss row for compliance to the Hyper table
+
+        :param dss_row:
+
+        :return:
+        """
         hyper_row = [self.type_converter.dss_value_to_hyper(value_, type_) for value_, type_ in zip(dss_row, self.dss_storage_types)]
         return hyper_row

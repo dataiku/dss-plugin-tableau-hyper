@@ -12,6 +12,7 @@ Assess the class:
 import logging
 
 from tableauhyperapi import SqlType
+from tableauhyperapi import TypeTag
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
@@ -57,6 +58,7 @@ class TypeConversion(object):
             https://help.tableau.com/current/api/hyper_api/en-us/reference/py/_modules/tableauhyperapi/sqltype.html
         """
 
+        # TODO: Change to TypeTag as key in the mapping
         self.mapping_dss_to_hyper = {
             'array': None,
             'bigint': (SqlType.int(), int),
@@ -74,21 +76,12 @@ class TypeConversion(object):
         }
 
         self.mapping_hyper_to_dss = {
-            SqlType.big_int(): ('bigint', int),
-            SqlType.bool(): ('bool', bool),
-            SqlType.bytes(): None,
-            SqlType.date(): ('date', to_dss_date),
-            SqlType.double(): ('double', float),
-            SqlType.geography(): ('geometry', to_dss_geometry),
-            SqlType.int(): ('bigint', int),
-            SqlType.interval(): None,
-            SqlType.json(): None,
-            # SqlType.mro(): None,
-            # SqlType.oid(): None,
-            # SqlType.small_int(): ('smallint', int),
-            SqlType.text(): ('string', str),
-            # SqlType.time(): ('date', to_dss_date),
-            # SqlType.timestamp(): ('date', to_dss_date)
+            TypeTag.BIG_INT: ('bigint', int),
+            TypeTag.BOOL: ('bool', bool),
+            TypeTag.DATE: ('date', to_dss_date),
+            TypeTag.DOUBLE: ('double', float),
+            TypeTag.GEOGRAPHY: ('geometry', to_dss_geometry),
+            TypeTag.TEXT: ('string', str)
         }
 
     def dss_type_to_hyper(self, dss_type):
