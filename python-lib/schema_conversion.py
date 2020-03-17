@@ -104,9 +104,9 @@ class SchemaConversion:
         """
         dss_columns = []
         for hyper_column in hyper_columns:
-            hyper_name, hyper_type_tag = hyper_column.name, hyper_column.type.tag
+            hyper_name, hyper_type_tag = hyper_column["name"], hyper_column["type"]
             dss_type = self.type_converter.hyper_type_to_dss(hyper_type_tag)
-            dss_columns.append({"name": hyper_name, "type": hyper_type_tag})
+            dss_columns.append({"name": hyper_name, "type": dss_type})
         return dss_columns
 
     def set_dss_storage_types(self, dss_storage_types):

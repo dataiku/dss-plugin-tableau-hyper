@@ -123,6 +123,7 @@ class MyFormatExtractor(FormatExtractor):
     """
         Read the input format in DSS
 
+    TODO: Check lifecycle of this class
     TODO: Remove the test path:
     /Users/thibaultdesfontaines/superstore_sample.hyper
     """
@@ -141,6 +142,7 @@ class MyFormatExtractor(FormatExtractor):
         hyper_storage_types = self.tableau_reader.read_hyper_columns()
         logger.info("Read the following Hyper Storage Type: {}"
                     .format(hyper_storage_types))
+        # TODO: To deport to read_row ?
         self.tableau_reader.fetch_rows()
         self.tableau_reader.close_connection()
 

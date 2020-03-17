@@ -76,6 +76,7 @@ class TypeConversion(object):
         }
 
         self.mapping_hyper_to_dss = {
+            TypeTag.INT: ('bigint', int),
             TypeTag.BIG_INT: ('bigint', int),
             TypeTag.BOOL: ('bool', bool),
             TypeTag.DATE: ('date', to_dss_date),
@@ -108,7 +109,7 @@ class TypeConversion(object):
             logger.warning("Storage type not found for hyper conversion to dss: {}".format(hyper_type))
             return 'string'
         else:
-            return self.mapping_dss_to_hyper[hyper_type][0]
+            return self.mapping_hyper_to_dss[hyper_type][0]
 
     def dss_value_to_hyper(self, value, dss_type='string'):
         try:
@@ -122,10 +123,21 @@ class TypeConversion(object):
         except:
             logger.warning("Failed to convert value {} to type {}".format(value, dss_type))
             output_value = self.mapping_dss_to_hyper[dss_type][1]
+            # TODO: Look for TypeError (message in the exception)
             raise TypeError
-            return False
-
         return output_value
 
-    def hyper_value_to_dss(self, value, hyper_type=SqlType.text()):
-        return self.mapping_hyper_to_dss[hyper_type][1](value)
+    def hyper_value_to_dss(self, value, hyper_type=SqlType.text().tag):
+        # TODO: Try value is None, Check NULL dans SQL
+        try:
+            conversion_function = self.mapping_hyper_to_dss[hyper_type][1]
+        except:
+            logger.warning("Hyper type for value conversion: {}".format(hyper_type))
+            logger.warning("Mapping: {}".format(self.mapping_dss_to_hyper))
+            return False
+        try:
+            output_value = conversion_function(value)
+        except:
+            logger.warning("Failed to convert value {} to type {}".format(value, hyper_type))
+            raise TypeError
+        return output_value
