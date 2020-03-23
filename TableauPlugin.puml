@@ -32,6 +32,7 @@ class SchemaConversionDSSHyper {
 }
 
 class TypeConversionDSSHyper {
+
     mapping_dss_to_hyper
     mapping_hyper_type_enforcement
      + translate()

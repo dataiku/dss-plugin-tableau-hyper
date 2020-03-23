@@ -27,25 +27,56 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
 
 
+def build_query(columns):
+    """
+    Build the query for the SQL type querying for the Hyper Table.
+    Handle the text conversion to text if a geography column is in the table.
+
+    :param: columns : A Hyper Table Definition Object (Should support the following methods)
+        >>> table_definition = connection.catalog.get_table_definition(table_name)
+        >>> columns = table_definition.columns
+        >>> for column in columns:
+        >>>     print(column.type, column.name.unescaped)
+    :return: The core of the SQL query with columns specifications
+        :example: "host_id, host_name, neighbourhood, geopoint:: text"
+    """
+    query_columns = ''
+    for column in columns:
+        query_columns += column.name.unescaped
+        if str(column.type) == 'GEOGRAPHY':
+            query_columns += ':: text'
+        query_columns += ', '
+    return query_columns[:-2]
+
+
 class TableauTableReader(object):
 
     def __init__(self, schema_name, table_name):
         """
-        Wrapper for the format exporter.
+        Instanciate the Tableau Table Reader for the file format wrapper
+
+        :param schema_name : The name of the schema as stored in the Hyper File
+        :param table_name : The name of the table as stored in the Hyper File
         """
+        # Target Hyper Table from the DSS
         self.table_name = table_name
         self.schema_name = schema_name
-        self.path_to_hyper = None
+
+        self.hyper_table = None
+        self.hyper_columns = None
+        self.hyper_storage_types = None
+        self.dss_columns = None
+        self.dss_storage_types = None
+
         self.rows = []
+        self.row_index = 0
+
+        self.path_to_hyper = None
+
         self.hyper = None
         self.connection = None
-        self.columns = None
-        self.hyper_table = None
-        self.row_index = 0
+
         self.schema_converter = SchemaConversion()
-        self.hyper_storage_types = None
-        self.dss_storage_types = None
-        self.dss_columns = None
 
     def create_tmp_hyper(self):
         """
@@ -83,6 +114,7 @@ class TableauTableReader(object):
 
         :return: self.hyper_storage_types
         """
+        # Retrieve the table object accessor from the Hyper Table
         logger.info("Trying to read Hyper Table {}.{}".format(self.schema_name, self.table_name))
         hyper_table = TableName(self.schema_name, self.table_name)
         self.hyper_table = hyper_table
@@ -93,27 +125,24 @@ class TableauTableReader(object):
                            .format(self.table_name, self.schema_name))
             raise Exception("Table does not exist: {}.{}".format(self.schema_name, self.table_name))
 
-        hyper_columns = [{'name': column.name.unescaped, 'type': column.type.tag} for column in table_def.columns]
-        logger.info("Read schema from the hyper table: {}".format(hyper_columns))
-        hyper_storage_types = [hyper_column['type'] for hyper_column in hyper_columns]
-        dss_storage_types = self.schema_converter.hyper_columns_to_dss_columns(hyper_columns)
-        dss_storage_types = [column['type'] for column in dss_storage_types]
-        self.dss_storage_types = dss_storage_types
-        print("Conversion to the following dss storage types: {}".format(dss_storage_types))
-        dss_columns = [{'name': column.name.unescaped, 'type': type_} for column, type_ in zip(table_def.columns, dss_storage_types)]
-        self.dss_columns = dss_columns
-        print("Create the following schema in DSS: {}".format(dss_columns))
-        self.schema_converter.set_dss_storage_types(dss_storage_types)
-        self.schema_converter.set_hyper_storage_types(hyper_storage_types)
-        return hyper_storage_types
+        self.hyper_columns = table_def.columns
+        self.hyper_storage_types = [column.type.tag for column in self.hyper_columns]
+
+        self.dss_columns = self.schema_converter.hyper_columns_to_dss_columns(self.hyper_columns)
+        self.dss_storage_types = [column['type'] for column in self.dss_columns]
+
+        self.schema_converter.set_dss_storage_types(self.dss_storage_types)
+        self.schema_converter.set_hyper_storage_types(self.hyper_storage_types)
 
     def fetch_rows(self):
         """
-        Retrieve all the rows from the Hyper file db
+        Retrieve all the rows from the Hyper file db, convert values on the fly
         """
-        result = self.connection.execute_query(f'SELECT * FROM {self.hyper_table}')
+        sql_hyper_query = f'SELECT {build_query(self.hyper_columns)} FROM {self.hyper_table}'
+        result = self.connection.execute_query(sql_hyper_query)
         for row in result:
             # TODO: Change name of the prepare_row_to_dss
+            # TODO: Check time consumption and parallelize the threads potentially
             dss_row = self.schema_converter.prepare_row_to_dss(row)
             print("Fetch rows: {}".format(row))
             print("Prepared DSS rows: {}".format(dss_row))
