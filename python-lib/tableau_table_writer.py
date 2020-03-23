@@ -1,5 +1,7 @@
 """
-    Wrapper for the write in the plugin.
+
+This is a Tableau Writer wrapper for the exporters in Python.
+
 """
 
 import joblib
@@ -23,11 +25,13 @@ logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s -
 
 class TableauTableWriter(object):
     """
-        Write a Tableau Hyper File. Use the global conversion functions from DSS to Hyper.
+    Wrapper class for writing a Tableau Hyper file from a DSS dataset.
     """
 
     def __init__(self, schema_name, table_name):
         """
+        :param schema_name: <str> Name of the target schema
+        :param table_name: <str> Name of the target table
         """
         self.row_index = 0
         self.data = []
@@ -51,30 +55,35 @@ class TableauTableWriter(object):
 
     def create_schema(self, schema_dss, destination_file_path):
         """
-        TODO: Test when file is already existing, other schema
+        Read the Hyper File database for extraction of the schema.
 
-        Start exporting. Only called for exporters with behavior OUTPUT_TO_FILE
-        :param schema_dss:
-        :param schema: the column names and types of the data that will be streamed
-                       in the write_row() calls
-        :param destination_file_path: the path where the exported data should be put
+        :param schema_dss: DSS schema from the DSS dataset to export
+            example: [{"columns": [{"name": "customer_id", "type": "bigint"}, ...]}, ...]
+
+        :param destination_file_path:
+        :return:
         """
+        # Read the destination file of the dss
         self.output_file = destination_file_path
-        logger.info("Destination file path: {}".format(destination_file_path))
-        # Keep the format of DSS in memory
-        logger.info("Detected storage types: {}".format(schema_dss))
-        dss_storage_types = [column_descriptor['type'] for column_descriptor in schema_dss["columns"]]
+        logger.info("Writing the hyper file to the following location: {}".format(destination_file_path))
+        logger.info("The dataset to extract has the following schema: {}".format(schema_dss))
+
+        dss_columns = schema_dss['columns']
+        dss_storage_types = [column_descriptor['type'] for column_descriptor in dss_columns]
         self.schema_converter.set_dss_storage_types(dss_storage_types)
-        # Check geo of the dss table
+
         self.is_geo_table = dss_is_geo(schema_dss)
         logger.info("The input table contains a geo column: {}".format(self.is_geo_table))
-        # Create the output Hyper Table (Similar to the schema in dss)
+
         if not self.schema_name or not self.table_name:
             logger.warning("Did not received the table or schema name.")
-        logger.info("Schema name: {} / Table name: {}".format(self.schema_name, self.table_name))
+            raise Exception("No valid schema or table name received.")
+
+        logger.info("Received user input for target schema {} and table {}".format(self.schema_name, self.table_name))
         self.output_table_definition = TableDefinition(
                         TableName(self.schema_name, self.table_name),
-                        self.schema_converter.dss_schema_to_hyper_table(schema_dss))
+                        self.schema_converter.dss_columns_to_hyper_columns(dss_columns))
+
         # Create the sequence of Tableau Hyper objects for connection to the hyper file and db
         self.hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
         self.connection = Connection(self.hyper.endpoint, self.output_file, CreateMode.CREATE_AND_REPLACE)
@@ -84,13 +93,12 @@ class TableauTableWriter(object):
         if self.is_geo_table:
             logger.info("Creating a temporary table for the input table contains a geo column")
             dss_tmp_schema = geo_to_text(schema_dss)
+            dss_tmp_columns = dss_tmp_schema['columns']
             self.tmp_table_definition = TableDefinition(
                         TableName(self.schema_name, "tmp_"+self.table_name),
-                        self.schema_converter.dss_schema_to_hyper_table(dss_tmp_schema))
-            logger.info("Created the temporary table hyper definition with schema")
-            if self.connection is None:
-                logger.info("Database connection is empty. Should be defined.")
+                        self.schema_converter.dss_columns_to_hyper_columns(dss_tmp_columns))
             self.connection.catalog.create_table(self.tmp_table_definition)
+            logger.info("Temporary hyper table has been created")
 
     def write_row(self, row):
         """

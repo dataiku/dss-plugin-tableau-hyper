@@ -51,6 +51,7 @@ def geo_to_text(dss_schema):
         :example: [{"columns": [{"name": "customer_id", "type": "bigint"}, ...]}, ...]
 
     :return: regular_schema : The schema after the change of type of the `geopoint` type to `string`
+        :example: [{"columns": [{"name": "customer_id", "type": "bigint"}, ...]}, ...]
     """
     regular_schema = copy.deepcopy(dss_schema)
     for typed_column in regular_schema['columns']:
@@ -104,7 +105,7 @@ class SchemaConversion:
         """
         dss_columns = []
         for hyper_column in hyper_columns:
-            hyper_name, hyper_type_tag = hyper_column["name"], hyper_column["type"]
+            hyper_name, hyper_type_tag = hyper_column.name.unescaped, hyper_column.type.tag
             dss_type = self.type_converter.hyper_type_to_dss(hyper_type_tag)
             dss_columns.append({"name": hyper_name, "type": dss_type})
         return dss_columns

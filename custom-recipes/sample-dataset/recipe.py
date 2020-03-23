@@ -1,3 +1,7 @@
+"""
+A recipe for creating a random dataset in DSS with an exhaustive list of types.
+"""
+
 import dataiku
 from dataiku.customrecipe import *
 import pandas as pd
@@ -9,10 +13,11 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
 
+# Should read one table only
 output_names = get_output_names_for_role('main_output')
 output_dataset = dataiku.Dataset(output_names[0])
 
-n_rows = get_recipe_config()['n_rows']
+n_rows = get_recipe_config()['log_rows']
 N = 10**int(n_rows)
 
 geo_bool = get_recipe_config()['geo_bool']

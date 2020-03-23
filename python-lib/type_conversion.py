@@ -1,14 +1,4 @@
-"""
-TODO: Remove
-Assess the class:
-1. Locate the definition of the storage types in DSS (See the code source)
-2. Create a dataset on dku17 with all the types available (?)
-3. Store at least one row of the dataset from the plugin component
-4. This row will be used for later tests in the tests files
-5. Demo your class, play with the class you created potentially in a python notebook
-6. Create tests on the class, use Shift+Command+T when selecting the class
-"""
-
+import datetime
 import logging
 
 from tableauhyperapi import SqlType
@@ -18,13 +8,16 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
 
 
+# TODO: Trace the objects in the date and geometry format
+
 def to_dss_date(hyper_date):
     """
         Expecting <class 'pandas._libs.tslibs.timestamps.Timestamp'> for hyper_date
     :param hyper_date:
     :return:
     """
-    return hyper_date.date()
+    intermediary_date = hyper_date.to_date()
+    return datetime.datetime(intermediary_date.year, intermediary_date.month, intermediary_date.day)
 
 
 def to_dss_geometry(hyper_string):
@@ -33,7 +26,7 @@ def to_dss_geometry(hyper_string):
     :param hyper_string:
     :return:
     """
-    return hyper_string.lower()
+    return hyper_string.upper()
 
 
 def to_hyper_date(dss_date):
@@ -89,7 +82,7 @@ class TypeConversion(object):
         """
             Convert an identifier (string) of a single dss storage type to the mapped hyper type.
 
-        :param dss_type:
+        :param dss_type: Storage type string identifier from DSS ("int", "bigint", "date"...)
         :return:
         """
         if dss_type not in self.mapping_dss_to_hyper:
@@ -112,6 +105,14 @@ class TypeConversion(object):
             return self.mapping_hyper_to_dss[hyper_type][0]
 
     def dss_value_to_hyper(self, value, dss_type='string'):
+        """
+        Convert a value coming from a DSS dataset and stored using the
+        `dss_type` storage type to the appropriate storage type in Hyper File.
+
+        :param value: Value from DSS dataset
+        :param dss_type: Storage type of the DSS dataset
+        :return: output_value : Value compliant to Hyper File
+        """
         try:
             conversion_function = self.mapping_dss_to_hyper[dss_type][1]
         except:
@@ -127,17 +128,28 @@ class TypeConversion(object):
             raise TypeError
         return output_value
 
-    def hyper_value_to_dss(self, value, hyper_type=SqlType.text().tag):
+    def hyper_value_to_dss(self, value, tag=SqlType.text().tag):
+        """
+        Convert the value `value` stored in a Hyper File under the storage type
+        `hyper_type_tag` to the apropriate DSS type.
+
+        >>> from tableauhyperapi import TypeTag, SqlType
+        >>> assert TypeTag.INT == SqlType.int().tag
+
+        :param value: Value from the Hyper Dataset
+        :param hyper_type: Storage type under which the value is stored in Hyper
+        :return: output_value : Value compliant to Hyper
+        """
         # TODO: Try value is None, Check NULL dans SQL
         try:
-            conversion_function = self.mapping_hyper_to_dss[hyper_type][1]
+            conversion_function = self.mapping_hyper_to_dss[tag][1]
         except:
-            logger.warning("Hyper type for value conversion: {}".format(hyper_type))
+            logger.warning("Hyper type for value conversion: {}".format(tag))
             logger.warning("Mapping: {}".format(self.mapping_dss_to_hyper))
             return False
         try:
             output_value = conversion_function(value)
         except:
-            logger.warning("Failed to convert value {} to type {}".format(value, hyper_type))
+            logger.warning("Failed to convert value {} to type {}".format(value, tag))
             raise TypeError
         return output_value

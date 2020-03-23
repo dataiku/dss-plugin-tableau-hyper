@@ -22,7 +22,7 @@
 
     "params": [
         {
-            "name": "n_rows",
+            "name": "log_rows",
             "label": "Number of rows = 10^n_rows",
             "type": "INT",
             "description": "Exponent for the number of rows",
