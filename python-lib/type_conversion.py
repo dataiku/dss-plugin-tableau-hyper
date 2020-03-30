@@ -1,5 +1,8 @@
 import datetime
 import logging
+import numpy as np
+import pandas as pd
+import math
 
 from tableauhyperapi import SqlType
 from tableauhyperapi import TypeTag
@@ -7,8 +10,6 @@ from tableauhyperapi import TypeTag
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
 
-
-# TODO: Trace the objects in the date and geometry format
 
 def to_dss_date(hyper_date):
     """
@@ -51,36 +52,38 @@ class TypeConversion(object):
             https://help.tableau.com/current/api/hyper_api/en-us/reference/py/_modules/tableauhyperapi/sqltype.html
         """
 
-        # TODO: Change to TypeTag as key in the mapping
+        handle_nan = lambda f: lambda x: None if x is np.nan else f(x)
+        handle_nat = lambda f: lambda x: None if issubclass(type(x), type(pd.NaT)) else f(x)
+
         self.mapping_dss_to_hyper = {
             'array': None,
-            'bigint': (SqlType.int(), int),
-            'boolean': (SqlType.bool(), bool),
-            'date': (SqlType.date(), to_hyper_date),
-            'double': (SqlType.double(), float),
-            'float': (SqlType.double(), float),
-            'geometry': (SqlType.geography(), to_hyper_geography),
-            'geopoint': (SqlType.geography(), to_hyper_geography),
-            'int': (SqlType.int(), int),
+            'bigint': (SqlType.int(), handle_nan(int)),
+            'boolean': (SqlType.bool(), handle_nan(bool)),
+            'date': (SqlType.date(), handle_nat(to_hyper_date)),
+            'double': (SqlType.double(), handle_nan(float)),
+            'float': (SqlType.double(), handle_nan(float)),
+            'geometry': (SqlType.geography(), handle_nan(to_hyper_geography)),
+            'geopoint': (SqlType.geography(), handle_nan(to_hyper_geography)),
+            'int': (SqlType.int(), handle_nan(int)),
             'map': None,
             'object': None,
-            'smallint': (SqlType.geography(), int),
-            'string': (SqlType.text(), str),
+            'smallint': (SqlType.geography(), handle_nan(int)),
+            'string': (SqlType.text(), handle_nan(str)),
         }
 
         self.mapping_hyper_to_dss = {
-            TypeTag.INT: ('bigint', int),
-            TypeTag.BIG_INT: ('bigint', int),
-            TypeTag.BOOL: ('bool', bool),
-            TypeTag.DATE: ('date', to_dss_date),
-            TypeTag.DOUBLE: ('double', float),
-            TypeTag.GEOGRAPHY: ('geometry', to_dss_geometry),
-            TypeTag.TEXT: ('string', str)
+            TypeTag.INT: ('bigint', lambda x: None if math.isnan(x) else int(x)),
+            TypeTag.BIG_INT: ('bigint', lambda x: None if math.isnan(x) else int(x)),
+            TypeTag.BOOL: ('bool', lambda x: None if x is None else bool(x)),
+            TypeTag.DATE: ('date', lambda x: None if x is None else to_dss_date(x)),
+            TypeTag.DOUBLE: ('double', lambda x: None if math.isnan(x) else float(x)),
+            TypeTag.GEOGRAPHY: ('geometry', lambda x: None if x is None else to_dss_geometry(x)),
+            TypeTag.TEXT: ('string', lambda x: None if x is None else str(x))
         }
 
     def dss_type_to_hyper(self, dss_type):
         """
-            Convert an identifier (string) of a single dss storage type to the mapped hyper type.
+        Convert an identifier (string) of a single dss storage type to the mapped hyper type.
 
         :param dss_type: Storage type string identifier from DSS ("int", "bigint", "date"...)
         :return:
@@ -93,7 +96,7 @@ class TypeConversion(object):
 
     def hyper_type_to_dss(self, hyper_type):
         """
-            Convert an identifier (string) of a single hyper type to the mapped dss storage type.
+        Convert an identifier (string) of a single hyper type to the mapped dss storage type.
 
         :param hyper_type:
         :return:
@@ -116,16 +119,14 @@ class TypeConversion(object):
         try:
             conversion_function = self.mapping_dss_to_hyper[dss_type][1]
         except:
-            logger.warning("DSS type for value conversion: {}".format(dss_type))
-            logger.warning("Mapping: {}".format(self.mapping_dss_to_hyper))
+            logger.info("DSS type for value conversion: {}".format(dss_type))
+            logger.info("Mapping: {}".format(self.mapping_dss_to_hyper))
             return False
         try:
             output_value = conversion_function(value)
         except:
-            logger.warning("Failed to convert value {} to type {}".format(value, dss_type))
-            output_value = self.mapping_dss_to_hyper[dss_type][1]
-            # TODO: Look for TypeError (message in the exception)
-            raise TypeError
+            logger.warning("Failed to convert value {} to type {} with {}".format(value, dss_type, type(value)))
+            output_value = None
         return output_value
 
     def hyper_value_to_dss(self, value, tag=SqlType.text().tag):
@@ -140,7 +141,6 @@ class TypeConversion(object):
         :param hyper_type: Storage type under which the value is stored in Hyper
         :return: output_value : Value compliant to Hyper
         """
-        # TODO: Try value is None, Check NULL dans SQL
         try:
             conversion_function = self.mapping_hyper_to_dss[tag][1]
         except:
@@ -151,5 +151,5 @@ class TypeConversion(object):
             output_value = conversion_function(value)
         except:
             logger.warning("Failed to convert value {} to type {}".format(value, tag))
-            raise TypeError
+            output_value = None
         return output_value

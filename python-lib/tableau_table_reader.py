@@ -141,11 +141,8 @@ class TableauTableReader(object):
         sql_hyper_query = f'SELECT {build_query(self.hyper_columns)} FROM {self.hyper_table}'
         result = self.connection.execute_query(sql_hyper_query)
         for row in result:
-            # TODO: Change name of the prepare_row_to_dss
             # TODO: Check time consumption and parallelize the threads potentially
             dss_row = self.schema_converter.prepare_row_to_dss(row)
-            print("Fetch rows: {}".format(row))
-            print("Prepared DSS rows: {}".format(dss_row))
             self.rows.append(dss_row)
         return True
 
@@ -169,14 +166,11 @@ class TableauTableReader(object):
         Read one row from the stored data
         :return:
         """
-        print("DSS storage types: {}".format(self.dss_storage_types))
         if self.row_index == len(self.rows):
             return None
         line = self.rows[self.row_index]
-        print("Row number {} is {}".format(self.row_index, line))
         row = {}
         for column, value in zip(self.dss_columns, line):
             row[column["name"]] = value
         self.row_index += 1
-        print("Send to dss during read_row: {}".format(row))
         return row

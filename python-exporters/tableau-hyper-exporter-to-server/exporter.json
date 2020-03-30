@@ -8,7 +8,7 @@
 
     "exportOptions": [
         {
-            "label" : "+++ To Server"
+            "label" : "Tableau, To Tableau Server"
         }
     ],
 

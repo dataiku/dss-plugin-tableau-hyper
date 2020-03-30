@@ -14,7 +14,7 @@
 
     "exportOptions": [
         {
-            "label" : "+++ hyper file"
+            "label" : "Tableau, to Hyper File (.hyper)"
         }
     ],
 
