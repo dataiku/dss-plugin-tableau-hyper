@@ -26,7 +26,8 @@
             "label": "Number of rows = 10^n_rows",
             "type": "INT",
             "description": "Exponent for the number of rows",
-            "mandatory": true
+            "mandatory": true,
+            "default": 3
         },
         {
             "name": "geo_bool",
@@ -34,13 +35,21 @@
             "type": "INT",
             "description": "Allow geopoint column in the dataset",
             "mandatory": true,
-            "default": 0
+            "default": 1
         },
         {
             "name": "date_bool",
             "label": "Date allowed",
             "type": "INT",
             "description": "Allow date column in the dataset",
+            "mandatory": true,
+            "default": 1
+        },
+        {
+            "name": "allow_nan_values",
+            "label": "Allow some null values in the DSS table",
+            "type": "INT",
+            "description": "Allow some null values in the DSS table",
             "mandatory": true,
             "default": 0
         }
