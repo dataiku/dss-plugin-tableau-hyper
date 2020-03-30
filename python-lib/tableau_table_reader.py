@@ -78,10 +78,10 @@ class TableauTableReader(object):
 
         self.schema_converter = SchemaConversion()
 
+
     def create_tmp_hyper(self):
         """
         Create a temporary file for the stream buffer storage
-
         :return: self.path_to_hyper : The path to the temporary file
         """
         self.path_to_hyper = tempfile.NamedTemporaryFile(prefix='output', suffix=".hyper", dir=os.getcwd()).name
@@ -94,9 +94,10 @@ class TableauTableReader(object):
         :param stream:
         :return:
         """
+        # TODO: Lecture par morceaux en byte array (read)
         lines = stream.readlines()
-        for line in lines:
-            with open(self.path_to_hyper, "ab") as f:
+        with open(self.path_to_hyper, "ab") as f:
+            for line in lines:
                 f.write(line)
         logger.info("Store the full storage bytes")
 
@@ -138,6 +139,7 @@ class TableauTableReader(object):
         """
         Retrieve all the rows from the Hyper file db, convert values on the fly
         """
+        # For the batch f'SELECT *, geopoint::text FROM {table} OFFSET 48000 LIMIT 2000'
         sql_hyper_query = f'SELECT {build_query(self.hyper_columns)} FROM {self.hyper_table}'
         result = self.connection.execute_query(sql_hyper_query)
         for row in result:
