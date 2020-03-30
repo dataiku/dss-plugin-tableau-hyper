@@ -18,49 +18,38 @@
             "type": "SEPARATOR"
         },
         {
-            "name": "server",
-            "label": "server",
-            "type": "STRING",
-            "mandatory": true
+            "name": "tableau_server",
+            "label": "url to tableau server",
+            "type": "PRESET",
+            "parameterSetId": "tableau-server-connection"
         },
         {
-            "name": "site",
-            "label": "site",
-            "type": "STRING",
-            "mandatory": true
+            "name": "tableau_site",
+            "label": "tableau site",
+            "type": "PRESET",
+            "parameterSetId": "tableau-server-connection"
         },
         {
             "name": "username",
-            "label":"username",
-            "type": "STRING",
-            "mandatory": true
+            "label": "username",
+            "type": "PRESET",
+            "parameterSetId": "tableau-server-connection"
         },
         {
             "name": "password",
-            "label":"password",
-            "type": "PASSWORD",
-            "mandatory": true
-        },
-        {
-            "label":"Destination",
-            "type": "SEPARATOR"
-        },
-        {
-            "name": "project_name",
-            "label":"project_name",
-            "type": "TEXTAREA",
-            "defaultValue": "default_project",
-            "description":"Upload the TDE file to this project."
+            "label": "password",
+            "type": "PRESET",
+            "parameterSetId": "tableau-server-connection"
         },
         {
             "name": "table_name",
-            "label":"table_name",
+            "label":"The table name in target Tableau Schema",
             "type": "STRING",
             "defaultValue": "dss_table"
         },
         {
             "name": "schema_name",
-            "label": "schema_name",
+            "label": "The schema name in target Tableau Schema",
             "type": "STRING",
             "defaultValue": "dss_schema"
         }
