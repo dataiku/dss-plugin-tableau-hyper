@@ -98,9 +98,16 @@ class TableauTableReader(object):
         :param stream:
         :return:
         """
+        # TODO: Check the same without full loading of the buffer
+        # with open(self.path_to_hyper, "ab") as f:
+        #     lines = stream.readlines()
+        #     for line in lines:
+        #         f.write(line)
+        line = True
         with open(self.path_to_hyper, "ab") as f:
-            buffer_chunk = stream.readlines()
-            f.write(buffer_chunk)
+            while line:
+                line = stream.read(1024)
+                f.write(line)
 
     def read_hyper_file(self, path_to_hyper):
         """

@@ -139,6 +139,7 @@ class MyFormatExtractor(FormatExtractor):
         self.tableau_reader.create_tmp_hyper()
         self.tableau_reader.read_buffer(stream)
         self.tableau_reader.open_connection()
+        self.tableau_reader.read_hyper_columns()
 
     def read_schema(self):
         """
