@@ -126,7 +126,6 @@ class TableauTableWriter(object):
         :return:
         """
         if self.is_geo_table:
-
             self.tmp_table_inserter = Inserter(self.connection, self.tmp_table_definition)
 
             self.tmp_table_inserter.add_rows(self.data)

@@ -139,11 +139,6 @@ class MyFormatExtractor(FormatExtractor):
         self.tableau_reader.create_tmp_hyper()
         self.tableau_reader.read_buffer(stream)
         self.tableau_reader.open_connection()
-        hyper_storage_types = self.tableau_reader.read_hyper_columns()
-        logger.info("Read the following Hyper Storage Type: {}"
-                    .format(hyper_storage_types))
-        self.tableau_reader.fetch_rows()
-        self.tableau_reader.close_connection()
 
     def read_schema(self):
         """
