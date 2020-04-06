@@ -1,14 +1,7 @@
 """
-    Schema Conversion:
-
-    Main class and helpers functions for the conversion from a dss schema to a hyper schema
-    and the other way around.
-
-    Concepts:
-        dss_columns
-        hyper_columns
-        dss_storage_types
-        hyper_storage_types
+Schema Conversion:
+Main class and helpers functions for the conversion from a dss schema to a hyper schema
+and the other way around.
 """
 
 
@@ -17,7 +10,6 @@ from type_conversion import TypeConversion
 
 import copy
 import logging
-import pdb
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')

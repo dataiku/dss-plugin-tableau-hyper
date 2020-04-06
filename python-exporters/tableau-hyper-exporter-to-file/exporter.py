@@ -1,5 +1,6 @@
 """
-    Contains only the class TableauHyperExporter.
+Enables the export of a DSS dataset to Hyper file, file format of Tableau Software.
+It will handle conversion between storage types from DSS to Hyper.
 """
 
 import logging
@@ -13,42 +14,47 @@ logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s -
 
 class TableauHyperExporter(Exporter):
     """
-        Plugin component (Exporter) to export a dataset in dss to a hyper file format. Based on the TableauTableWriter
-        wrapper for the read/write to hyper file Tableau APIs.
-
-        Test location:
-            - (DSS flow) dku17: Should be tested on different scenarios
-            - (Mock execution) local: Can be tested on mock run locally
+    Plugin component (Exporter):
+    Export a dataset in DSS to a Hyper file, format of Tableau Software.
+    Rely mostly on a wrapper located at ./tableau-hyper-export/python-lib/tableau_table_writer.py
     """
+
     def __init__(self, config, plugin_config):
         """
-        :param config: the dict of the configuration of the object
-        :param plugin_config: contains the plugin settings
+        :param config:
+        :param plugin_config:
         """
         self.config = config
         self.plugin_config = plugin_config
-        # Retrieve the hyper table configuration
-        if not 'table_name' in self.config:
-            logger.warning("No table_name detected in config.")
-        logger.info("Detected schema_name: {}".format(self.config['schema_name']))
-        logger.info("Detected table_name: {}".format(self.config['table_name']))
-        # Instantiate the Tableau custom writer
-        self.writer = TableauTableWriter(schema_name=self.config['schema_name'], table_name=self.config['table_name'])
-        # TODO: Should we checked the configuration for the table and schema ?
-        # Will be filled via DSS
+
+        self.table_name = self.config.get('table_name')
+        if self.table_name is None:
+            raise ValueError('The table name parameter is not defined and is mandatory.')
+
+        self.schema_name = self.config.get('schema_name')
+        if self.schema_name is None:
+            raise ValueError('The schema name parameter is not defined and is mandatory.')
+
+        # Init custom wrapper for writing Tableau hyper file
+        self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
+
+        # To be filled later
         self.output_file = None
 
     def open(self, schema):
-        # Leave method empty here
+        """
+        Leave empty.
+        :param schema:
+        :return:
+        """
         return None
 
     def open_to_file(self, schema, destination_file_path):
         """
-            Initial actions for the opening of the output file.
+        Called when opening the output export file.
 
-        :param schema: the column names and types of the data that will be streamed
-                       in the write_row() calls
-        :param destination_file_path: the path where the exported data should be put
+        :param schema: dss dataset schema
+        :param destination_file_path: path of the export output file
         """
         self.output_file = destination_file_path
         self.writer.schema_converter.set_dss_storage_types(schema)
@@ -56,9 +62,9 @@ class TableauHyperExporter(Exporter):
 
     def write_row(self, row):
         """
-            Handle one row of data to export
+        Receive one row from DSS, iterate on the DSS file.
 
-        :param row: a tuple with N strings matching the schema passed to open.
+        :param row: <tuple>
         """
         self.writer.write_row(row)
         self.writer.row_index += 1
@@ -66,7 +72,7 @@ class TableauHyperExporter(Exporter):
 
     def close(self):
         """
-            Called when closing the table.
+        Called when closing the export file
         """
         self.writer.close()
         return True

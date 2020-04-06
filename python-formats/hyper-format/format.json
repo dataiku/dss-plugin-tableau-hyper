@@ -1,8 +1,8 @@
 {
     "meta" : {
-        "id": "Hyper",
-        "label": "Custom format hyper-format",
-        "description": "My plugin formatter",
+        "id": "hyper_format",
+        "label": "import_hyper",
+        "description": "Import Hyper file in DSS",
         "icon": "icon-puzzle-piece"
     },
 
@@ -23,14 +23,14 @@
             "name": "schema_name",
             "label": "Schema name",
             "type": "STRING",
-            "description": "The name of the Schema contained in the Hyper File",
+            "description": "A schema already existing in the Hyper file",
             "mandatory": true
         },
         {
             "name": "table_name",
             "label": "Table name",
             "type": "STRING",
-            "description": "The name of the Table contained in the Hyper File",
+            "description": "A table already existing in the Hyper file and associated to prefilled schema",
             "mandatory": true
         }
     ]

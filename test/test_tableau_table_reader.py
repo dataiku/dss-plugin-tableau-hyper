@@ -16,7 +16,7 @@ def test_fetch_rows():
                             table_name='dss_table',
                             schema_name='dss_schema'
                                         )
-    path_to_hyper = "./data/1e4_rows.hyper"
+    path_to_hyper = "data/hyper_test_file.hyper"
     tableau_reader.read_hyper_file(path_to_hyper)
     tableau_reader.open_connection()
     tableau_reader.read_hyper_columns()

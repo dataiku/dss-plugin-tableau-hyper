@@ -1,7 +1,7 @@
 {
     "meta" : {
-        "label": "Export Tableau Hyper File",
-        "description": "Hyper file format downloader",
+        "label": "Export to Hyper file",
+        "description": "Export a DSS dataset as a Tableau Hyper file",
         "icon": "icon-puzzle-piece"
     },
 
@@ -14,7 +14,7 @@
 
     "exportOptions": [
         {
-            "label" : "Tableau, to Hyper File (.hyper)"
+            "label" : "Tableau Software: to Hyper file (.hyper)"
         }
     ],
 

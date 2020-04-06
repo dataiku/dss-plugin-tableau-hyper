@@ -1,27 +1,17 @@
 """
-    Class dedicated to read the Hyper files and tables.
+The wrapper for the DSS formatter interface.
 """
-
-from typing import List
 
 import logging
 import os
 import tempfile
 
-from tableauhyperapi import TableDefinition
 from tableauhyperapi import HyperProcess
 from tableauhyperapi import Telemetry
 from tableauhyperapi import Connection
-from tableauhyperapi import CreateMode
-from tableauhyperapi import Inserter
 from tableauhyperapi import TableName
 from tableauhyperapi import HyperException
-from tableauhyperapi import TypeTag
-
-from schema_conversion import dss_is_geo
-from schema_conversion import geo_to_text
 from schema_conversion import SchemaConversion
-
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
@@ -89,20 +79,13 @@ class TableauTableReader(object):
         :return: self.path_to_hyper : The path to the temporary file
         """
         self.path_to_hyper = tempfile.NamedTemporaryFile(prefix='output', suffix=".hyper", dir=os.getcwd()).name
-        logger.info("Create a temporary hyper file at location: {}".format(self.path_to_hyper))
         return self.path_to_hyper
 
     def read_buffer(self, stream):
         """
         Read the full stream for storage and hyper file filling
         :param stream:
-        :return:
         """
-        # TODO: Check the same without full loading of the buffer
-        # with open(self.path_to_hyper, "ab") as f:
-        #     lines = stream.readlines()
-        #     for line in lines:
-        #         f.write(line)
         line = True
         with open(self.path_to_hyper, "ab") as f:
             while line:
@@ -122,7 +105,6 @@ class TableauTableReader(object):
         """
         self.hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
         self.connection = Connection(self.hyper.endpoint, self.path_to_hyper)
-        logger.info("Open the connection to Hyper File")
 
     def read_hyper_columns(self):
         """
@@ -130,15 +112,11 @@ class TableauTableReader(object):
 
         :return: self.hyper_storage_types
         """
-        # Retrieve the table object accessor from the Hyper Table
-        logger.info("Trying to read Hyper Table {}.{}".format(self.schema_name, self.table_name))
         hyper_table = TableName(self.schema_name, self.table_name)
         self.hyper_table = hyper_table
         try:
             table_def = self.connection.catalog.get_table_definition(hyper_table)
         except HyperException as e:
-            logger.warning("The target table does not exists in this hyper file. Requested table: {}.{}"
-                           .format(self.table_name, self.schema_name))
             raise Exception("Table does not exist: {}.{}".format(self.schema_name, self.table_name))
 
         self.hyper_columns = table_def.columns
@@ -185,7 +163,6 @@ class TableauTableReader(object):
         if self.end_read:
             return None
         if len(self.rows) == 0:
-            logger.info("Execute query with OFFSET: {} and LIMIT: {}".format(self.offset, self.limit))
             self.fetch_rows(self.offset, self.limit)
             self.offset += self.limit
         if len(self.rows) == 0:

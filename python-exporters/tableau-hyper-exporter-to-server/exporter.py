@@ -1,9 +1,8 @@
 """
-Export to a Tableau Server with credentials in DSS preset plugin form.
+Export to a Tableau Server. The credentials are stored in the Plugin Preset.
 """
 
 import logging
-
 from dataiku.exporter import Exporter
 from tableau_table_writer import TableauTableWriter
 
@@ -15,34 +14,39 @@ logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s -
 
 class TableauHyperExporter(Exporter):
     """
-        Plugin component (Exporter) to export a dataset in dss to a hyper file format. Based on the TableauTableWriter
-        wrapper for the read/write to hyper file Tableau APIs.
-
-        Test location:
-            - (DSS flow) dku17: Should be tested on different scenarios
-            - (Mock execution) local: Can be tested on mock run locally
+    Plugin component (Exporter):
+    Export a dataset in DSS to a Hyper file, format of Tableau Software.
+    Rely mostly on a wrapper located at ./tableau-hyper-export/python-lib/tableau_table_writer.py
     """
+
     def __init__(self, config, plugin_config):
         """
-        :param config: the dict of the configuration of the object
-        :param plugin_config: contains the plugin settings
+        :param config:
+        :param plugin_config:
         """
         self.config = config
         self.plugin_config = plugin_config
-        if not 'table_name' in self.config:
-            logger.warning("No table_name detected in config.")
-        logger.info("Detected schema_name: {}".format(self.config['schema_name']))
-        logger.info("Detected table_name: {}".format(self.config['table_name']))
-        # Instantiate the Tableau custom writer
-        self.writer = TableauTableWriter(schema_name=self.config['schema_name'], table_name=self.config['table_name'])
-        self.output_file = None
-        # Should contain tableau_server
-        logger.info("Preset param: {}".format(self.config))
 
-        server_name = self.config['tableau_server']
-        site_name = self.config['tableau_site']
-        username = self.config['username']
-        password = self.config['password']
+        self.table_name = self.config.get('table_name')
+        if self.table_name is None:
+            raise ValueError('The table name parameter is not defined and is mandatory.')
+
+        self.schema_name = self.config.get('schema_name')
+        if self.schema_name is None:
+            raise ValueError('The schema name parameter is not defined and is mandatory.')
+
+        # Init custom wrapper for writing Tableau hyper file
+        self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
+
+        # To be filled later
+        self.output_file = None
+
+        # Get configuration from preset connection or manual definition
+        tableau_server_connection = self.config.get('tableau_server_connection')
+        server_name = tableau_server_connection['tableau_server']
+        site_name = tableau_server_connection['tableau_site']
+        username = tableau_server_connection['username']
+        password = tableau_server_connection['password']
 
         self.tableau_auth = tsc.TableauAuth(username, password, site_name)
         self.server = tsc.Server(server_name)
@@ -52,8 +56,15 @@ class TableauHyperExporter(Exporter):
             projects_name = [project.name for project in all_projects]
             logger.info("Available tables in Tableau Server: {}".format(projects_name))
 
-        project_id = all_projects[-1].id
-        self.tableau_datasource = tsc.DatasourceItem(project_id)
+        self.project_id = self.config.get('project_id')
+        if self.project_id is None:
+            raise ValueError('The project_id parameter is not defined and is mandatory.')
+
+        available_project_ids = [project.id for project in all_projects]
+        if self.project_id not in available_project_ids:
+            logger.info("Detected pre-existing project on Tableau Server: {}".format(available_project_ids))
+            raise ValueError("The input project_id does not match any existing Tableau project on server.")
+        self.tableau_datasource = tsc.DatasourceItem(self.project_id)
 
     def open(self, schema):
         """
@@ -65,19 +76,20 @@ class TableauHyperExporter(Exporter):
 
     def open_to_file(self, schema, destination_file_path):
         """
-        Initial actions for the opening of the output file.
-        :param schema: the column names and types of the data that will be streamed
-                       in the write_row() calls
-        :param destination_file_path: the path where the exported data should be put
-        """
+       Called when opening the output export file.
+
+       :param schema: dss dataset schema
+       :param destination_file_path: path of the export output file
+       """
         self.output_file = destination_file_path
         self.writer.schema_converter.set_dss_storage_types(schema)
         self.writer.create_schema(schema, self.output_file)
 
     def write_row(self, row):
         """
-        Handle one row of data to export
-        :param row: a tuple with N strings matching the schema passed to open.
+        Receive one row from DSS, iterate on the DSS file.
+
+        :param row: <tuple>
         """
         self.writer.write_row(row)
         self.writer.row_index += 1
@@ -88,6 +100,7 @@ class TableauHyperExporter(Exporter):
         Close the connections and send data to Tableau
         """
         self.writer.close()
+        # Send the file to Tableau server
         with self.server.auth.sign_in(self.tableau_auth):
             self.server.datasources.publish(self.tableau_datasource, self.output_file, 'CreateNew')
         return True

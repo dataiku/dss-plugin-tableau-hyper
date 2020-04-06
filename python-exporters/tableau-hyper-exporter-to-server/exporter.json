@@ -1,57 +1,45 @@
 {
     "meta" : {
-        "label" : "To Tableau server",
-        "description": "Export a DSS dataset to a Tableau Server"
+        "label" : "Convert to Hyper file and send to Tableau server",
+        "description": "Export a DSS dataset as a Tableau Hyper file, send it to Tableau server"
     },
 
     "exportBehavior" : "OUTPUT_TO_FILE",
 
+    "mime" : {
+        "mimeType": "text/plain",
+        "extension": ".hyper"
+    },
+
     "exportOptions": [
         {
-            "label" : "Tableau, To Tableau Server"
+            "label" : "Tableau Software: to Hyper Server (.hyper)"
         }
     ],
 
     "params": [
         {
-            "label":"Tableau Server",
-            "type": "SEPARATOR"
-        },
-        {
-            "name": "tableau_server",
-            "label": "url to tableau server",
-            "type": "PRESET",
-            "parameterSetId": "tableau-server-connection"
-        },
-        {
-            "name": "tableau_site",
-            "label": "tableau site",
-            "type": "PRESET",
-            "parameterSetId": "tableau-server-connection"
-        },
-        {
-            "name": "username",
-            "label": "username",
-            "type": "PRESET",
-            "parameterSetId": "tableau-server-connection"
-        },
-        {
-            "name": "password",
-            "label": "password",
+            "name": "tableau_server_connection",
+            "label": "Credentials from Tableau Server preset",
             "type": "PRESET",
             "parameterSetId": "tableau-server-connection"
         },
         {
             "name": "table_name",
-            "label":"The table name in target Tableau Schema",
+            "label":"table_name",
             "type": "STRING",
             "defaultValue": "dss_table"
         },
         {
             "name": "schema_name",
-            "label": "The schema name in target Tableau Schema",
+            "label": "schema_name",
             "type": "STRING",
             "defaultValue": "dss_schema"
+        },
+        {
+            "name": "project_id",
+            "label": "project_id",
+            "type": "STRING"
         }
     ]
 }
