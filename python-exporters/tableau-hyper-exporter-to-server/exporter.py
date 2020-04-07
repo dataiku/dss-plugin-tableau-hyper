@@ -54,17 +54,20 @@ class TableauHyperExporter(Exporter):
         with self.server.auth.sign_in(self.tableau_auth):
             all_projects, pagination_item = self.server.projects.get()
             projects_name = [project.name for project in all_projects]
-            logger.info("Available tables in Tableau Server: {}".format(projects_name))
+        logger.info("Detected the following pre-existing project name in Tableau Server: {}".format(
+            projects_name
+        ))
 
-        self.project_id = self.config.get('project_id')
-        if self.project_id is None:
-            raise ValueError('The project_id parameter is not defined and is mandatory.')
+        self.project_name = self.config.get('project_name')
+        if self.project_name is None:
+            raise ValueError('The project_name parameter is not defined and is mandatory.')
 
-        available_project_ids = [project.id for project in all_projects]
-        if self.project_id not in available_project_ids:
-            logger.info("Detected pre-existing project on Tableau Server: {}".format(available_project_ids))
-            raise ValueError("The input project_id does not match any existing Tableau project on server.")
-        self.tableau_datasource = tsc.DatasourceItem(self.project_id)
+        self.tableau_datasource = None
+        for project in all_projects:
+            if project.name == self.project_name:
+                self.tableau_datasource = tsc.DatasourceItem(project.id)
+        if self.tableau_datasource is None:
+            raise ValueError('The target project does not exist in Tableau Server.')
 
     def open(self, schema):
         """
