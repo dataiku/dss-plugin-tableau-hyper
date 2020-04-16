@@ -134,9 +134,11 @@ class TableauTableWriter(object):
             self.tmp_table_inserter.close()
 
             rows_count = self.connection.execute_command(
-                command=f"INSERT INTO {self.output_table_definition.table_name} SELECT * FROM {self.tmp_table_definition.table_name};")
+                command=f"INSERT INTO {self.output_table_definition.table_name} SELECT * FROM {self.tmp_table_definition.table_name};"
+            )
             rows_count = self.connection.execute_command(
-                command=f"DROP TABLE {self.tmp_table_definition.table_name};")
+                command=f"DROP TABLE {self.tmp_table_definition.table_name};"
+            )
         else:
             self.output_table_inserter = Inserter(self.connection, self.output_table_definition)
             self.output_table_inserter.add_rows(self.data)
