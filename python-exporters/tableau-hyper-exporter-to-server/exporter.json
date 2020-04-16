@@ -37,8 +37,8 @@
             "defaultValue": "dss_schema"
         },
         {
-            "name": "project_id",
-            "label": "project_id",
+            "name": "project_name",
+            "label": "project_name",
             "type": "STRING"
         }
     ]
