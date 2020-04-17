@@ -51,8 +51,6 @@ class TableauHyperExporter(Exporter):
         self.tableau_auth = tsc.TableauAuth(username, password, site_name)
         self.server = tsc.Server(server_name)
 
-        # TODO: Add the check for the project id
-
         with self.server.auth.sign_in(self.tableau_auth):
             all_projects, pagination_item = self.server.projects.get()
             projects_name = [project.name for project in all_projects]

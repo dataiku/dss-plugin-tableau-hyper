@@ -12,14 +12,14 @@
     "params": [
         {
             "name": "tableau_server",
-            "label": "server",
+            "label": "Tableau Server",
             "type": "STRING",
             "description": "Tableau Server Url",
             "mandatory": true
         },
         {
             "name": "tableau_site",
-            "label": "site",
+            "label": "Site",
             "type": "STRING",
             "description": "Site",
             "mandatory": true
