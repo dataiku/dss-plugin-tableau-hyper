@@ -59,6 +59,12 @@
             "defaultValue": "DSS_extract"
         },
         {
+            "name": "schema_name",
+            "label":"Schema_name",
+            "type": "STRING",
+            "defaultValue": "DSS_schema"
+        },
+        {
             "label":"Advanced",
             "type": "SEPARATOR"
         },

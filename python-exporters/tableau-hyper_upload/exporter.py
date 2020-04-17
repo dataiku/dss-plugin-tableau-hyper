@@ -1,112 +1,99 @@
-# This file is the actual code for the custom Python exporter tableau-hyper_upload
+"""
+Export to a Tableau Server with credentials in DSS preset plugin form.
+"""
+
+import logging
 
 from dataiku.exporter import Exporter
-from dataiku.exporter import SchemaHelper
-import tempfile, os
-from tableau_utils import TableauExport
+from tableau_table_writer import TableauTableWriter
 
-import tableauserverclient as TSC
+import tableauserverclient as tsc
 
-class CustomExporter(Exporter):
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
 
+
+class TableauHyperExporter(Exporter):
+    """
+        Plugin component (Exporter) to export a dataset in dss to a hyper file format. Based on the TableauTableWriter
+        wrapper for the read/write to hyper file Tableau APIs.
+
+        Test location:
+            - (DSS flow) dku17: Should be tested on different scenarios
+            - (Mock execution) local: Can be tested on mock run locally
+    """
     def __init__(self, config, plugin_config):
+        """
+        :param config: the dict of the configuration of the object
+        :param plugin_config: contains the plugin settings
+        """
         self.config = config
         self.plugin_config = plugin_config
-        self.username = config.get('username', None)
-        self.password = config.get('password','')
-        self.server_url = config.get('server_url', None)
-        self.project_name_utf8 = config.get('project', 'Default').encode('utf-8')
-        self.output_table_utf8 = config.get('output_table', 'DSS_extract').encode('utf-8')
-        self.site_id = config.get('site_id', '')
+
+        # Legacy of the user interface of hyper v1
+        username = config.get('username', None)
+        password = config.get('password', None)
+        server_name = config.get('server_url', None)
+        site_name = config.get('site_id', None)
+
+        self.project_name = config.get('project', 'Samples')
+        self.schema_name = config.get('schema_name', 'dss_schema')
+        self.table_name = config.get('output_table', 'dss_table')
+
+        # Non mandatory parameter
         self.ssl_cert_path = config.get('ssl_cert_path', None)
-        
-        
-        if self.ssl_cert_path:
-            if not os.path.isfile(self.ssl_cert_path):
-                raise ValueError('SSL certificate file %s does not exist' % self.ssl_cert_path)
-            else:
-                #default variables handled by python requests to validate cert (used by underlying tableauserverclient)
-                os.environ['REQUESTS_CA_BUNDLE'] = self.ssl_cert_path
-                os.environ['CURL_CA_BUNDLE'] = self.ssl_cert_path
-        
-        self.project = None
-        self.datasource = None
-        
-        if not (self.username and self.password and self.server_url):
-            print('Connection params: {}'.format(
-                {'username:' : self.username,
-                'password:' : '#' * len(self.password),
-                'server_url:' : self.server_url})
-            )
-            raise ValueError("username, password and server_url shall not be empty")
+
+        self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
+        self.output_file = None
+        # Should contain tableau_server
+        logger.info("Preset param: {}".format(self.config))
+
+        self.tableau_auth = tsc.TableauAuth(username, password, site_name)
+        self.server = tsc.Server(server_name)
+
+        # TODO: Add the check for the project id
+
+        with self.server.auth.sign_in(self.tableau_auth):
+            all_projects, pagination_item = self.server.projects.get()
+            projects_name = [project.name for project in all_projects]
+            logger.info("Available tables in Tableau Server: {}".format(projects_name))
+
+        project_id = all_projects[-1].id
+        self.tableau_datasource = tsc.DatasourceItem(project_id)
 
     def open(self, schema):
-        print('INFO: Given data schema {}'.format(schema))
-        tableau_auth = TSC.TableauAuth(self.username, self.password, site_id=self.site_id)
-        server = TSC.Server(self.server_url, use_server_version=True)
-        print('Using Tableau server version {}'.format(server.version))
-        s_info = server.server_info.get()
-        print("\nServer info:")
-        print("\tProduct version: {0}".format(s_info.product_version))
-        print("\tREST API version: {0}".format(s_info.rest_api_version))
-        print("\tBuild number: {0}".format(s_info.build_number))
-        
-        server.auth.sign_in(tableau_auth)
-        
-        all_project_items, pagination_item = server.projects.get()
-            
-        project_match = [proj for proj in all_project_items if proj.name.encode('utf-8') == self.project_name_utf8]
-        if len(project_match) > 0:
-            self.project = project_match[0]
-            print('Found project matching {} with id {}'.format(self.project.name.encode('utf8'), self.project.id))            
-        else:
-            #when project is not matched we want to print all accessible projects names for debugging
-            server_project_names = [proj.name.encode('utf-8') for proj in all_project_items]
-            print('ERROR: No project matches, projects accessible on server are: {}'.format(server_project_names))
-            raise ValueError('Project {} does not exist on server'.format(self.project_name_utf8))
-        
-        all_datasources, pagination_item = server.datasources.get()
-            
-        datasource_match = [d for d in all_datasources if d.name.encode('utf-8') == self.output_table_utf8 ]
-        if len(datasource_match) > 0:
-            self.datasource = datasource_match[0]
-            print('WARN: Found existing table {} with id {}, will be overwritten'.format(self.datasource.name.encode('utf-8'), self.datasource.id))
+        """
+        Leave empty
+        :param schema:
+        :return:
+        """
+        return None
 
-        server.auth.sign_out()
-        
-        # Fairly ugly. We create and delete a temporary file while retaining its name
-        with tempfile.NamedTemporaryFile(prefix="output", suffix=".hyper", dir=os.getcwd()) as f:
-            self.output_file = f.name
-        print("Tmp file: {}".format(self.output_file))
-        self.e = TableauExport(self.output_file , schema['columns'])
+    def open_to_file(self, schema, destination_file_path):
+        """
+        Initial actions for the opening of the output file.
+        :param schema: the column names and types of the data that will be streamed
+                       in the write_row() calls
+        :param destination_file_path: the path where the exported data should be put
+        """
+        self.output_file = destination_file_path
+        self.writer.schema_converter.set_dss_storage_types(schema)
+        self.writer.create_schema(schema, self.output_file)
 
     def write_row(self, row):
         """
         Handle one row of data to export
         :param row: a tuple with N strings matching the schema passed to open.
         """
-        self.e.insert_array_row(row)
-        
-        
+        self.writer.write_row(row)
+        self.writer.row_index += 1
+        return True
+
     def close(self):
         """
-        Perform any necessary cleanup
+        Close the connections and send data to Tableau
         """
-        self.e.close()
-        tableau_auth = TSC.TableauAuth(self.username, self.password, site_id=self.site_id)
-        server = TSC.Server(self.server_url, use_server_version=True)
-        
-        server.auth.sign_in(tableau_auth)
-        
-        try:
-            if self.datasource:
-                server.datasources.publish(self.datasource, self.output_file, 'Overwrite', connection_credentials=None)
-            else:
-                new_datasource = TSC.DatasourceItem(self.project.id, name=self.output_table_utf8)
-                new_datasource = server.datasources.publish(new_datasource, self.output_file, 'CreateNew')
-        except:
-            raise
-        finally:
-            server.auth.sign_out()
-            os.remove(self.output_file)
-
+        self.writer.close()
+        with self.server.auth.sign_in(self.tableau_auth):
+            self.server.datasources.publish(self.tableau_datasource, self.output_file, 'CreateNew')
+        return True

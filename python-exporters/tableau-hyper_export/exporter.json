@@ -19,5 +19,17 @@
     ],
 
     "params": [
+        {
+            "name": "schema_name",
+            "label": "schema_name",
+            "type": "STRING",
+            "defaultValue": "dss_schema"
+        },
+        {
+            "name": "table_name",
+            "label":"table_name",
+            "type": "STRING",
+            "defaultValue": "dss_table"
+        }
     ]
 }
