@@ -21,13 +21,13 @@
     "params": [
         {
             "name": "schema_name",
-            "label": "schema_name",
+            "label": "Schema name",
             "type": "STRING",
             "defaultValue": "dss_schema"
         },
         {
             "name": "table_name",
-            "label":"table_name",
+            "label":"Table name",
             "type": "STRING",
             "defaultValue": "dss_table"
         }
