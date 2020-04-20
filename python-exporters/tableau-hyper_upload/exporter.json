@@ -48,7 +48,7 @@
         },
         {
             "name": "schema_name",
-            "label":"Schema_name",
+            "label":"Schema name",
             "type": "STRING",
             "defaultValue": "DSS_schema"
         }
