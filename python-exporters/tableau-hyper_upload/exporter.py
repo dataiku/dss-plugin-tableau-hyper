@@ -38,10 +38,11 @@ class TableauHyperExporter(Exporter):
         self.project_name = config.get('project', 'Samples')
         self.schema_name = config.get('schema_name', 'dss_schema')
         self.table_name = config.get('output_table', 'dss_table')
+        if "." in self.table_name:
+            raise ValueError("The table name parameter is invalid, remove \'.\' in {}".format(self.table_name))
 
         # Non mandatory parameter
         self.ssl_cert_path = config.get('ssl_cert_path', None)
-
         logger.info("Detected config: {}".format(config))
 
         self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
@@ -70,7 +71,7 @@ class TableauHyperExporter(Exporter):
         :param schema:
         :return:
         """
-        self.output_file = "sample_file.hyper"
+        self.output_file = self.table_name + ".hyper"
         self.writer.schema_converter.set_dss_storage_types(schema)
         self.writer.create_schema(schema, self.output_file)
         return None
