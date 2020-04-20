@@ -11,31 +11,27 @@
 
     "params": [
         {
-            "name": "tableau_server",
-            "label": "Tableau Server",
+            "name": "server_url",
+            "label":"URL",
             "type": "STRING",
-            "description": "Tableau Server Url",
             "mandatory": true
         },
         {
-            "name": "tableau_site",
-            "label": "Site",
+            "name": "site_id",
+            "label":"Site ID",
             "type": "STRING",
-            "description": "Site",
-            "mandatory": true
+            "description":"optional, default is empty"
         },
         {
             "name": "username",
-            "label": "username",
+            "label":"Username",
             "type": "STRING",
-            "description": "Username",
             "mandatory": true
         },
         {
             "name": "password",
-            "label": "password",
+            "label": "Password",
             "type": "PASSWORD",
-            "description": "Password",
             "mandatory": true
         }
     ]

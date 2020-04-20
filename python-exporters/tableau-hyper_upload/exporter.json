@@ -17,22 +17,10 @@
             "type": "SEPARATOR"
         },
         {
-            "name": "server_url",
-            "label":"URL",
-            "type": "STRING",
-            "mandatory": true
-        },
-        {
-            "name": "username",
-            "label":"Username",
-            "type": "STRING",
-            "mandatory": true
-        },
-        {
-            "name": "password",
-            "label":"Password",
-            "type": "PASSWORD",
-            "mandatory": true
+            "name": "tableau_server_connection",
+            "label": "Credentials from Tableau Server preset",
+            "type": "PRESET",
+            "parameterSetId": "tableau-server-connection"
         },
         {
             "name": "ssl_cert_path",
@@ -48,8 +36,8 @@
         {
             "name": "project",
             "label":"Project",
-            "type": "TEXTAREA",
-            "defaultValue": "Default",
+            "type": "STRING",
+            "defaultValue": "Samples",
             "description":"Upload the Hyper file to this project."
         },
         {
@@ -63,16 +51,6 @@
             "label":"Schema_name",
             "type": "STRING",
             "defaultValue": "DSS_schema"
-        },
-        {
-            "label":"Advanced",
-            "type": "SEPARATOR"
-        },
-        {
-            "name": "site_id",
-            "label":"Site ID",
-            "type": "STRING",
-            "description":"optional, default is empty"
         }
     ]
 }

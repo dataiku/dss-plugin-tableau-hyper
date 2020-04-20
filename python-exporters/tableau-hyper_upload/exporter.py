@@ -15,12 +15,12 @@ logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s -
 
 class TableauHyperExporter(Exporter):
     """
-        Plugin component (Exporter) to export a dataset in dss to a hyper file format. Based on the TableauTableWriter
-        wrapper for the read/write to hyper file Tableau APIs.
+    Plugin component (Exporter) to export a dataset in dss to a hyper file format. Based on the TableauTableWriter
+    wrapper for the read/write to hyper file Tableau APIs.
 
-        Test location:
-            - (DSS flow) dku17: Should be tested on different scenarios
-            - (Mock execution) local: Can be tested on mock run locally
+    Test location:
+        - (DSS flow) dku17: Should be tested on different scenarios
+        - (Mock execution) local: Can be tested on mock run locally
     """
     def __init__(self, config, plugin_config):
         """
@@ -30,7 +30,6 @@ class TableauHyperExporter(Exporter):
         self.config = config
         self.plugin_config = plugin_config
 
-        # Legacy of the user interface of hyper v1
         username = config.get('username', None)
         password = config.get('password', None)
         server_name = config.get('server_url', None)
@@ -43,6 +42,8 @@ class TableauHyperExporter(Exporter):
         # Non mandatory parameter
         self.ssl_cert_path = config.get('ssl_cert_path', None)
 
+        logger.info("Detected config: {}".format(config))
+
         self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
         self.output_file = None
         # Should contain tableau_server
@@ -52,12 +53,16 @@ class TableauHyperExporter(Exporter):
         self.server = tsc.Server(server_name)
 
         with self.server.auth.sign_in(self.tableau_auth):
-            all_projects, pagination_item = self.server.projects.get()
+            all_projects, pagination = self.server.projects.get()
             projects_name = [project.name for project in all_projects]
-            logger.info("Available tables in Tableau Server: {}".format(projects_name))
-
-        project_id = all_projects[-1].id
-        self.tableau_datasource = tsc.DatasourceItem(project_id)
+        if self.project_name is None:
+            raise ValueError
+        self.tableau_datasource = None
+        for project in all_projects:
+            if project.name == self.project_name:
+                self.tableau_datasource = tsc.DatasourceItem(project.id)
+        if self.tableau_datasource is None:
+            raise ValueError("The target project does not exist in Tableau Server")
 
     def open(self, schema):
         """
@@ -65,6 +70,9 @@ class TableauHyperExporter(Exporter):
         :param schema:
         :return:
         """
+        self.output_file = "sample_file.hyper"
+        self.writer.schema_converter.set_dss_storage_types(schema)
+        self.writer.create_schema(schema, self.output_file)
         return None
 
     def open_to_file(self, schema, destination_file_path):
@@ -93,5 +101,5 @@ class TableauHyperExporter(Exporter):
         """
         self.writer.close()
         with self.server.auth.sign_in(self.tableau_auth):
-            self.server.datasources.publish(self.tableau_datasource, self.output_file, 'CreateNew')
+            self.server.datasources.publish(self.tableau_datasource, self.output_file, 'Overwrite')
         return True

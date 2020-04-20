@@ -57,6 +57,7 @@ class TableauHyperExporter(Exporter):
         :param destination_file_path: the path where the exported data should be put
         """
         self.output_file = destination_file_path
+        logger.info("Writing the output hyper file at the following location: {}".format(self.output_file))
         self.writer.schema_converter.set_dss_storage_types(schema)
         self.writer.create_schema(schema, self.output_file)
 

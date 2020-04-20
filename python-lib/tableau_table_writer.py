@@ -3,8 +3,6 @@
 This is a Tableau Writer wrapper for the exporters in Python.
 
 """
-
-import joblib
 import logging
 
 from tableauhyperapi import TableDefinition
@@ -80,6 +78,7 @@ class TableauTableWriter(object):
             raise Exception("No valid schema or table name received.")
 
         logger.info("Received user input for target schema {} and table {}".format(self.schema_name, self.table_name))
+
         self.output_table_definition = TableDefinition(
                         TableName(self.schema_name, self.table_name),
                         self.schema_converter.dss_columns_to_hyper_columns(dss_columns))
@@ -87,6 +86,7 @@ class TableauTableWriter(object):
         # Create the sequence of Tableau Hyper objects for connection to the hyper file and db
         self.hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
         self.connection = Connection(self.hyper.endpoint, self.output_file, CreateMode.CREATE_AND_REPLACE)
+        assert self.connection is not None
         self.connection.catalog.create_schema(self.schema_name)
         self.connection.catalog.create_table(self.output_table_definition)
 
@@ -111,13 +111,11 @@ class TableauTableWriter(object):
             self.row_index += 1
 
             if self.row_index % self.batch_size == 0:
+                logger.info("Writing {} lines to hyper file".format(len(self.data)))
                 self.update_table()
                 self.data = []
         except:
-            logger.warning("Failed to convert the row to make it compliant.")
-            logger.warning("Trying to convert a dss row to hyper")
             logger.warning("Failed on row: {}".format(row))
-            raise TypeError
         return True
 
     def update_table(self):
@@ -134,12 +132,12 @@ class TableauTableWriter(object):
             self.tmp_table_inserter.close()
 
             rows_count = self.connection.execute_command(
-                command=f"INSERT INTO {self.output_table_definition.table_name} SELECT * FROM {self.tmp_table_definition.table_name};"
-            )
+                command=f"INSERT INTO {self.output_table_definition.table_name} SELECT * FROM {self.tmp_table_definition.table_name};")
             rows_count = self.connection.execute_command(
-                command=f"DROP TABLE {self.tmp_table_definition.table_name};"
-            )
+                command=f"DROP TABLE {self.tmp_table_definition.table_name};")
         else:
+            if self.connection is None:
+                logger.warning("Connection to Tableau Hyper file is undefined")
             self.output_table_inserter = Inserter(self.connection, self.output_table_definition)
             self.output_table_inserter.add_rows(self.data)
             self.output_table_inserter.execute()
@@ -151,7 +149,9 @@ class TableauTableWriter(object):
         """
             Called when closing the table.
         """
+        logger.info("Closing the file")
         if self.data:
+            logger.info("Last update on dataset")
             self.update_table()
             self.data = []
         self.hyper.close()
