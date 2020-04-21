@@ -43,6 +43,7 @@ class TableauHyperExporter(Exporter):
 
         # Non mandatory parameter
         self.ssl_cert_path = config.get('ssl_cert_path', None)
+
         logger.info("Detected config: {}".format(config))
 
         self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)

@@ -23,6 +23,24 @@
             "parameterSetId": "tableau-server-connection"
         },
         {
+            "name": "server_url",
+            "label":"URL",
+            "type": "STRING",
+            "mandatory": true
+        },
+        {
+            "name": "username",
+            "label":"Username",
+            "type": "STRING",
+            "mandatory": true
+        },
+        {
+            "name": "password",
+            "label":"Password",
+            "type": "PASSWORD",
+            "mandatory": true
+        },
+        {
             "name": "ssl_cert_path",
             "label": "SSL certificate",
             "type": "STRING",
@@ -37,7 +55,7 @@
             "name": "project",
             "label":"Project",
             "type": "STRING",
-            "defaultValue": "Samples",
+            "defaultValue": "Default",
             "description":"Upload the Hyper file to this project."
         },
         {
@@ -47,10 +65,14 @@
             "defaultValue": "DSS_extract"
         },
         {
-            "name": "schema_name",
-            "label":"Schema name",
+            "label":"Advanced",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "site_id",
+            "label":"Site ID",
             "type": "STRING",
-            "defaultValue": "DSS_schema"
+            "description":"optional, default is empty"
         }
     ]
 }
