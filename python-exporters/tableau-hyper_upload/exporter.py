@@ -29,19 +29,25 @@ class TableauHyperExporter(Exporter):
         """
 
         self.plugin_config = plugin_config
+        logger.info("Received following overall config:\n{}".format(config))
         # The standard config is overwritten by the preset config
         preset_config = config.pop('tableau_server_connection')
 
         for key in preset_config:
-            if preset_config[key] == None:
+            if preset_config[key] == None or preset_config[key] == '':
                 del preset_config[key]
 
         for key in config:
-            if config[key] == None:
+            if config[key] == None or config[key] == '':
                 del config[key]
+
+        logger.info("Preset config:\n{}".format(preset_config))
+        logger.info("V1 config:\n{}".format(config))
 
         config = {**config, **preset_config}
         self.config = config
+
+        logger.info("Final config: {}".format(self.config))
 
         username = config.get('username', None)
         password = config.get('password', None)
