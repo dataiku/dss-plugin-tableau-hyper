@@ -27,8 +27,21 @@ class TableauHyperExporter(Exporter):
         :param config: the dict of the configuration of the object
         :param plugin_config: contains the plugin settings
         """
-        self.config = config
+
         self.plugin_config = plugin_config
+        # The standard config is overwritten by the preset config
+        preset_config = config.pop('tableau_server_connection')
+
+        for key in preset_config:
+            if preset_config['key'] == None:
+                del preset_config['key']
+
+        for key in config:
+            if config['key'] == None:
+                del config['key']
+
+        config = {**config, **preset_config}
+        self.config = config
 
         username = config.get('username', None)
         password = config.get('password', None)
@@ -44,12 +57,8 @@ class TableauHyperExporter(Exporter):
         # Non mandatory parameter
         self.ssl_cert_path = config.get('ssl_cert_path', None)
 
-        logger.info("Detected config: {}".format(config))
-
         self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
         self.output_file = None
-        # Should contain tableau_server
-        logger.info("Preset param: {}".format(self.config))
 
         self.tableau_auth = tsc.TableauAuth(username, password, site_name)
         self.server = tsc.Server(server_name)

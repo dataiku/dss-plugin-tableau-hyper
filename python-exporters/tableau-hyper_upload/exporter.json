@@ -26,19 +26,19 @@
             "name": "server_url",
             "label":"URL",
             "type": "STRING",
-            "mandatory": true
+            "mandatory": false
         },
         {
             "name": "username",
             "label":"Username",
             "type": "STRING",
-            "mandatory": true
+            "mandatory": false
         },
         {
             "name": "password",
             "label":"Password",
             "type": "PASSWORD",
-            "mandatory": true
+            "mandatory": false
         },
         {
             "name": "ssl_cert_path",
@@ -72,7 +72,8 @@
             "name": "site_id",
             "label":"Site ID",
             "type": "STRING",
-            "description":"optional, default is empty"
+            "description":"optional, default is empty",
+            "mandatory": false
         }
     ]
 }

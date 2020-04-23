@@ -11,25 +11,25 @@
 
     "params": [
         {
-            "name": "server_url_preset",
+            "name": "server_url",
             "label":"Tableau Server URL",
             "type": "STRING",
             "mandatory": true
         },
         {
-            "name": "site_id_preset",
+            "name": "site_id",
             "label":"Site ID",
             "type": "STRING",
             "description":"optional, default is empty"
         },
         {
-            "name": "username_preset",
+            "name": "username",
             "label":"Username",
             "type": "STRING",
             "mandatory": true
         },
         {
-            "name": "password_preset",
+            "name": "password",
             "label": "Password",
             "type": "PASSWORD",
             "mandatory": true
