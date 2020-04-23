@@ -33,12 +33,12 @@ class TableauHyperExporter(Exporter):
         preset_config = config.pop('tableau_server_connection')
 
         for key in preset_config:
-            if preset_config['key'] == None:
-                del preset_config['key']
+            if preset_config[key] == None:
+                del preset_config[key]
 
         for key in config:
-            if config['key'] == None:
-                del config['key']
+            if config[key] == None:
+                del config[key]
 
         config = {**config, **preset_config}
         self.config = config
