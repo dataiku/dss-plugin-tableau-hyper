@@ -67,6 +67,16 @@ class TableauHyperExporter(Exporter):
         site_name = config.get('site_id', None)
         assert_not_none(site_name, 'site_id')
 
+        self.ssl_cert_path = config.get('ssl_cert_path', None)
+
+        if self.ssl_cert_path:
+            if not os.path.isfile(self.ssl_cert_path):
+                raise ValueError('SSL certificate file %s does not exist' % self.ssl_cert_path)
+            else:
+                # default variables handled by python requests to validate cert (used by underlying tableauserverclient)
+                os.environ['REQUESTS_CA_BUNDLE'] = self.ssl_cert_path
+                os.environ['CURL_CA_BUNDLE'] = self.ssl_cert_path
+
         self.project_name = config.get('project', 'Samples')
         self.schema_name = config.get('schema_name', 'dss_schema')
         self.table_name = config.get('output_table', 'dss_table')
