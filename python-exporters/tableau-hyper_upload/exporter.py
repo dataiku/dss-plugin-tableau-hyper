@@ -13,6 +13,15 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
 
 
+def remove_empty_keys(dictionary):
+    key_to_remove = []
+    for key in dictionary:
+        if dictionary[key] is None or dictionary[key] == '':
+            key_to_remove.append(key)
+    for key in key_to_remove:
+        del dictionary[key]
+
+
 class TableauHyperExporter(Exporter):
     """
     Plugin component (Exporter) to export a dataset in dss to a hyper file format. Based on the TableauTableWriter
@@ -33,13 +42,8 @@ class TableauHyperExporter(Exporter):
         # The standard config is overwritten by the preset config
         preset_config = config.pop('tableau_server_connection')
 
-        for key in preset_config:
-            if preset_config[key] == None or preset_config[key] == '':
-                del preset_config[key]
-
-        for key in config:
-            if config[key] == None or config[key] == '':
-                del config[key]
+        remove_empty_keys(preset_config)
+        remove_empty_keys(config)
 
         logger.info("Preset config:\n{}".format(preset_config))
         logger.info("V1 config:\n{}".format(config))
