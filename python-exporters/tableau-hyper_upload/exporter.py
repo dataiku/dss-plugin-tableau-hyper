@@ -22,6 +22,10 @@ def remove_empty_keys(dictionary):
         del dictionary[key]
 
 
+def assert_not_none(variable, var_name):
+    assert ((variable is not None) and variable != ''), "Parameter {} should be defined".format(var_name)
+
+
 class TableauHyperExporter(Exporter):
     """
     Plugin component (Exporter) to export a dataset in dss to a hyper file format. Based on the TableauTableWriter
@@ -39,24 +43,29 @@ class TableauHyperExporter(Exporter):
 
         self.plugin_config = plugin_config
         logger.info("Received following overall config:\n{}".format(config))
-        # The standard config is overwritten by the preset config
+        # The user config is overwritten by the preset config
         preset_config = config.pop('tableau_server_connection')
 
+        logger.info("Processing user interface input parameters...")
         remove_empty_keys(preset_config)
         remove_empty_keys(config)
 
         logger.info("Preset config:\n{}".format(preset_config))
-        logger.info("V1 config:\n{}".format(config))
+        logger.info("Parameter config:\n{}".format(config))
 
         config = {**config, **preset_config}
-        self.config = config
+        self.config = config # Final config
 
         logger.info("Final config: {}".format(self.config))
 
         username = config.get('username', None)
+        assert_not_none(username, 'username')
         password = config.get('password', None)
+        assert_not_none(password, 'password')
         server_name = config.get('server_url', None)
+        assert_not_none(server_name, 'server_url')
         site_name = config.get('site_id', None)
+        assert_not_none(site_name, 'site_id')
 
         self.project_name = config.get('project', 'Samples')
         self.schema_name = config.get('schema_name', 'dss_schema')
