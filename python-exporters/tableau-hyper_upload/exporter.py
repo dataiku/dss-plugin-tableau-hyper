@@ -3,6 +3,7 @@ Export to a Tableau Server with credentials in DSS preset plugin form.
 """
 
 import logging
+import os
 
 from dataiku.exporter import Exporter
 from tableau_table_writer import TableauTableWriter
@@ -77,9 +78,9 @@ class TableauHyperExporter(Exporter):
                 os.environ['REQUESTS_CA_BUNDLE'] = self.ssl_cert_path
                 os.environ['CURL_CA_BUNDLE'] = self.ssl_cert_path
 
-        self.project_name = config.get('project', 'Samples')
-        self.schema_name = config.get('schema_name', 'dss_schema')
-        self.table_name = config.get('output_table', 'dss_table')
+        self.project_name = config.get('project', 'Default')
+        self.schema_name = config.get('schema_name', 'Extract')
+        self.table_name = config.get('output_table', 'DSS_extract')
         if "." in self.table_name:
             raise ValueError("The table name parameter is invalid, remove \'.\' in {}".format(self.table_name))
 

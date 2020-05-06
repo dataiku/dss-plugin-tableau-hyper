@@ -121,11 +121,7 @@ class MyOutputFormatter(OutputFormatter):
 
 class MyFormatExtractor(FormatExtractor):
     """
-        Read the input format in DSS
-
-    TODO: Check lifecycle of this class
-    TODO: Remove the test path:
-    /Users/thibaultdesfontaines/superstore_sample.hyper
+    Read the input format
     """
 
     def __init__(self, stream, schema, table_name = None, schema_name = None):
