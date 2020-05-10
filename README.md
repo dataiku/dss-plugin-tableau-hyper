@@ -1,71 +1,35 @@
-Current Version: 0.0.4
-Compatible with DSS version: 5.0.2 and higher
+<!--<h3><b>Plugin: Tableau Hyper API</b></h3>-->
+## <b>Plugin: Tableau Hyper API</b> [[Plugin Page]](https://www.dataiku.com/product/plugins/) <br>
 
-**For earlier versions of DSS please refer to the manual installation procedure below**
+![Teaser Image](https://avatars0.githubusercontent.com/u/828667?s=200&v=4)
 
-## Plugin information
+### Overview ###
 
-[Tableau](https://tableau.com) is one of the leading data visualization tools
+<b>This plugin offers the following capabilities:</b>
+- (0) Upload a DSS dataset to Tableau Server 
+- (1) Export a DSS dataset as a Hyper File
+- (2) Import a hyper file to a DSS project 
 
-The recently released [Hyper format](https://www.tableau.com/about/blog/2018/1/onboarding-your-team-hyper-79398) deprecates former Tableau Extract API and Server SDK
+### Dependencies ###
 
-This plugin offers the ability to export Dataiku data to Tableau with the Hyper format:
+This plugins relies on [Tableau Hyper API](https://help.tableau.com/current/api/hyper_api/en-us/index.html) and the 
+[Tableau Server Client](https://tableau.github.io/server-client-python/docs/), installed via Pip during plugin setup.
+The Tableau Hyper API requires at least Python 3.6 version.
 
-* Export to a Hyper file for immediate open in Tableau Desktop
-* Directly upload a dataset to Tableau Server with the Hyper format
+### (1) Usage in DSS
 
-## Prerequisites
+(1) See the demo video on [Google Video](https://drive.google.com/open?id=1YBPjrkygRzAzsC3yNZu6mEfhqHIjx75Z)
 
-The plugin comes prepackaged with a code environement that will install the [Tableau Server Client](https://tableau.github.io/server-client-python/)
+### (2) Structure of the plugin ### 
 
-The plugin also depends on [Tableau Extract API 2.0](https://onlinehelp.tableau.com/current/api/extract_api/en-us/help.htm)
+- An exporter to file
+- An uploader to server
+- A formatter to read a Hyper file
 
-Tableau Extract API 2.0 and Tableau Extract API 1.0 **cannot** coexist in the same environement.
+### (3) Testing the plugin component ###
 
-For DSS version 5.0.2 and later, an script is provided that will automatically download and install the SDK into the code environement.
+The test are done using the PyTest framework. You can run them using `pytest` in a console.
 
-For DSS **prior** to version **5.0.2** you will need to run Tableau extract API 2.0 **manually into the code environement of the plugin**
+### Misc ###
 
-## How it works
-
-Once the plugin is successfully installed you can use it a regular DSS exporter
-
-Please refer to the [Dataiku Plugin webpage](https://www.dataiku.com/dss/plugins/info/tableau-hyper-extract.html) for detailed usage information
-
-## Manual Installation
-
-Tableau Server Client will be installed in the plugin code environement automatically since it is accessible through pip
-
-To install the Tableau Extract API 2.0 manually (_e.g: for DSS versions prior to 5.0.2_) you will need to:
-
-* [Download](https://onlinehelp.tableau.com/current/api/extract_api/en-us/Extract/extract_api_installing.htm#downloading) the SDK manually on the DSS Server machine
-* Untar and decompress the package
-* Run the installation setup using the plugin codenvironement python binary
-
-```
-$DIP_HOME/code-envs/python/plugin_tableau-hyper-export_managed/bin/python setup.py build
-$DIP_HOME/code-envs/python/plugin_tableau-hyper-export_managed/bin/python setup.py install
-```
-
-where $DIP_HOME stands for your DSS home directory
-
-## Known issues
-
-### Issue with GLIBCXX library
-
-On some distributions (centOS and RHEL) the Tableau SDK used in the plugin is known to be incompatible with the OS distribution packaged libstdc++
-
-https://help.tableau.com/current/api/extract_api/en-us/Extract/extract_api_troubleshooting.htm#gcc-ver
-
-To workaround this issue with DSS:
-
-* edit the $DSS_HOME/bin/env-site.sh
-* add an entry to the file:
-
-```
-export LD_LIBRARY_PATH=$DSS_HOME/code-envs/python/plugin_tableau-hyper-export_managed/lib/python2.7/site-packages/tableausdk/lib
-```
-
-where $DSS_HOME stands for your DSS home directory
-
-* restart DSS
+Contact thibault.desfontaines@dataiku.com

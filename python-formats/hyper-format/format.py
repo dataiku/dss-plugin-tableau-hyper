@@ -21,18 +21,10 @@ import os
 import pandas
 import tempfile
 
-from tableauhyperapi import TableDefinition
-from tableauhyperapi import HyperProcess
-from tableauhyperapi import Telemetry
-from tableauhyperapi import Connection
-from tableauhyperapi import CreateMode
-from tableauhyperapi import Inserter
-from tableauhyperapi import TableName
-
 from tableau_table_reader import TableauTableReader
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='Tableau Hyper Plugin | %(levelname)s - %(message)s')
 
 
 class MyFormatter(Formatter):
@@ -45,10 +37,6 @@ class MyFormatter(Formatter):
         file settings.json at the root of the plugin directory are passed as a json
         object 'plugin_config' to the constructor
         """
-        print("Plugin init config: {}".format(config))
-        logger.info("Plugin init config: {}".format(config))
-        if config is None:
-            raise "Invalid configurationm should not be empty."
         Formatter.__init__(self, config, plugin_config)
 
     def get_output_formatter(self, stream, schema):
@@ -124,7 +112,7 @@ class MyFormatExtractor(FormatExtractor):
     Read the input format
     """
 
-    def __init__(self, stream, schema, table_name = None, schema_name = None):
+    def __init__(self, stream, schema, table_name=None, schema_name=None):
         """
         Initialize the extractor
         :param stream: the stream to read the formatted data from
@@ -135,11 +123,7 @@ class MyFormatExtractor(FormatExtractor):
         self.tableau_reader.create_tmp_hyper()
         self.tableau_reader.read_buffer(stream)
         self.tableau_reader.open_connection()
-        hyper_storage_types = self.tableau_reader.read_hyper_columns()
-        logger.info("Read the following Hyper Storage Type: {}"
-                    .format(hyper_storage_types))
-        self.tableau_reader.fetch_rows()
-        self.tableau_reader.close_connection()
+        self.tableau_reader.read_hyper_columns()
 
     def read_schema(self):
         """
