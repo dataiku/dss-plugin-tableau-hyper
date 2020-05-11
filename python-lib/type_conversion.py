@@ -21,11 +21,11 @@ def to_dss_date(hyper_date):
     return datetime.datetime(intermediary_date.year, intermediary_date.month, intermediary_date.day)
 
 
-def to_dss_geometry(hyper_string):
+def to_dss_geopoint(hyper_string):
     """
-    Format geometry type from Tableau Hyper to DSS
+    Format geopoint type from Tableau Hyper to DSS
     :param hyper_string: String type in Tableau
-    :return: A pre-formatted string before export as geometry
+    :return: A pre-formatted string before export as geopoint
     """
     return hyper_string.upper()
 
@@ -82,7 +82,7 @@ class TypeConversion(object):
             'date': (SqlType.date(), handle_nat(to_hyper_date)),
             'double': (SqlType.double(), handle_nan(float)),
             'float': (SqlType.double(), handle_nan(float)),
-            'geometry': (SqlType.geography(), handle_nan(to_hyper_geography)),
+            'geometry': (SqlType.text(), handle_nan(str)),
             'geopoint': (SqlType.geography(), handle_nan(to_hyper_geography)),
             'int': (SqlType.int(), handle_nan(int)),
             'map': (SqlType.text(), handle_nan(str)),
@@ -100,7 +100,7 @@ class TypeConversion(object):
             TypeTag.CHAR: ('string', lambda x: None if x is None else str(x)),
             TypeTag.DATE: ('date', lambda x: None if x is None else to_dss_date(x)),
             TypeTag.DOUBLE: ('double', lambda x: None if math.isnan(x) else float(x)),
-            TypeTag.GEOGRAPHY: ('geometry', lambda x: None if x is None else to_dss_geometry(x)),
+            TypeTag.GEOGRAPHY: ('geopoint', lambda x: None if x is None else to_dss_geopoint(x)),
             TypeTag.INT: ('bigint', lambda x: None if math.isnan(x) else int(x)),
             TypeTag.INTERVAL: ('string', lambda x: None if x is None else str(x)),
             TypeTag.JSON: ('string', lambda x: None if x is None else str(x)),
