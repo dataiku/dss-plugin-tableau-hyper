@@ -1,6 +1,8 @@
 import datetime
 import logging
 import math
+import numpy as np
+import pandas as pd
 
 from tableauhyperapi import SqlType
 from tableauhyperapi import TypeTag
