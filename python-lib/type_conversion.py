@@ -74,7 +74,7 @@ class TypeConversion(object):
 
         # Mapping DSS to Tableau Hyper types
         self.mapping_dss_to_hyper = {
-            'array': None,
+            'array': (SqlType.text(), handle_nan(str)),
             'bigint': (SqlType.int(), handle_nan(int)),
             'boolean': (SqlType.bool(), handle_nan(bool)),
             'date': (SqlType.date(), handle_nat(to_hyper_date)),
@@ -83,8 +83,8 @@ class TypeConversion(object):
             'geometry': (SqlType.geography(), handle_nan(to_hyper_geography)),
             'geopoint': (SqlType.geography(), handle_nan(to_hyper_geography)),
             'int': (SqlType.int(), handle_nan(int)),
-            'map': None,
-            'object': None,
+            'map': (SqlType.text(), handle_nan(str)),
+            'object': (SqlType.text(), handle_nan(str)),
             'smallint': (SqlType.int(), handle_nan(int)),
             'string': (SqlType.text(), handle_nan(str)),
             'tinyint': (SqlType.int(), handle_nan(int)),
@@ -165,9 +165,6 @@ class TypeConversion(object):
             >>> 'bigint'
         :return: output_value : the value converted in the Tableau Hyper type, may affect its value or not
         """
-        if dss_type not in self.mapping_dss_to_hyper:
-            logger.warning("Invalid dss storage type {}".format(dss_type))
-            dss_type = "string"
         try: # retrieve the conversion function
             conversion_function = self.mapping_dss_to_hyper[dss_type][1]
         except Exception as err:
@@ -192,9 +189,6 @@ class TypeConversion(object):
         :param tag: Storage type under which the value is stored in Hyper
         :return: output_value : Value compliant to Hyper
         """
-        if tag not in self.mapping_hyper_to_dss:
-            logger.warning("Invalid hyper storage type {}".format(tag))
-            tag = SqlType.text().tag
         try: # try to retrieve the conversion function
             conversion_function = self.mapping_hyper_to_dss[tag][1]
         except Exception as err:
