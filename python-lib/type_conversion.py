@@ -95,23 +95,23 @@ class TypeConversion(object):
         # Mapping Tableau Hyper to DSS types
         self.mapping_hyper_to_dss = {
             TypeTag.BIG_INT: ('bigint', lambda x: None if math.isnan(x) else int(x)),
-            TypeTag.BYTES: None,
+            TypeTag.BYTES: ('string', lambda x: None if x is None else str(x)),
             TypeTag.BOOL: ('bool', lambda x: None if x is None else bool(x)),
-            TypeTag.CHAR: None,
+            TypeTag.CHAR: ('string', lambda x: None if x is None else str(x)),
             TypeTag.DATE: ('date', lambda x: None if x is None else to_dss_date(x)),
             TypeTag.DOUBLE: ('double', lambda x: None if math.isnan(x) else float(x)),
             TypeTag.GEOGRAPHY: ('geometry', lambda x: None if x is None else to_dss_geometry(x)),
             TypeTag.INT: ('bigint', lambda x: None if math.isnan(x) else int(x)),
-            TypeTag.INTERVAL: None,
-            TypeTag.JSON: None,
-            TypeTag.NUMERIC: None,
-            TypeTag.OID: None,
-            TypeTag.SMALL_INT: None,
+            TypeTag.INTERVAL: ('string', lambda x: None if x is None else str(x)),
+            TypeTag.JSON: ('string', lambda x: None if x is None else str(x)),
+            TypeTag.NUMERIC: ('string', lambda x: None if x is None else str(x)),
+            TypeTag.OID: ('string', lambda x: None if x is None else str(x)),
+            TypeTag.SMALL_INT: ('bigint', lambda x: None if math.isnan(x) else int(x)),
             TypeTag.TEXT: ('string', lambda x: None if x is None else str(x)),
-            TypeTag.TIME: None,
-            TypeTag.TIMESTAMP: None,
-            TypeTag.TIMESTAMP_TZ: None,
-            TypeTag.VARCHAR: None
+            TypeTag.TIME: ('string', lambda x: None if x is None else str(x)),
+            TypeTag.TIMESTAMP: ('string', lambda x: None if x is None else str(x)),
+            TypeTag.TIMESTAMP_TZ: ('string', lambda x: None if x is None else str(x)),
+            TypeTag.VARCHAR: ('string', lambda x: None if x is None else str(x))
         }
 
     def dss_type_to_hyper(self, dss_type):

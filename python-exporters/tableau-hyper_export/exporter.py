@@ -13,12 +13,7 @@ logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s -
 
 class TableauHyperExporter(Exporter):
     """
-        Plugin component (Exporter) to export a dataset in dss to a hyper file format. Based on the TableauTableWriter
-        wrapper for the read/write to hyper file Tableau APIs.
-
-        Test location:
-            - (DSS flow) dku17: Should be tested on different scenarios
-            - (Mock execution) local: Can be tested on mock run locally
+    Exporter to Tableau Hyper file
     """
     def __init__(self, config, plugin_config):
         """

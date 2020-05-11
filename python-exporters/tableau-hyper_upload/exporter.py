@@ -30,12 +30,7 @@ def assert_not_none(variable, var_name):
 
 class TableauHyperExporter(Exporter):
     """
-    Plugin component (Exporter) to export a dataset in dss to a hyper file format. Based on the TableauTableWriter
-    wrapper for the read/write to hyper file Tableau APIs.
-
-    Test location:
-        - (DSS flow) dku17: Should be tested on different scenarios
-        - (Mock execution) local: Can be tested on mock run locally
+    Exporter to Tableau Hyper to Server
     """
     def __init__(self, config, plugin_config):
         """
@@ -66,8 +61,7 @@ class TableauHyperExporter(Exporter):
         assert_not_none(password, 'password')
         server_name = config.get('server_url', None)
         assert_not_none(server_name, 'server_url')
-        site_name = config.get('site_id', None)
-        assert_not_none(site_name, 'site_id')
+        site_name = config.get('site_id', None) # Site name is optional
 
         self.ssl_cert_path = config.get('ssl_cert_path', None)
 
