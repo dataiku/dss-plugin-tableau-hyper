@@ -74,10 +74,12 @@ class TableauHyperExporter(Exporter):
                 os.environ['CURL_CA_BUNDLE'] = self.ssl_cert_path
 
         self.project_name = config.get('project', 'Default')
-        self.schema_name = config.get('schema_name', 'Extract')
-        self.table_name = config.get('output_table', 'DSS_extract')
-        if "." in self.table_name:
-            raise ValueError("The table name parameter is invalid, remove \'.\' in {}".format(self.table_name))
+        self.schema_name = 'Extract'
+        self.table_name = 'Extract'
+        # self.schema_name = config.get('schema_name', 'Extract')
+        # self.table_name = config.get('output_table', 'DSS_extract')
+        # if "." in self.table_name:
+        #   raise ValueError("The table name parameter is invalid, remove \'.\' in {}".format(self.table_name))
 
         # Non mandatory parameter
         self.ssl_cert_path = config.get('ssl_cert_path', None)
