@@ -168,13 +168,13 @@ class TypeConversion(object):
         try: # retrieve the conversion function
             conversion_function = self.mapping_dss_to_hyper[dss_type][1]
         except Exception as err:
-            logger.warning("Failed to retrieve the function {}: {}".format(dss_type, err))
+            logger.warning("Failed to retrieve the conversion function for type {}".format(dss_type))
             raise err
         try: # convert the dss value in the hyper storage type
             output_value = conversion_function(value)
         except Exception as err:
             logger.warning("Failed to convert value {} of type {} to type {}".format(value, type(value), dss_type))
-            output_value = None
+            raise err
         return output_value
 
     def hyper_value_to_dss(self, value, tag=SqlType.text().tag):
@@ -198,5 +198,5 @@ class TypeConversion(object):
             output_value = conversion_function(value)
         except Exception as err:
             logger.warning("Failed to convert value {} of type {} stored as {}".format(value, type(value), tag))
-            output_value = None
+            raise err
         return output_value
