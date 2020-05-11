@@ -1,5 +1,4 @@
 """
-
 Export to a Tableau Server with credentials in DSS preset plugin form.
 """
 
@@ -73,6 +72,7 @@ class TableauHyperExporter(Exporter):
                 os.environ['REQUESTS_CA_BUNDLE'] = self.ssl_cert_path
                 os.environ['CURL_CA_BUNDLE'] = self.ssl_cert_path
 
+        self.out_file_name = config.get('output_table', 'DSS_extract')
         self.project_name = config.get('project', 'Default')
         self.schema_name = 'Extract'
         self.table_name = 'Extract'
@@ -108,7 +108,7 @@ class TableauHyperExporter(Exporter):
         :param schema:
         :return:
         """
-        self.output_file = self.table_name + ".hyper"
+        self.output_file = self.out_file_name + ".hyper"
         self.writer.schema_converter.set_dss_storage_types(schema)
         self.writer.create_schema(schema, self.output_file)
         return None
