@@ -1,35 +1,25 @@
-<!--<h3><b>Plugin: Tableau Hyper API</b></h3>-->
-## <b>Plugin: Tableau Hyper API</b> [[Plugin Page]](https://www.dataiku.com/product/plugins/) <br>
+Current Version: 0.1.0
+Compatible with DSS version: 7.0.0 and higher
 
-![Teaser Image](https://avatars0.githubusercontent.com/u/828667?s=200&v=4)
+**For earlier versions of DSS please refer to the manual installation procedure below**
 
-### Overview ###
+## Plugin information
 
-<b>This plugin offers the following capabilities:</b>
-- (0) Upload a DSS dataset to Tableau Server 
-- (1) Export a DSS dataset as a Hyper File
-- (2) Import a hyper file to a DSS project 
+[Tableau](https://tableau.com) is one of the leading data visualization tools
 
-### Dependencies ###
+This plugin offers the ability to export Dataiku data to Tableau with the Hyper format:
 
-This plugins relies on [Tableau Hyper API](https://help.tableau.com/current/api/hyper_api/en-us/index.html) and the 
-[Tableau Server Client](https://tableau.github.io/server-client-python/docs/), installed via Pip during plugin setup.
-The Tableau Hyper API requires at least Python 3.6 version.
+* Export to a Hyper file for immediate open in Tableau Desktop
+* Directly upload a dataset to Tableau Server with the Hyper format
+* Import a Hype file as a DSS dataset using a formatter component
 
-### (1) Usage in DSS
+## Prerequisites
 
-(1) See the demo video on [Google Video](https://drive.google.com/open?id=1YBPjrkygRzAzsC3yNZu6mEfhqHIjx75Z)
+The plugin comes prepackaged with a code environement that will install the [Tableau Server Client](https://tableau.github.io/server-client-python/)
+and the [Tableau Hyper API](https://help.tableau.com/current/api/hyper_api/en-us/index.html).
 
-### (2) Structure of the plugin ### 
+## How it works
 
-- An exporter to file
-- An uploader to server
-- A formatter to read a Hyper file
+Once the plugin is successfully installed you can use it as an ordinary DSS exporter or formatter.
 
-### (3) Testing the plugin component ###
-
-The test are done using the PyTest framework. You can run them using `pytest` in a console.
-
-### Misc ###
-
-Contact thibault.desfontaines@dataiku.com
+Please refer to the [Dataiku Plugin webpage](https://www.dataiku.com/dss/plugins/info/tableau-hyper-extract.html) for detailed usage information
