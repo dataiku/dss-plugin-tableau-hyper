@@ -1,11 +1,5 @@
 """
 Helper functions and class definition for conversion between schema in DSS and Tableau Hyper
-
-The dss_columns
-The hyper_columns
-The dss_storage_types
-The hyper_storage_types
-
 """
 
 from tableauhyperapi import TableDefinition
@@ -116,7 +110,6 @@ class SchemaConversion:
         >>> from tableauhyperapi import SqlType
         >>> from tableauhyperapi import TypeTag
         >>> assert SqlType.double().tag == TypeTag.DOUBLE
-
         """
         self.hyper_storage_types = hyper_storage_types
 
@@ -124,6 +117,7 @@ class SchemaConversion:
         """
         Transform value with respect to specified type in DSS dataset
         :param hyper_row: row of values coming from Tableau Hyper
+        :return dss_row: dss compliant row
         """
         dss_row = [self.type_converter.hyper_value_to_dss(value_, type_) for value_, type_ in zip(hyper_row, self.hyper_storage_types)]
         return dss_row
@@ -132,6 +126,7 @@ class SchemaConversion:
         """
         Transform value with respect to specified type in Tableau Hyper dataset
         :param dss_row: row of values coming from DSS dataset
+        :return hyper_row: tableau hyper compliant row
         """
         hyper_row = [self.type_converter.dss_value_to_hyper(value_, type_) for value_, type_ in zip(dss_row, self.dss_storage_types)]
         return hyper_row

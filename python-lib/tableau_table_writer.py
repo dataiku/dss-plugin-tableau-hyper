@@ -19,7 +19,7 @@ from schema_conversion import geo_to_text
 from schema_conversion import SchemaConversion
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='Tableau Hyper API | %(levelname)s - %(message)s')
 
 
 class TableauTableWriter(object):

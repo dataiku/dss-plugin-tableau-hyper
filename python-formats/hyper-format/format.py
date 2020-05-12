@@ -118,8 +118,7 @@ class MyFormatExtractor(FormatExtractor):
         :param stream: the stream to read the formatted data from
         """
         FormatExtractor.__init__(self, stream)
-        self.tableau_reader = TableauTableReader(table_name=table_name,
-                                                 schema_name=schema_name)
+        self.tableau_reader = TableauTableReader(table_name=table_name, schema_name=schema_name)
         self.tableau_reader.create_tmp_hyper()
         self.tableau_reader.read_buffer(stream)
         self.tableau_reader.open_connection()

@@ -1,14 +1,10 @@
-"""
-    Contains only the class TableauHyperExporter.
-"""
-
 import logging
 
 from dataiku.exporter import Exporter
 from tableau_table_writer import TableauTableWriter
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='Tableau Hyper Plugin | %(levelname)s - %(message)s')
 
 
 class TableauHyperExporter(Exporter):
@@ -25,11 +21,11 @@ class TableauHyperExporter(Exporter):
 
         schema_name = self.config.get("schema_name")
         if schema_name is None:
-            schema_name = "dss_schema"
+            schema_name = "Extract"
 
         table_name = self.config.get("table_name")
         if table_name is None:
-            table_name = "dss_table"
+            table_name = "Extract"
 
         logger.info("Detected schema_name: {}".format(schema_name))
         logger.info("Detected table_name: {}".format(table_name))
@@ -45,10 +41,9 @@ class TableauHyperExporter(Exporter):
 
     def open_to_file(self, schema, destination_file_path):
         """
-            Initial actions for the opening of the output file.
+        Initial actions for the opening of the output file.
 
-        :param schema: the column names and types of the data that will be streamed
-                       in the write_row() calls
+        :param schema: the column names and types of the data
         :param destination_file_path: the path where the exported data should be put
         """
         self.output_file = destination_file_path

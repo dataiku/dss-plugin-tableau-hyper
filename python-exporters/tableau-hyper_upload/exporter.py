@@ -1,5 +1,6 @@
 """
-Export to a Tableau Server with credentials in DSS preset plugin form.
+Export to Tableau Server
+Allow credentials from plugin preset
 """
 
 import logging
@@ -11,7 +12,7 @@ from tableau_table_writer import TableauTableWriter
 import tableauserverclient as tsc
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Tableau Plugin | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='Tableau Hyper Plugin | %(levelname)s - %(message)s')
 
 
 def remove_empty_keys(dictionary):
@@ -49,8 +50,8 @@ class TableauHyperExporter(Exporter):
         logger.info("Preset config:\n{}".format(preset_config))
         logger.info("Parameter config:\n{}".format(config))
 
-        config = {**config, **preset_config}
-        self.config = config # Final config
+        config = {**config, **preset_config} # preset config overwrites user config
+        self.config = config # final config
 
         logger.info("Final config: {}".format(self.config))
 
@@ -60,7 +61,7 @@ class TableauHyperExporter(Exporter):
         assert_not_none(password, 'password')
         server_name = config.get('server_url', None)
         assert_not_none(server_name, 'server_url')
-        site_name = config.get('site_id', None) # Site name is optional
+        site_name = config.get('site_id', None) # site name is optional
 
         self.ssl_cert_path = config.get('ssl_cert_path', None)
 
@@ -76,10 +77,6 @@ class TableauHyperExporter(Exporter):
         self.project_name = config.get('project', 'Default')
         self.schema_name = 'Extract'
         self.table_name = 'Extract'
-        # self.schema_name = config.get('schema_name', 'Extract')
-        # self.table_name = config.get('output_table', 'DSS_extract')
-        # if "." in self.table_name:
-        #   raise ValueError("The table name parameter is invalid, remove \'.\' in {}".format(self.table_name))
 
         # Non mandatory parameter
         self.ssl_cert_path = config.get('ssl_cert_path', None)
@@ -116,8 +113,7 @@ class TableauHyperExporter(Exporter):
     def open_to_file(self, schema, destination_file_path):
         """
         Initial actions for the opening of the output file.
-        :param schema: the column names and types of the data that will be streamed
-                       in the write_row() calls
+        :param schema: the column names and types of the input data
         :param destination_file_path: the path where the exported data should be put
         """
         self.output_file = destination_file_path
@@ -140,4 +136,5 @@ class TableauHyperExporter(Exporter):
         self.writer.close()
         with self.server.auth.sign_in(self.tableau_auth):
             self.server.datasources.publish(self.tableau_datasource, self.output_file, 'Overwrite')
+        os.remove(self.output_file)
         return True
