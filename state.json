@@ -1,0 +1,12 @@
+{
+  "actions": [
+    {
+      "ts": 1589374771483,
+      "action": "INSTALLED_DEPS_CUSTOM",
+      "user": "admin"
+    }
+  ],
+  "gitState": {
+    "enabled": false
+  }
+}

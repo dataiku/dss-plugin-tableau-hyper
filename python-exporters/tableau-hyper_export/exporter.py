@@ -12,5 +12,5 @@ class TableauHyperExporter(Exporter):
         self.e.insert_array_row(row)
 
     def close(self):
-        print "Hyper: Exported %d rows" % self.e.nrows
+        print("Hyper: Exported %d rows" % self.e.nrows)
         self.e.close()
