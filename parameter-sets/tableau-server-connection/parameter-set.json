@@ -1,7 +1,7 @@
 {
     "meta" : {
-        "label": "Tableau Server Preset Login",
-        "description": "Parameter set for the Tableau Server Login",
+        "label": "Tableau Server Preset",
+        "description": "Tableau Server Preset",
         "icon": "icon-puzzle-piece"
     },
     "defaultDefinableInline": true,

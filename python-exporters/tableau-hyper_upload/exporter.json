@@ -18,7 +18,7 @@
         },
         {
             "name": "tableau_server_connection",
-            "label": "Credentials from Tableau Server preset",
+            "label": "Tableau Server Preset",
             "type": "PRESET",
             "parameterSetId": "tableau-server-connection"
         },
