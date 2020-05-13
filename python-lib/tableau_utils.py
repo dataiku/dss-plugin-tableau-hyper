@@ -137,7 +137,7 @@ class TableauExport(object):
             data = input_row[col_no]
             try:
                 fieldSetterMap[col['type']](output_row, col_no, data)
-            except Exceptio as e:
+            except Exception, e:
                 self.errors += 1
                 if self.errors < 100 or (self.errors < 10000 and self.errors % 100 == 0) or (self.errors % 1000 ==0):
                     try:
