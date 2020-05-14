@@ -52,8 +52,10 @@ class CustomExporter(Exporter):
         print("\tBuild number: {0}".format(s_info.build_number))
         
         server.auth.sign_in(tableau_auth)
-        
-        all_project_items, pagination_item = server.projects.get()
+
+        # We cannot use Tableau API Filtering as it has some limitation in special characters. Indeed, ",", "&", ":" and
+        # all characters that usually appear in url break the request. The only solution, for the moment, is to iterate
+        # through all the projets.
         page_nb = 1
         while not self.project:
             all_project_items, pag_it = server.projects.get(req_options=TSC.RequestOptions(pagenumber=page_nb))
