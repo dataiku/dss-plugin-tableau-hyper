@@ -4,6 +4,7 @@ from dataiku.exporter import Exporter
 from dataiku.exporter import SchemaHelper
 import tempfile, os
 from tableau_utils import TableauExport
+from tableau_utils import get_project_from_name, get_datasource_from_name
 
 import tableauserverclient as TSC
 
@@ -53,24 +54,8 @@ class CustomExporter(Exporter):
         
         server.auth.sign_in(tableau_auth)
 
-        # We cannot use Tableau API Filtering as it has some limitation in special characters. Indeed, ",", "&", ":" and
-        # all characters that usually appear in url break the request. The only solution, for the moment, is to iterate
-        # through all the projets.
-        page_nb = 1
-        while not self.project:
-            all_project_items, pag_it = server.projects.get(req_options=TSC.RequestOptions(pagenumber=page_nb))
-            filtered_projects = filter(lambda x: x.name.encode('utf-8') == self.project_name_utf8, all_project_items)
-            self.project = filtered_projects[0] if filtered_projects else None
-            if pag_it.page_number == (pag_it.total_available // pag_it.page_size) + 1 and not self.project:
-                raise ValueError('Project {} does not exist on server'.format(self.project_name_utf8))
-            page_nb += 1
-        
-        all_datasources, pagination_item = server.datasources.get()
-            
-        datasource_match = [d for d in all_datasources if d.name.encode('utf-8') == self.output_table_utf8 ]
-        if len(datasource_match) > 0:
-            self.datasource = datasource_match[0]
-            print('WARN: Found existing table {} with id {}, will be overwritten'.format(self.datasource.name.encode('utf-8'), self.datasource.id))
+        self.project = get_project_from_name(server, self.project_name_utf8)
+        self.datasource = get_datasource_from_name(server, self.output_table_utf8)
 
         server.auth.sign_out()
         
