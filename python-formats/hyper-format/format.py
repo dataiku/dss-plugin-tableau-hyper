@@ -9,8 +9,6 @@ Note: the name of the class itself is not relevant.
 
 """
 
-from typing import List
-
 from dataiku.customformat import Formatter, OutputFormatter, FormatExtractor
 
 import base64
