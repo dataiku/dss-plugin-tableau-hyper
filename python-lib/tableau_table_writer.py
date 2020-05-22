@@ -160,6 +160,7 @@ class TableauTableWriter(object):
             self.update_table()
             self.data = []
         logger.info("Closing Tableau Hyper connections...")
+
         self.hyper.close()
         self.connection.close()
         logger.info("Closed export")

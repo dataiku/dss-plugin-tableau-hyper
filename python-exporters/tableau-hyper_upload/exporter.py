@@ -111,6 +111,7 @@ class TableauHyperExporter(Exporter):
         :param schema:
         :return:
         """
+        logger.info("Open target storage file in exporter (open method)...")
         self.output_file = self.output_file_name + ".hyper"
         self.writer.schema_converter.set_dss_storage_types(schema)
         self.writer.create_schema(schema, self.output_file)
@@ -118,13 +119,8 @@ class TableauHyperExporter(Exporter):
 
     def open_to_file(self, schema, destination_file_path):
         """
-        Initial actions for the opening of the output file.
-        :param schema: the column names and types of the input data
-        :param destination_file_path: the path where the exported data should be put
         """
-        self.output_file = destination_file_path
-        self.writer.schema_converter.set_dss_storage_types(schema)
-        self.writer.create_schema(schema, self.output_file)
+        pass
 
     def write_row(self, row):
         """

@@ -6,7 +6,6 @@ The formatter (import a Tableau Hyper file as DSS dataset) relies on this class.
 
 import logging
 import os
-import tempfile
 
 from schema_conversion import SchemaConversion
 from tableauhyperapi import HyperProcess
@@ -35,7 +34,7 @@ def build_query(columns):
     """
     query_columns = ''
     for column in columns:
-        query_columns += column.name.unescaped
+        query_columns += str(column.name)
         if str(column.type) == 'GEOGRAPHY':
             query_columns += ':: text'
         query_columns += ', '
@@ -76,14 +75,15 @@ class TableauTableReader(object):
         self.limit = 10000
         self.end_read = False
 
-    def create_tmp_hyper(self):
+    def create_tmp_hyper_file(self):
         """
         Create a temporary file to store the streaming buffer
         :return: self.path_to_hyper: path to the temporary file
         """
-        self.path_to_hyper = tempfile.NamedTemporaryFile(prefix='output', suffix=".hyper", dir=os.getcwd()).name
-        logger.info("Create a temporary hyper file at location: {}".format(self.path_to_hyper))
-        return self.path_to_hyper
+        self.path_to_hyper = "temporary_hyper_file.hyper" # default name
+        if os.path.exists(self.path_to_hyper):
+            logger.info("Existing temporary hyper storage file detected: {}\nWill be destroyed...".format(self.path_to_hyper))
+            os.remove(self.path_to_hyper)
 
     def read_buffer(self, stream):
         """
@@ -136,7 +136,12 @@ class TableauTableReader(object):
         Retrieve all the rows from the Tableau Hyper file, convert values on the fly
         """
         sql_hyper_query = f'SELECT {build_query(self.hyper_columns)} FROM {self.hyper_table} OFFSET {offset} LIMIT {limit}'
-        result = self.connection.execute_query(sql_hyper_query)
+        logger.warning("SQL query ", sql_hyper_query)
+        try:
+            result = self.connection.execute_query(sql_hyper_query)
+        except Exception as err:
+            logger.fatal("Tried to execute query but was unsuccessful.")
+            raise err
         for row in result:
             self.rows.append(row)
 
@@ -165,7 +170,9 @@ class TableauTableReader(object):
             self.offset += self.limit
         if len(self.rows) == 0:
             self.close_connection()
+            os.remove(self.path_to_hyper)
             self.end_read = True
+            logger.info("Finished reading rows from hyper file...")
             return None
         else:
             hyper_row = self.rows.pop()
