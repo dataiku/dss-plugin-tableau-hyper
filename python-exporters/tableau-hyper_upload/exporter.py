@@ -39,7 +39,6 @@ class TableauHyperExporter(Exporter):
         """
 
         self.plugin_config = plugin_config
-        logger.info("Received following overall config:\n{}".format(config))
         # The user config is overwritten by the preset config
         preset_config = config.pop('tableau_server_connection')
 
@@ -47,13 +46,8 @@ class TableauHyperExporter(Exporter):
         remove_empty_keys(preset_config)
         remove_empty_keys(config)
 
-        logger.info("Preset config:\n{}".format(preset_config))
-        logger.info("Parameter config:\n{}".format(config))
-
         config = {**config, **preset_config} # preset config overwrites user config
         self.config = config # final config
-
-        logger.info("Final config: {}".format(self.config))
 
         username = config.get('username', None)
         assert_not_none(username, 'username')
@@ -62,6 +56,11 @@ class TableauHyperExporter(Exporter):
         server_name = config.get('server_url', None)
         assert_not_none(server_name, 'server_url')
         site_name = config.get('site_id', None) # site name is optional
+
+        logger.info("Detected following user input configuration:\n"
+                    "     username: {},\n"
+                    "   server_url: {},\n"
+                    "    site_name: {}".format(username, server_name, site_name))
 
         self.ssl_cert_path = config.get('ssl_cert_path', None)
 
@@ -77,6 +76,13 @@ class TableauHyperExporter(Exporter):
         self.project_name = config.get('project', 'Default')
         self.schema_name = 'Extract'
         self.table_name = 'Extract'
+
+        logger.info("Detected following Tableau Hyper file configuration:\n"
+                    "   output_file_name: {},\n"
+                    "       project_name: {},\n"
+                    "        schema_name: {},\n"
+                    "         table_name: {},\n".format(
+            self.output_file_name, self.project_name, self.schema_name, self.table_name))
 
         # Non mandatory parameter
         self.ssl_cert_path = config.get('ssl_cert_path', None)
