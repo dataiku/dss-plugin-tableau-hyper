@@ -8,6 +8,8 @@ import os
 
 from dataiku.exporter import Exporter
 from tableau_table_writer import TableauTableWriter
+from tableau_server_utils import get_project_from_name
+from tableau_server_utils import get_full_list_of_projects
 
 import tableauserverclient as tsc
 
@@ -39,6 +41,7 @@ class TableauHyperExporter(Exporter):
         """
 
         self.plugin_config = plugin_config
+
         # The user config is overwritten by the preset config
         preset_config = config.pop('tableau_server_connection')
 
@@ -94,16 +97,14 @@ class TableauHyperExporter(Exporter):
         self.server = tsc.Server(server_name)
 
         with self.server.auth.sign_in(self.tableau_auth):
-            all_projects, pagination = self.server.projects.get()
-            projects_name = [project.name for project in all_projects]
-        if self.project_name is None:
-            raise ValueError
-        self.tableau_datasource = None
-        for project in all_projects:
-            if project.name == self.project_name:
-                self.tableau_datasource = tsc.DatasourceItem(project.id)
-        if self.tableau_datasource is None:
-            raise ValueError("The target project does not exist in Tableau Server")
+            project_names = get_full_list_of_projects(self.server)
+            logger.info('Got following projects available on server: {}'.format(project_names))
+
+        with self.server.auth.sign_in(self.tableau_auth):
+            exists, project = get_project_from_name(self.server, self.project_name)
+            if not exists:
+                raise ValueError('The project {} does not exist on server.'.format(self.project_name))
+            self.tableau_datasource = tsc.DatasourceItem(project.id) # get tableau data source
 
     def open(self, schema):
         """

@@ -17,28 +17,38 @@
             "type": "SEPARATOR"
         },
         {
+            "name": "usePreset",
+            "label" : "Use preset",
+            "type": "BOOLEAN",
+            "mandatory": false
+        },
+        {
             "name": "tableau_server_connection",
             "label": "Tableau Server Preset",
             "type": "PRESET",
-            "parameterSetId": "tableau-server-connection"
+            "parameterSetId": "tableau-server-connection",
+            "visibilityCondition": "model.usePreset == true"
         },
         {
             "name": "server_url",
             "label":"URL",
             "type": "STRING",
-            "mandatory": false
+            "mandatory": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         },
         {
             "name": "username",
             "label":"Username",
             "type": "STRING",
-            "mandatory": false
+            "mandatory": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         },
         {
             "name": "password",
             "label":"Password",
             "type": "PASSWORD",
-            "mandatory": false
+            "mandatory": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         },
         {
             "name": "ssl_cert_path",
@@ -72,8 +82,9 @@
             "name": "site_id",
             "label":"Site ID",
             "type": "STRING",
-            "description":"optional, default is empty",
-            "mandatory": false
+            "description":"The site_id SITENAME is the subpath of your full site URL (also called contentURL in the REST API). MYSITE would be the site name of https://10ax.online.tableau.com/MYSITE. This parameter can be omitted when signing in to the Default site of a on premise Tableau server.",
+            "mandatory": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         }
     ]
 }

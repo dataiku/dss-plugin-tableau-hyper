@@ -12,7 +12,7 @@
     "params": [
         {
             "name": "server_url",
-            "label":"Tableau Server URL",
+            "label":"URL",
             "type": "STRING",
             "mandatory": true
         },

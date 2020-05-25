@@ -56,18 +56,44 @@ credentials once for all DSS user on the instance. The parameters available are 
 * Tableau Server Username
 * Tableau Server Password
 
+Usage of those parameters are detailed on the documentation of the 
+[Tableau Server Client in Python](https://tableau.github.io/server-client-python/docs/).
+
+ 
+```python
+import tableauserverclient as TSC
+
+tableau_auth = TSC.TableauAuth('USERNAME', 'PASSWORD', 'SITENAME')
+server = TSC.Server('http://SERVER_URL')
+
+with server.auth.sign_in(tableau_auth):
+    all_datasources, pagination_item = server.datasources.get()
+    print("\nThere are {} datasources on site: ".format(pagination_item.total_available))
+    print([datasource.name for datasource in all_datasources])
+```
+
+SERVER_URL is the URL of your Tableau server without subpaths. 
+For local Tableau servers, an example would be: https://www.MY_SERVER.com. For Tableau Online, 
+an example would be: https://10ax.online.tableau.com/.
+
+SITENAME is the subpath of your full site URL (also called contentURL in the REST API). MYSITE would be the site 
+name of https://10ax.online.tableau.com/MYSITE. This parameter can be omitted when signing in to the Default site of a 
+on premise Tableau server.
+
+
+
 ### The Tableau Hyper Format Component
 
 Explore Tableau Hyper files directly as a datasource in your DSS flow. Specify the Tableau 
 Hyper format on the input file and interact with the data instantly. 
 
-## The Tableau Hyper Exporter to file
+## Specific question relative to DSS
 
-Export the results of your data processing, findings and predictions in DSS
-as a Tableau Hyper file that can be opened directly into Tableau.
+### What is the behavior with respect to partitioning ?
 
-## The Tableau Hyper Exporter to Server
-
-Enables the upload of a file to a Tableau Server or to Tableau Online directly from your
-DSS flow. Using the preset, the Tableau Server credentials are available for all DSS
-users on your instance. 
+As a user, I have a dataset partitioned on the column "month" and stored in PostGreSQL.
+Doing a direct export to file or direct export to folder, you get all the value of month and every partitions.
+Using an "Export to folder" component in the flow, you can choose the target partition you want to export to file 
+or to Tableau server. In both case, it will be a Hyper file. Be careful, the default behavior of the plugin on Tableau 
+Server is to overwrite the existing Hyper table. So changing the target partition and uploading to the same table
+and file will overwrite the existing table.
