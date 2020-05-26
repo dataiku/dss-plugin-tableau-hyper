@@ -1,5 +1,5 @@
 Current Version: 0.1.0
-Compatible with DSS version: 7.0.0 and higher
+Compatible with DSS version: 5.0.0 and higher
 
 ## Plugin information
 
@@ -96,4 +96,5 @@ Doing a direct export to file or direct export to folder, you get all the value 
 Using an "Export to folder" component in the flow, you can choose the target partition you want to export to file 
 or to Tableau server. In both case, it will be a Hyper file. Be careful, the default behavior of the plugin on Tableau 
 Server is to overwrite the existing Hyper table. So changing the target partition and uploading to the same table
-and file will overwrite the existing table.
+and file will overwrite the existing table. **Also, you can not write several partitions in a same Hyper file, you 
+must first merge all your partitions in a single one before doing an export** 
