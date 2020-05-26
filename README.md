@@ -80,8 +80,6 @@ SITENAME is the subpath of your full site URL (also called contentURL in the RES
 name of https://10ax.online.tableau.com/MYSITE. This parameter can be omitted when signing in to the Default site of a 
 on premise Tableau server.
 
-
-
 ### The Tableau Hyper Format Component
 
 Explore Tableau Hyper files directly as a datasource in your DSS flow. Specify the Tableau 
@@ -91,10 +89,6 @@ Hyper format on the input file and interact with the data instantly.
 
 ### What is the behavior with respect to partitioning ?
 
-As a user, I have a dataset partitioned on the column "month" and stored in PostGreSQL.
-Doing a direct export to file or direct export to folder, you get all the value of month and every partitions.
-Using an "Export to folder" component in the flow, you can choose the target partition you want to export to file 
-or to Tableau server. In both case, it will be a Hyper file. Be careful, the default behavior of the plugin on Tableau 
-Server is to overwrite the existing Hyper table. So changing the target partition and uploading to the same table
-and file will overwrite the existing table. **Also, you can not write several partitions in a same Hyper file, you 
-must first merge all your partitions in a single one before doing an export** 
+For partitioned datasets, an export to folder will create as many folders as partitions and will create
+one Tableau Hyper file in each folder (one per partition). However, uploading a partitioned dataset to Tableau Server is 
+not allowed due to the fact that there can be only one connection at a given time for a Hyper file.

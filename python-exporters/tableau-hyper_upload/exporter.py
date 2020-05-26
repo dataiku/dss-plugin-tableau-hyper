@@ -93,7 +93,7 @@ class TableauHyperExporter(Exporter):
         self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
         self.output_file = None
 
-        self.tableau_auth = tsc.TableauAuth(username, password, site_name)
+        self.tableau_auth = tsc.TableauAuth(username, password, site_id=site_name)
         self.server = tsc.Server(server_name)
 
         with self.server.auth.sign_in(self.tableau_auth):
