@@ -39,12 +39,16 @@ Please refer to the [Dataiku Plugin webpage](https://www.dataiku.com/dss/plugins
 Export the results of your data processing, findings and predictions in DSS
 as a Tableau Hyper file that can be opened directly into Tableau. 
 
+Be careful, if run twice, it overwrites the existing Table. 
+
 ### The Tableau Hyper Exporter to Server
 
 Enables the upload of a file to a Tableau Server or to Tableau Online directly from your
 DSS flow. Using the preset, the Tableau Server credentials are available for all DSS
 users on your instance. Access and interact with your data on Tableau Server or Tableau 
 Online.
+
+If a table already exists in the target project, it will be overwritten.
 
 ### Parameter Set
 
