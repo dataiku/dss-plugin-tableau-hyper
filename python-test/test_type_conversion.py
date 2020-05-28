@@ -33,7 +33,7 @@ def test_dss_type_to_hyper():
 def test_hyper_type_to_dss():
     type_converter = TypeConversion()
     dss_type = type_converter.hyper_type_to_dss(TypeTag.INT)
-    assert dss_type == 'bigint'
+    assert dss_type == 'int'
 
 
 def test_dss_value_to_hyper():
@@ -47,3 +47,11 @@ def test_hyper_value_to_dss():
     dss_value = type_converter.hyper_value_to_dss("point(-90 80)", TypeTag.GEOGRAPHY)
     assert dss_value == "POINT(-90 80)"
     return True
+
+
+if __name__ == "__main__":
+    test_to_dss_date()
+    test_dss_type_to_hyper()
+    test_hyper_type_to_dss()
+    test_dss_value_to_hyper()
+    test_hyper_value_to_dss()
