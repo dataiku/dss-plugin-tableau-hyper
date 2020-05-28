@@ -1,6 +1,5 @@
 """
-Export to Tableau Server
-Allow credentials from plugin preset
+Exporter to Tableau Server or Tableau Online
 """
 
 import logging
@@ -14,10 +13,15 @@ from tableau_server_utils import get_full_list_of_projects
 import tableauserverclient as tsc
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Tableau Hyper Plugin | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(levelname)s - %(message)s')
 
 
 def remove_empty_keys(dictionary):
+    """
+    Remove empty keys from dictionary
+    :param dictionary:
+    :return:
+    """
     key_to_remove = []
     for key in dictionary:
         if dictionary[key] is None or dictionary[key] == '':
@@ -27,12 +31,21 @@ def remove_empty_keys(dictionary):
 
 
 def assert_not_none(variable, var_name):
+    """
+    Return error message if input variable is not defined
+    :param variable: value of the variable
+    :param var_name: name of the input variable
+    :return:
+    """
     assert ((variable is not None) and variable != ''), "Parameter {} should be defined".format(var_name)
 
 
 class TableauHyperExporter(Exporter):
     """
-    Exporter to Tableau Hyper to Server
+    Exporter to Tableau Server or Tableau Online
+
+    This exporter will first produce a Tableau Hyper file in the home dss directory, and
+    then send it to Tableau Server/Online.
     """
     def __init__(self, config, plugin_config):
         """
@@ -42,16 +55,19 @@ class TableauHyperExporter(Exporter):
 
         self.plugin_config = plugin_config
 
-        # The user config is overwritten by the preset config
+        # Extract preset configuration from general configuration
         preset_config = config.pop('tableau_server_connection')
 
+        # Sanitize the two configurations
         logger.info("Processing user interface input parameters...")
         remove_empty_keys(preset_config)
         remove_empty_keys(config)
 
-        config = {**config, **preset_config} # preset config overwrites user config
+        # Preset configuration will overwrite the manual configuration
+        config = {**config, **preset_config}
         self.config = config # final config
 
+        # Retrieve credentials parameters
         username = config.get('username', None)
         assert_not_none(username, 'username')
         password = config.get('password', None)
@@ -65,6 +81,7 @@ class TableauHyperExporter(Exporter):
                     "   server_url: {},\n"
                     "    site_name: {}".format(username, server_name, site_name))
 
+        # Handle ssl certificates
         self.ssl_cert_path = config.get('ssl_cert_path', None)
 
         if self.ssl_cert_path:
@@ -75,6 +92,7 @@ class TableauHyperExporter(Exporter):
                 os.environ['REQUESTS_CA_BUNDLE'] = self.ssl_cert_path
                 os.environ['CURL_CA_BUNDLE'] = self.ssl_cert_path
 
+        # Retrieve Tableau Hyper and Server/Online locations and table configurations
         self.output_file_name = config.get('output_table', 'my_dss_table')
         self.project_name = config.get('project', 'Default')
         self.schema_name = 'Extract'
@@ -87,19 +105,22 @@ class TableauHyperExporter(Exporter):
                     "         table_name: {},\n".format(
             self.output_file_name, self.project_name, self.schema_name, self.table_name))
 
-        # Non mandatory parameter
-        self.ssl_cert_path = config.get('ssl_cert_path', None)
-
+        # Instantiate Tableau Writer wrapper
         self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
+
+        # Init output file location
         self.output_file = None
 
+        # Open connection to Tableau Server
         self.tableau_auth = tsc.TableauAuth(username, password, site_id=site_name)
         self.server = tsc.Server(server_name)
 
+        # For debugging purpose only
         with self.server.auth.sign_in(self.tableau_auth):
             project_names = get_full_list_of_projects(self.server)
             logger.info('Got following projects available on server: {}'.format(project_names))
 
+        # Retrieve target project from Tableau Server/Online
         with self.server.auth.sign_in(self.tableau_auth):
             exists, project = get_project_from_name(self.server, self.project_name)
             if not exists:
@@ -108,7 +129,6 @@ class TableauHyperExporter(Exporter):
 
     def open(self, schema):
         """
-        Leave empty
         :param schema:
         :return:
         """
@@ -126,7 +146,8 @@ class TableauHyperExporter(Exporter):
     def write_row(self, row):
         """
         Handle one row of data to export
-        :param row: a tuple with N strings matching the schema passed to open.
+
+        :param row: a tuple with N strings matching the schema passed to open
         """
         self.writer.write_row(row)
         self.writer.row_index += 1
@@ -134,7 +155,8 @@ class TableauHyperExporter(Exporter):
 
     def close(self):
         """
-        Close the connections and send data to Tableau
+        Close the connections and publish DataSource to Tableau Server/Online
+        If same DataSource exists, it will be overwritten
         """
         self.writer.close()
         with self.server.auth.sign_in(self.tableau_auth):

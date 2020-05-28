@@ -7,13 +7,16 @@ import logging
 import tableauserverclient as tsc
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Tableau Hyper Plugin | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(levelname)s - %(message)s')
 
 
 def get_project_from_name(server, project_name):
-    # We cannot use Tableau API Filtering as it has some limitation in special characters. Indeed, ",", "&", ":" and
-    # all characters that usually appear in url break the request. The only solution, for the moment, is to iterate
-    # through all the projets.
+    """
+    Retrieve the target project from Tableau Server
+    :param server: tableau server
+    :param project_name: target project name
+    :return: couple (Boolean{target project exists on server}, project)
+    """
     page_nb = 1
     while True:
         all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
@@ -28,12 +31,18 @@ def get_project_from_name(server, project_name):
         page_nb += 1
 
 
-def get_datasource_from_name(server, output_table_utf8):
+def get_datasource_from_name(server, output_table):
+    """
+    Retrieve a datasource from Tableau Server
+    :param server:
+    :param output_table:
+    :return:
+    """
     page_nb = 1
     while True:
         all_datasources, pag_it = server.datasources.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
         filtered_datasources = list(
-            filter(lambda x: x.name.encode('utf-8') == output_table_utf8, all_datasources)
+            filter(lambda x: x.name == output_table, all_datasources)
         )
         if filtered_datasources:
             datasource = filtered_datasources[0]
@@ -46,6 +55,11 @@ def get_datasource_from_name(server, output_table_utf8):
 
 
 def get_full_list_of_projects(server):
+    """
+    Return the full list of projects on Tableau Server
+    :param server:
+    :return:
+    """
     page_nb = 1
     while True:
         all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))

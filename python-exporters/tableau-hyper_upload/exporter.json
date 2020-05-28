@@ -20,7 +20,8 @@
             "name": "usePreset",
             "label" : "Use preset",
             "type": "BOOLEAN",
-            "mandatory": false
+            "mandatory": false,
+            "description":"Get the Tableau Server connection parameters from a shared configuration"
         },
         {
             "name": "tableau_server_connection",

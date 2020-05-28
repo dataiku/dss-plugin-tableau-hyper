@@ -21,7 +21,7 @@ import pandas
 from tableau_table_reader import TableauTableReader
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Tableau Hyper Plugin | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(levelname)s - %(message)s')
 
 
 class MyFormatter(Formatter):

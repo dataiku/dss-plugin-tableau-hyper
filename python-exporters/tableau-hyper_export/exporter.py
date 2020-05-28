@@ -4,7 +4,7 @@ from dataiku.exporter import Exporter
 from tableau_table_writer import TableauTableWriter
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Tableau Hyper Plugin | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(levelname)s - %(message)s')
 
 
 class TableauHyperExporter(Exporter):
@@ -53,7 +53,7 @@ class TableauHyperExporter(Exporter):
 
     def write_row(self, row):
         """
-            Handle one row of data to export
+        Handle one row of data to export
 
         :param row: a tuple with N strings matching the schema passed to open.
         """
@@ -63,7 +63,7 @@ class TableauHyperExporter(Exporter):
 
     def close(self):
         """
-            Called when closing the table.
+        Called when closing the table.
         """
         self.writer.close()
         return True
