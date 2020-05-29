@@ -76,18 +76,31 @@ class TableauTableReader(object):
         self.limit = 10000
         self.end_read = False
 
+    def clean_tmp_hyper_files(self):
+        """
+        :return:
+        """
+        hyper_to_clean = [x for x in os.listdir(".") if x.startswith("tmp_hyper_file")]
+        for file_name in hyper_to_clean:
+            try:
+                os.remove(file_name)
+            except Exception as err:
+                logger.warning(err)
+                pass
+
     def create_tmp_hyper_file(self, unique=False):
         """
         Create a temporary file to store the streaming buffer
         :return: self.path_to_hyper: path to the temporary file
         """
         if unique:
-            self.path_to_hyper = "temporary_hyper_file.hyper" # default name
+            self.path_to_hyper = "tmp_hyper_file.hyper" # default name
             if os.path.exists(self.path_to_hyper):
                 logger.info("Existing temporary hyper storage file detected: {}\nWill be destroyed...".format(self.path_to_hyper))
                 os.remove(self.path_to_hyper)
         else:
-            self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=True).name
+            self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=True, dir=".").name
+            logger.info("Creating temporary file to store future buffer stream from Hyper: {} ".format(self.path_to_hyper))
 
     def read_buffer(self, stream):
         """
@@ -119,11 +132,14 @@ class TableauTableReader(object):
         logger.info("Trying to read Tableau Hyper table {}.{} ...".format(self.schema_name, self.table_name))
         hyper_table = TableName(self.schema_name, self.table_name)
         self.hyper_table = hyper_table
+
         try:
             table_def = self.connection.catalog.get_table_definition(hyper_table)
         except HyperException as e:
             logger.warning("The target table does not exists in this hyper file. Requested table: {}.{}"
                            .format(self.table_name, self.schema_name))
+            if os.path.exists(self.path_to_hyper):
+                os.remove(self.path_to_hyper)
             raise Exception("Table does not exist: {}.{}".format(self.schema_name, self.table_name))
 
         self.hyper_columns = table_def.columns
@@ -155,6 +171,8 @@ class TableauTableReader(object):
         """
         self.connection.close()
         self.hyper.close()
+        if os.path.exists(self.path_to_hyper):
+            os.remove(self.path_to_hyper)
 
     def read_schema(self):
         """

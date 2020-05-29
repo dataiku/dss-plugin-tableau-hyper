@@ -116,6 +116,7 @@ class MyFormatExtractor(FormatExtractor):
         """
         FormatExtractor.__init__(self, stream)
         self.tableau_reader = TableauTableReader(table_name=table_name, schema_name=schema_name)
+        self.tableau_reader.clean_tmp_hyper_files()
         self.tableau_reader.create_tmp_hyper_file()
         self.tableau_reader.read_buffer(stream)
         self.tableau_reader.open_connection()
