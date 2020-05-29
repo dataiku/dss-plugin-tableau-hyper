@@ -6,6 +6,7 @@ The formatter (import a Tableau Hyper file as DSS dataset) relies on this class.
 
 import logging
 import os
+import tempfile
 
 from schema_conversion import SchemaConversion
 from tableauhyperapi import HyperProcess
@@ -75,15 +76,18 @@ class TableauTableReader(object):
         self.limit = 10000
         self.end_read = False
 
-    def create_tmp_hyper_file(self):
+    def create_tmp_hyper_file(self, unique=False):
         """
         Create a temporary file to store the streaming buffer
         :return: self.path_to_hyper: path to the temporary file
         """
-        self.path_to_hyper = "temporary_hyper_file.hyper" # default name
-        if os.path.exists(self.path_to_hyper):
-            logger.info("Existing temporary hyper storage file detected: {}\nWill be destroyed...".format(self.path_to_hyper))
-            os.remove(self.path_to_hyper)
+        if unique:
+            self.path_to_hyper = "temporary_hyper_file.hyper" # default name
+            if os.path.exists(self.path_to_hyper):
+                logger.info("Existing temporary hyper storage file detected: {}\nWill be destroyed...".format(self.path_to_hyper))
+                os.remove(self.path_to_hyper)
+        else:
+            self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=True).name
 
     def read_buffer(self, stream):
         """
