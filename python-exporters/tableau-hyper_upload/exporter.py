@@ -132,10 +132,11 @@ class TableauHyperExporter(Exporter):
         :param schema:
         :return:
         """
-        logger.info("Open target storage file in exporter (open method)...")
+        logger.info("Call to open method in upload exporter ...")
         self.output_file = self.output_file_name + ".hyper"
         self.writer.schema_converter.set_dss_storage_types(schema)
         self.writer.create_schema(schema, self.output_file)
+        logger.info("Define the temporary output file: {}".format(self.output_file))
         return None
 
     def open_to_file(self, schema, destination_file_path):
@@ -161,5 +162,9 @@ class TableauHyperExporter(Exporter):
         self.writer.close()
         with self.server.auth.sign_in(self.tableau_auth):
             self.server.datasources.publish(self.tableau_datasource, self.output_file, 'Overwrite')
-        os.remove(self.output_file)
+        try:
+            os.remove(self.output_file)
+        except Exception as err:
+            logger.warning("Failed to remove the temporary file...")
+            raise err
         return True

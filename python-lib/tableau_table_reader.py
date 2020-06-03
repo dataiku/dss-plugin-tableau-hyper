@@ -108,10 +108,13 @@ class TableauTableReader(object):
         :param stream: stream coming from the Tableau Hyper file
         :return:
         """
+        stream_size = 0
         line = True
         with open(self.path_to_hyper, "ab") as f:
             while line:
                 line = stream.read(1024)
+                if line is not None:
+                    stream_size += len(line)
                 f.write(line)
         logger.info("Stored the full stream as bytes")
 
@@ -156,7 +159,7 @@ class TableauTableReader(object):
         Retrieve all the rows from the Tableau Hyper file, convert values on the fly
         """
         sql_hyper_query = f'SELECT {build_query(self.hyper_columns)} FROM {self.hyper_table} OFFSET {offset} LIMIT {limit}'
-        logger.warning("SQL query ", sql_hyper_query)
+        logger.warning("SQL query: {} ".format(sql_hyper_query))
         try:
             result = self.connection.execute_query(sql_hyper_query)
         except Exception as err:
