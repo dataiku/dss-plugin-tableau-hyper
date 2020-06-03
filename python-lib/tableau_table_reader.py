@@ -84,7 +84,8 @@ class TableauTableReader(object):
         :return: self.path_to_hyper: path to the temporary file
         """
         cache_dir = get_cache_location_from_user_config()
-        self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=True, dir=cache_dir).name
+        # Set the delete parameter to False imperatively to avoid early deletion
+        self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=False, dir=cache_dir).name
         logger.info("Creating temporary file to store future buffer stream from Hyper: {} ".format(self.path_to_hyper))
 
     def read_buffer(self, stream):
@@ -175,7 +176,6 @@ class TableauTableReader(object):
             self.offset += self.limit
         if len(self.rows) == 0:
             self.close_connection()
-            os.remove(self.path_to_hyper)
             self.end_read = True
             logger.info("Finished reading rows from hyper file...")
             return None
