@@ -8,12 +8,14 @@ import logging
 import os
 import tempfile
 
+from cache_utils import get_cache_location_from_user_config
 from schema_conversion import SchemaConversion
 from tableauhyperapi import HyperProcess
 from tableauhyperapi import Telemetry
 from tableauhyperapi import Connection
 from tableauhyperapi import TableName
 from tableauhyperapi import HyperException
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(levelname)s - %(message)s')
@@ -76,31 +78,14 @@ class TableauTableReader(object):
         self.limit = 10000
         self.end_read = False
 
-    def clean_tmp_hyper_files(self):
-        """
-        :return:
-        """
-        hyper_to_clean = [x for x in os.listdir(".") if x.startswith("tmp_hyper_file")]
-        for file_name in hyper_to_clean:
-            try:
-                os.remove(file_name)
-            except Exception as err:
-                logger.warning(err)
-                pass
-
-    def create_tmp_hyper_file(self, unique=False):
+    def create_tmp_hyper_file(self):
         """
         Create a temporary file to store the streaming buffer
         :return: self.path_to_hyper: path to the temporary file
         """
-        if unique:
-            self.path_to_hyper = "tmp_hyper_file.hyper" # default name
-            if os.path.exists(self.path_to_hyper):
-                logger.info("Existing temporary hyper storage file detected: {}\nWill be destroyed...".format(self.path_to_hyper))
-                os.remove(self.path_to_hyper)
-        else:
-            self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=True, dir=".").name
-            logger.info("Creating temporary file to store future buffer stream from Hyper: {} ".format(self.path_to_hyper))
+        cache_dir = get_cache_location_from_user_config()
+        self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=True, dir=cache_dir).name
+        logger.info("Creating temporary file to store future buffer stream from Hyper: {} ".format(self.path_to_hyper))
 
     def read_buffer(self, stream):
         """
@@ -108,13 +93,10 @@ class TableauTableReader(object):
         :param stream: stream coming from the Tableau Hyper file
         :return:
         """
-        stream_size = 0
         line = True
         with open(self.path_to_hyper, "ab") as f:
             while line:
                 line = stream.read(1024)
-                if line is not None:
-                    stream_size += len(line)
                 f.write(line)
         logger.info("Stored the full stream as bytes")
 
@@ -141,8 +123,6 @@ class TableauTableReader(object):
         except HyperException as e:
             logger.warning("The target table does not exists in this hyper file. Requested table: {}.{}"
                            .format(self.table_name, self.schema_name))
-            if os.path.exists(self.path_to_hyper):
-                os.remove(self.path_to_hyper)
             raise Exception("Table does not exist: {}.{}".format(self.schema_name, self.table_name))
 
         self.hyper_columns = table_def.columns
@@ -170,7 +150,7 @@ class TableauTableReader(object):
 
     def close_connection(self):
         """
-        Close the connection to the Tableau Hyper File
+        Close the connection to the Tableau Hyper file
         """
         self.connection.close()
         self.hyper.close()
@@ -179,7 +159,7 @@ class TableauTableReader(object):
 
     def read_schema(self):
         """
-        Access
+        Access schema
         """
         logger.info("Send to dss during read_schema: {}".format(self.dss_columns))
         return self.dss_columns
