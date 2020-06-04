@@ -89,7 +89,6 @@ class TableauTableWriter(object):
         # Open connection to file
         self.hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
         self.connection = Connection(self.hyper.endpoint, self.output_file, CreateMode.CREATE_AND_REPLACE)
-        assert os.path.exists(self.output_file)
         assert self.connection is not None
         self.connection.catalog.create_schema(self.schema_name)
         self.connection.catalog.create_table(self.output_table_definition)
