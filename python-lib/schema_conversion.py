@@ -1,5 +1,6 @@
 """
 Helper functions and class definition for conversion between schema in DSS and Tableau Hyper
+
 """
 
 from tableauhyperapi import TableDefinition

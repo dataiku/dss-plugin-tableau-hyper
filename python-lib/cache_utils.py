@@ -1,5 +1,5 @@
 """
-Handle write of temporary file with respect of DSS MUS instance
+Handle write of temporary file with respect to DSS MUS instance
 
 """
 

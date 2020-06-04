@@ -21,7 +21,7 @@
             "label" : "Use preset",
             "type": "BOOLEAN",
             "mandatory": false,
-            "description":"Get the Tableau Server connection parameters from a shared configuration"
+            "description":"Get the Tableau Server connection parameters from a shared configuration in DSS"
         },
         {
             "name": "tableau_server_connection",
@@ -83,7 +83,7 @@
             "name": "site_id",
             "label":"Site ID",
             "type": "STRING",
-            "description":"The site_id SITENAME is the subpath of your full site URL (also called contentURL in the REST API). MYSITE would be the site name of https://10ax.online.tableau.com/MYSITE. This parameter can be omitted when signing in to the Default site of a on premise Tableau server.",
+            "description":"The site_id is the subpath of your full site URL. (See the README.md for details)",
             "mandatory": false,
             "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         }
