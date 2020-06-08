@@ -3,6 +3,7 @@ import logging
 import math
 import numpy as np
 import pandas as pd
+import pickle
 
 from tableauhyperapi import SqlType
 from tableauhyperapi import TypeTag
@@ -13,12 +14,28 @@ logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(le
 
 def to_dss_date(hyper_date):
     """
-    Format date from Tableau Hyper to DSS
+    Convert Tableau Hyper date to DSS date
     :param hyper_date: <class 'pandas._libs.tslibs.timestamps.Timestamp'>
     :return: A date object readable by DSS
     """
     intermediary_date = hyper_date.to_date()
     return datetime.datetime(intermediary_date.year, intermediary_date.month, intermediary_date.day)
+
+
+def to_dss_timestamp(hyper_timestamp):
+    """
+    Convert Tableau Hyper Timestamp to DSS date
+    :param hyper_date: <class 'pandas._libs.tslibs.timestamps.Timestamp'>
+    :return: A timestamp object readable by DSS
+    """
+    return datetime.datetime(
+             hyper_timestamp.year,
+             hyper_timestamp.month,
+             hyper_timestamp.day,
+             hyper_timestamp.hour,
+             hyper_timestamp.minute,
+             hyper_timestamp.second,
+             hyper_timestamp.microsecond)
 
 
 def to_dss_geopoint(hyper_string):
@@ -30,13 +47,13 @@ def to_dss_geopoint(hyper_string):
     return hyper_string.upper()
 
 
-def to_hyper_date(dss_date):
+def to_hyper_timestamp(dss_date):
     """
     Format a date object from DSS to Tableau Hyper
     :param dss_date: A DSS date value
     :return: Tableau Hyper date value
     """
-    return dss_date.date()
+    return dss_date
 
 
 def to_hyper_geography(dss_geopoint):
@@ -79,7 +96,7 @@ class TypeConversion(object):
             'array': (SqlType.text(), handle_nan(str)),
             'bigint': (SqlType.int(), handle_nan(int)),
             'boolean': (SqlType.bool(), handle_nan(bool)),
-            'date': (SqlType.date(), handle_nat(to_hyper_date)),
+            'date': (SqlType.timestamp(), handle_nat(to_hyper_timestamp)),
             'double': (SqlType.double(), handle_nan(float)),
             'float': (SqlType.double(), handle_nan(float)),
             'geometry': (SqlType.text(), handle_nan(str)),
@@ -109,7 +126,7 @@ class TypeConversion(object):
             TypeTag.SMALL_INT: ('int', lambda x: None if math.isnan(x) else int(x)),
             TypeTag.TEXT: ('string', lambda x: None if x is None else str(x)),
             TypeTag.TIME: ('string', lambda x: None if x is None else str(x)),
-            TypeTag.TIMESTAMP: ('string', lambda x: None if x is None else str(x)),
+            TypeTag.TIMESTAMP: ('date', lambda x: None if x is None else to_dss_timestamp(x)),
             TypeTag.TIMESTAMP_TZ: ('string', lambda x: None if x is None else str(x)),
             TypeTag.VARCHAR: ('string', lambda x: None if x is None else str(x))
         }

@@ -1,8 +1,6 @@
 import datetime
-from type_conversion import to_dss_date
 from type_conversion import TypeConversion
 from schema_conversion import SchemaConversion
-
 from tableauhyperapi import TypeTag, HyperProcess, Connection, Telemetry, TableName
 
 
