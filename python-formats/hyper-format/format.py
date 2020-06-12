@@ -88,13 +88,13 @@ class MyOutputFormatter(OutputFormatter):
         :param row: array of strings, with one value per column in the schema
         """
         clean_row = []
-        for x in row:
-            if isinstance(x, datetime.datetime):
-                clean_row.append(x.isoformat())
-            elif isinstance(x, pandas.Timestamp):
-                clean_row.append(x.isoformat())
+        for column_value in row:
+            if isinstance(column_value, datetime.datetime):
+                clean_row.append(column_value.isoformat())
+            elif isinstance(column_value, pandas.Timestamp):
+                clean_row.append(column_value.isoformat())
             else:
-                clean_row.append(x)
+                clean_row.append(column_value)
         self.stream.write(base64.b64encode(json.dumps(clean_row)) + '\n')
 
     def write_footer(self):

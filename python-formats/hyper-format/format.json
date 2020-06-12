@@ -3,7 +3,7 @@
         "id": "Hyper",
         "label": "Tableau Hyper (.hyper)",
         "description": "Tableau Hyper format",
-        "icon": "icon-puzzle-piece"
+        "icon": "icon-tableau"
     },
 
     "canBeDatasetFormat": true,

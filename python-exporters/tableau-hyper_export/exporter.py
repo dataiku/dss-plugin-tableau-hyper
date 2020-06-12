@@ -19,13 +19,8 @@ class TableauHyperExporter(Exporter):
         self.config = config
         self.plugin_config = plugin_config
 
-        schema_name = self.config.get("schema_name")
-        if schema_name is None:
-            schema_name = "Extract"
-
-        table_name = self.config.get("table_name")
-        if table_name is None:
-            table_name = "Extract"
+        schema_name = self.config.get("schema_name", "Extract")
+        table_name = self.config.get("table_name", "Extract")
 
         logger.info("Detected schema_name: {}".format(schema_name))
         logger.info("Detected table_name: {}".format(table_name))
