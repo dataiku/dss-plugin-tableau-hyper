@@ -31,29 +31,6 @@ def get_project_from_name(server, project_name):
         page_nb += 1
 
 
-def get_datasource_from_name(server, output_table):
-    """
-    Retrieve a datasource from Tableau Server
-    :param server:
-    :param output_table:
-    :return:
-    """
-    page_nb = 1
-    while True:
-        all_datasources, pag_it = server.datasources.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
-        filtered_datasources = list(
-            filter(lambda x: x.name == output_table, all_datasources)
-        )
-        if filtered_datasources:
-            datasource = filtered_datasources[0]
-            print('WARN: Found existing table {} with id {}, will be overwritten'.format(
-                datasource.name.encode('utf-8'), datasource.id)
-            )
-            return datasource
-        if pag_it.page_number == (pag_it.total_available // pag_it.page_size) + 1: return
-        page_nb += 1
-
-
 def get_full_list_of_projects(server):
     """
     Return the full list of projects on Tableau Server
