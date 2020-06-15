@@ -65,7 +65,7 @@
         {
             "name": "project",
             "label":"Project",
-            "type": "STRING",
+            "type": "TEXTAREA",
             "defaultValue": "Default",
             "description":"Upload the Hyper file to this project."
         },
