@@ -1,59 +1,43 @@
-Current Version: 0.1.0
-Compatible with DSS version: 5.0.0 and higher
+Current Version: 0.1.0 <br>
+Compatible with DSS version: 5.0.2 and higher<br>
 
 ## Plugin information
 
-[Tableau](https://tableau.com) is one of the leading data visualization tools. Tableau Hyper is a file format
-that is specific to Tableau.
+This plugin aims at enhancing interactions between Tableau Software products and DSS platform. [Tableau Software](https://tableau.com) offers a leading data visualisation engine available on several of their products (Tableau Server, Online, Desktop...).
 
-This plugin offers the ability to interact with the Tableau Hyper format from a DSS instance, 
-enabling the following actions:
+Visualisations made with Tableau are associated with datasources that can be stored as Tableau Hyper files (`.hyper` extension). 
 
-* Import a Hyper file in Dataiku as a standard dataset
-* Export a DSS standard dataset to a Hyper file for immediate open in Tableau Desktop
-* Directly upload a dataset to Tableau Server with the Hyper format
-* Make credentials to Tableau Server available to all DSS users on instance using a Plugin Preset
+This plugin offers the ability to interact with the Tableau Hyper format from a DSS instance, enabling the following actions:
+
+* Export a DSS dataset to a Hyper file locally (This file can be opened in Tableau Desktop.)
+* Upload a DSS dataset to Tableau Server or Tableau Online
+* Create shared credentials for Tableau Server or Tableau Online available to all DSS users on the instance
+* Import a Hyper file stored locally as a DSS dataset
 
 ## Prerequisites
 
-This plugin requires DSS 5.0.2 or higher. The installation setup for this plugin follows
-the standard Dataiku code environment creation procedure. This plugin requires the 
-Python modules [Tableau Server Client](https://tableau.github.io/server-client-python/) and 
-[Tableau Hyper API](https://help.tableau.com/current/api/hyper_api/en-us/index.html) that 
-will be installed automatically through Pip. Note that the Tableau Hyper API is 
-compatible with Python 3.6 or Python 3.7 and not with older versions of Python.
+This plugin requires DSS 5.0.2 or higher. The installation setup for this plugin follows the standard Dataiku code environment creation procedure. This plugin requires the [Tableau Server Client](https://tableau.github.io/server-client-python/) and 
+[Tableau Hyper API](https://help.tableau.com/current/api/hyper_api/en-us/index.html) Python modules. They will be installed automatically through Pip. Note that the Tableau Hyper API is compatible with Python 3.6 or Python 3.7 but not with older versions of Python.
 
 ## How it works  
 
-Once the plugin is successfully installed, the flow contains two exporters, 
-available in the standard "Export" dialog of DSS, a file format component allowing 
-creation of Dataiku dataset from Hyper files, and a plugin preset enabling Tableau 
-Server credentials to be accessible to all user on the Dataiku instance of your organisation.
+Once the plugin is successfully installed, the flow contains two exporters, available in the standard "Export" dialog of DSS, a file format component allowing creation of Dataiku dataset from Hyper files, and a plugin preset enabling Tableau Server or Tableau Online credentials to be accessible to selected users of the DSS instance containing the preset.
 
-Please refer to the [Dataiku Plugin webpage](https://www.dataiku.com/dss/plugins/info/tableau-hyper-extract.html) for detailed usage information
+Please refer to the [Dataiku Plugin webpage](https://www.dataiku.com/dss/plugins/info/tableau-hyper-extract.html) for detailed usage information.
 
-## Components included in this plugin
+## Overview of the components included in this plugin
 
-### The Tableau Hyper Exporter to file
+### Tableau Hyper file exporter
 
-Export the results of your data processing, findings and predictions in DSS
-as a Tableau Hyper file that can be opened directly into Tableau. 
+Export any DSS dataset as a local `.hyper` file. Once the preprocessing of the data is done, the DSS dataset is exported. Null values are kept and dataset schema is adapted to Tableau Hyper schema. The date and geopoints columns are preserved in Tableau enabling filtering and map visualisations.
 
-Be careful, if run twice, it overwrites the existing Table. 
+### Tableau Hyper server upload
 
-### The Tableau Hyper Exporter to Server
+Enables the upload of a DSS dataset to Tableau Server or Tableau Online directly from your DSS flow. After upload, visualisations created from the resulting datasource are easily shared across organisation.
 
-Enables the upload of a file to a Tableau Server or to Tableau Online directly from your
-DSS flow. Using the preset, the Tableau Server credentials are available for all DSS
-users on your instance. Access and interact with your data on Tableau Server or Tableau 
-Online.
+### Parameter Preset
 
-If a table already exists in the target project, it will be overwritten.
-
-### Parameter Set
-
-A preset for referencing your Tableau Server or Tableau Online credentials is available in this plugin. Set up your connection 
-credentials once for all DSS user on the instance. The parameters available are the following:
+The parameter preset enables referencing of Tableau Server or Tableau Online credentials making those available for selected users of DSS instance. The parameters that need to be set are associated with the Tableau Server Client connection: 
 
 * Tableau Server URL
 * Tableau Server Site ID
@@ -61,7 +45,7 @@ credentials once for all DSS user on the instance. The parameters available are 
 * Tableau Server Password
 
 Usage of those parameters are detailed on the documentation of the 
-[Tableau Server Client in Python](https://tableau.github.io/server-client-python/docs/).
+[Tableau Server Client in Python](https://tableau.github.io/server-client-python/docs/):
 
  
 ```python
@@ -76,6 +60,7 @@ with server.auth.sign_in(tableau_auth):
     print([datasource.name for datasource in all_datasources])
 ```
 
+```text
 SERVER_URL is the URL of your Tableau server without subpaths. 
 For local Tableau servers, an example would be: https://www.MY_SERVER.com. For Tableau Online, 
 an example would be: https://10ax.online.tableau.com/.
@@ -84,15 +69,20 @@ SITENAME is the subpath of your full site URL (also called contentURL in the RES
 name of https://10ax.online.tableau.com/MYSITE. This parameter can be omitted when signing in to the Default site of a 
 on premise Tableau server.
 
-### The Tableau Hyper Format Component
+```
 
-Explore Tableau Hyper files directly as a datasource in your DSS flow. Specify the Tableau 
-Hyper format on the input file and interact with the data instantly. 
+### Tableau Hyper format handler
 
-## Specific question relative to DSS
+Tableau Hyper files can be read directly in DSS as datasets in the flow. 
+
+## Technical details with respect to DSS
+
+### What is the behavior during sequential export ?
+
+Each time the DSS dataset is uploaded to Tableau Server or Tableau Online, it overwrites the existing datasource associated to it. Therefore, when launching the export from a DSS flow, the data on Tableau is up-to-date with the latest version of the dataset in DSS at that time.
 
 ### What is the behavior with respect to partitioning ?
 
-For partitioned datasets, an export to folder will create as many folders as partitions and will create
-one Tableau Hyper file in each folder (one per partition). However, uploading a partitioned dataset to Tableau Server is 
-not allowed due to the fact that there can be only one connection at a given time for a Hyper file.
+DSS enables dataset partitioning. When partitioned datasets on DSS are exported to file using the Tableau Hyper plugin, one folder per partition is created. One `.hyper` file per partition and folder will be created.
+
+An upload to server of a partitioned dataset will raise an error and is not supported. Before uploading, the dataset partitions have to be stacked together and merged as one. 
