@@ -84,28 +84,25 @@ class TypeConversion(object):
 
         """
 
-        # Define functions for explicit conversion of null values
-        # Handle nan values, mostly for quantitative values
-        handle_nan = lambda f: lambda x: None if x is np.nan else f(x)
-        # Handle nat values, for dates
-        handle_nat = lambda f: lambda x: None if issubclass(type(x), type(pd.NaT)) else f(x)
+        # Handle null values
+        handle_null = lambda f: lambda x: None if pd.isna(x) else f(x)
 
         # Mapping DSS to Tableau Hyper types
         self.mapping_dss_to_hyper = {
-            'array': (SqlType.text(), handle_nan(str)),
-            'bigint': (SqlType.int(), handle_nan(int)),
-            'boolean': (SqlType.bool(), handle_nan(bool)),
-            'date': (SqlType.timestamp(), handle_nat(to_hyper_timestamp)),
-            'double': (SqlType.double(), handle_nan(float)),
-            'float': (SqlType.double(), handle_nan(float)),
-            'geometry': (SqlType.text(), handle_nan(str)),
-            'geopoint': (SqlType.geography(), handle_nan(to_hyper_geography)),
-            'int': (SqlType.int(), handle_nan(int)),
-            'map': (SqlType.text(), handle_nan(str)),
-            'object': (SqlType.text(), handle_nan(str)),
-            'smallint': (SqlType.int(), handle_nan(int)),
-            'string': (SqlType.text(), handle_nan(str)),
-            'tinyint': (SqlType.int(), handle_nan(int)),
+            'array': (SqlType.text(), handle_null(str)),
+            'bigint': (SqlType.int(), handle_null(int)),
+            'boolean': (SqlType.bool(), handle_null(bool)),
+            'date': (SqlType.timestamp(), handle_null(to_hyper_timestamp)),
+            'double': (SqlType.double(), handle_null(float)),
+            'float': (SqlType.double(), handle_null(float)),
+            'geometry': (SqlType.text(), handle_null(str)),
+            'geopoint': (SqlType.geography(), handle_null(to_hyper_geography)),
+            'int': (SqlType.int(), handle_null(int)),
+            'map': (SqlType.text(), handle_null(str)),
+            'object': (SqlType.text(), handle_null(str)),
+            'smallint': (SqlType.int(), handle_null(int)),
+            'string': (SqlType.text(), handle_null(str)),
+            'tinyint': (SqlType.int(), handle_null(int)),
         }
 
         # Mapping Tableau Hyper to DSS types
