@@ -50,10 +50,3 @@ def test_hyper_columns_to_dss_columns():
     hyper.close()
     dss_columns = schema_converter.hyper_columns_to_dss_columns(hyper_table.columns)
     return True
-
-
-if __name__ == "__main__":
-    test_dss_is_geo()
-    test_geo_to_text()
-    test_dss_columns_to_hyper_columns()
-    test_hyper_columns_to_dss_columns()

@@ -52,7 +52,7 @@ Usage of those parameters are detailed on the documentation of the
 import tableauserverclient as TSC
 
 tableau_auth = TSC.TableauAuth('USERNAME', 'PASSWORD', 'SITENAME')
-server = TSC.Server('http://SERVER_URL')
+server = TSC.Server('SERVER_URL')
 
 with server.auth.sign_in(tableau_auth):
     all_datasources, pagination_item = server.datasources.get()
