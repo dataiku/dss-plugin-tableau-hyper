@@ -136,7 +136,7 @@ class TestTableauTableWriter(TestCase):
                           "and value from hyper: {}".format(a, b))
                 count += 1
 
-        os.remove(destination_file_path)
+        # os.remove(destination_file_path)
 
     def test_export_geo_values(self):
         """
@@ -195,4 +195,4 @@ class TestTableauTableWriter(TestCase):
                           "and value from hyper: {}".format(a, b))
                 count += 1
 
-        os.remove(destination_file_path)
+        # os.remove(destination_file_path)
