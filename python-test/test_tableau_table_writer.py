@@ -136,7 +136,7 @@ class TestTableauTableWriter(TestCase):
                           "and value from hyper: {}".format(a, b))
                 count += 1
 
-        # os.remove(destination_file_path)
+        os.remove(destination_file_path)
 
     def test_export_geo_values(self):
         """
@@ -195,4 +195,51 @@ class TestTableauTableWriter(TestCase):
                           "and value from hyper: {}".format(a, b))
                 count += 1
 
-        # os.remove(destination_file_path)
+        os.remove(destination_file_path)
+
+    def test_export_date_values(self):
+        """
+        Test the export of geo values (DSS geopoint storage type)
+        :return:
+        """
+        nan = float("nan")
+
+        # ===> Define parameters input from DSS for exporter
+        config = {}
+        plugin_config = {}
+        schema = {'columns': [{'name': 'price', 'type': 'double'}, {'name': 'last_review_parsed', 'type': 'date'}], 'userModified': True}
+        rows = [(149.0, Timestamp('2018-10-19 13:20:50.349000')), (225.0, Timestamp('2019-05-21 00:00:00')), (150.0, NaT), (80.0, NaT)]
+        # <===
+
+        # ===> Create a DSS-like exporter
+        exporter = TableauHyperExporter(config, plugin_config)
+        output_path = "./test_outputs/"
+        output_file_name = get_random_alphanumeric_string(10) + '.hyper'
+        destination_file_path = os.path.join(output_path, output_file_name)
+        exporter.open_to_file(schema, destination_file_path)
+        for row in rows:
+            exporter.write_row(row)
+        exporter.close()
+
+        with HyperProcess(telemetry=Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU) as hyper:
+            with Connection(endpoint=hyper.endpoint, database=destination_file_path) as connection:
+                with connection.execute_query(query=f"SELECT * FROM {TableName('Extract', 'Extract')}") as result:
+                    rows_from_hyper = list(result)
+
+        assert len(rows) == len(rows_from_hyper)
+
+        count = 0
+        valid = 0
+        for i in range(len(rows)):
+            row_dss, row_hyper = rows[i], rows_from_hyper[i]
+            for j in range(len(row_dss)):
+                a, b = row_dss[j], row_hyper[j]
+                if (pd.isna(a) and pd.isna(b)) or (a == b):
+                    valid += 1
+                else:
+                    print("WARNING: Values are not strictly equals...\n "
+                          "Value from DSS: {} \n "
+                          "and value from hyper: {}".format(a, b))
+                count += 1
+
+        os.remove(destination_file_path)
