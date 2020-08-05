@@ -4,9 +4,6 @@ from schema_conversion import SchemaConversion
 from tableauhyperapi import HyperProcess, Telemetry, Connection, CreateMode, NOT_NULLABLE, NULLABLE, SqlType, \
     TableDefinition, Inserter, escape_name, escape_string_literal, HyperException, TableName
 
-import pytest
-
-
 def test_dss_is_geo():
     dss_schema = {"columns": [
         {"name": "customer_id", "type": "bigint"},

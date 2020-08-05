@@ -4,10 +4,13 @@ Test null values handling in Hyper converter
 
 from pandas import Timestamp
 from pandas import NaT
-from exporter import TableauHyperExporter
 
 
 def test_null_values():
+    """
+    Test conversion of null values from DSS to
+    :return:
+    """
 
     nan = float("nan")
 
@@ -32,14 +35,9 @@ def test_null_values():
     # ===> Externalise the DSS exporter to execute unit tests
     exporter = TableauHyperExporter(config, plugin_config)
     destination_file_path = "/Users/thibaultdesfontaines/Library/DataScienceStudio/dss_home/plugins/dev/" \
-                            "tableau-hyper-export/python-test/mock_dss_inputs/test_null_values/test_output/output.hyper"
+                            "tableau-hyper-export/python-test/test_outputs/output.hyper"
     exporter.open_to_file(schema, destination_file_path)
     for row in rows:
         exporter.write_row(row)
     exporter.close()
     # <===
-
-
-if __name__ == '__main__':
-    # TODO: Remove and use pytest directly
-    test_null_values()
