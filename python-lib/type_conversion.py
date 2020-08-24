@@ -28,13 +28,13 @@ def to_dss_timestamp(hyper_timestamp):
     :return: A timestamp object readable by DSS
     """
     return datetime.datetime(
-             hyper_timestamp.year,
-             hyper_timestamp.month,
-             hyper_timestamp.day,
-             hyper_timestamp.hour,
-             hyper_timestamp.minute,
-             hyper_timestamp.second,
-             hyper_timestamp.microsecond)
+        hyper_timestamp.year,
+        hyper_timestamp.month,
+        hyper_timestamp.day,
+        hyper_timestamp.hour,
+        hyper_timestamp.minute,
+        hyper_timestamp.second,
+        hyper_timestamp.microsecond)
 
 
 def to_dss_geopoint(hyper_string):
@@ -83,29 +83,24 @@ class TypeConversion(object):
         TypeTag.TIMESTAMP_TZ, TypeTag.GEOGRAPHY
 
         """
-
-        # Define functions for explicit conversion of null values
-        # Handle nan values, mostly for quantitative values
-        handle_nan = lambda f: lambda x: None if x is np.nan else f(x)
-        # Handle nat values, for dates
-        handle_nat = lambda f: lambda x: None if issubclass(type(x), type(pd.NaT)) else f(x)
+        handle_null = lambda f: lambda x: None if pd.isna(x) else f(x)
 
         # Mapping DSS to Tableau Hyper types
         self.mapping_dss_to_hyper = {
-            'array': (SqlType.text(), handle_nan(str)),
-            'bigint': (SqlType.int(), handle_nan(int)),
-            'boolean': (SqlType.bool(), handle_nan(bool)),
-            'date': (SqlType.timestamp(), handle_nat(to_hyper_timestamp)),
-            'double': (SqlType.double(), handle_nan(float)),
-            'float': (SqlType.double(), handle_nan(float)),
-            'geometry': (SqlType.text(), handle_nan(str)),
-            'geopoint': (SqlType.geography(), handle_nan(to_hyper_geography)),
-            'int': (SqlType.int(), handle_nan(int)),
-            'map': (SqlType.text(), handle_nan(str)),
-            'object': (SqlType.text(), handle_nan(str)),
-            'smallint': (SqlType.int(), handle_nan(int)),
-            'string': (SqlType.text(), handle_nan(str)),
-            'tinyint': (SqlType.int(), handle_nan(int)),
+            'array': (SqlType.text(), handle_null(str)),
+            'bigint': (SqlType.int(), handle_null(int)),
+            'boolean': (SqlType.bool(), handle_null(bool)),
+            'date': (SqlType.timestamp(), handle_null(to_hyper_timestamp)),
+            'double': (SqlType.double(), handle_null(float)),
+            'float': (SqlType.double(), handle_null(float)),
+            'geometry': (SqlType.text(), handle_null(str)),
+            'geopoint': (SqlType.geography(), handle_null(to_hyper_geography)),
+            'int': (SqlType.int(), handle_null(int)),
+            'map': (SqlType.text(), handle_null(str)),
+            'object': (SqlType.text(), handle_null(str)),
+            'smallint': (SqlType.int(), handle_null(int)),
+            'string': (SqlType.text(), handle_null(str)),
+            'tinyint': (SqlType.int(), handle_null(int)),
         }
 
         # Mapping Tableau Hyper to DSS types
@@ -183,12 +178,12 @@ class TypeConversion(object):
             >>> 'bigint'
         :return: output_value : the value converted in the Tableau Hyper type, may affect its value or not
         """
-        try: # retrieve the conversion function
+        try:  # retrieve the conversion function
             conversion_function = self.mapping_dss_to_hyper[dss_type][1]
         except Exception as err:
             logger.warning("Failed to retrieve the conversion function for type {}".format(dss_type))
             raise err
-        try: # convert the dss value in the hyper storage type
+        try:  # convert the dss value in the hyper storage type
             output_value = conversion_function(value)
         except Exception as err:
             logger.warning("Failed to convert value {} of type {} to type {}".format(value, type(value), dss_type))
@@ -207,7 +202,7 @@ class TypeConversion(object):
         :param tag: Storage type under which the value is stored in Hyper
         :return: output_value : Value compliant to Hyper
         """
-        try: # try to retrieve the conversion function
+        try:  # try to retrieve the conversion function
             conversion_function = self.mapping_hyper_to_dss[tag][1]
         except Exception as err:
             logger.warning("Failed to retrieve the conversion function {}: {}".format(tag, err))
