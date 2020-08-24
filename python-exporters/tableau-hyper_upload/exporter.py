@@ -21,7 +21,6 @@ def remove_empty_keys(dictionary):
     """
     Remove empty keys from dictionary
     :param dictionary:
-    :return:
     """
     key_to_remove = []
     for key in dictionary:
@@ -33,10 +32,9 @@ def remove_empty_keys(dictionary):
 
 def assert_not_none(variable, var_name):
     """
-    Return error message if input variable is not defined
+    Thow excpetion if input variable is not defined
     :param variable: value of the variable
     :param var_name: name of the input variable
-    :return:
     """
     assert ((variable is not None) and variable != ''), "Parameter {} should be defined".format(var_name)
 
@@ -53,8 +51,10 @@ class TableauHyperExporter(Exporter):
         :param config: the dict of the configuration of the object
         :param plugin_config: contains the plugin settings
         """
+        Exporter.__init__(self, config, plugin_config)
 
-        self.plugin_config = plugin_config
+        # Init output file location
+        self.output_file = None
 
         # Extract preset configuration from general configuration
         preset_config = config.pop('tableau_server_connection')
@@ -108,30 +108,23 @@ class TableauHyperExporter(Exporter):
 
         # Instantiate Tableau Writer wrapper
         self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
-
-        # Init output file location
-        self.output_file = None
-
         # Open connection to Tableau Server
         self.tableau_auth = tsc.TableauAuth(username, password, site_id=site_name)
         self.server = tsc.Server(server_name)
 
-        # For debugging purpose only
-        with self.server.auth.sign_in(self.tableau_auth):
-            project_names = get_full_list_of_projects(self.server)
-            logger.info('Got following projects available on server: {}'.format(project_names))
-
         # Retrieve target project from Tableau Server/Online
         with self.server.auth.sign_in(self.tableau_auth):
-            exists, project = get_project_from_name(self.server, self.project_name)
+            exists, project = get_project_from_name(self.server, self.project_name.encode("utf-8"))
             if not exists:
+                project_names = get_full_list_of_projects(self.server)
+                logger.warning("Target project {} seems to be unexisting on server, projects accessible on server are:"
+                               "{}".format(self.project_name, project_names))
                 raise ValueError('The project {} does not exist on server.'.format(self.project_name))
-            self.tableau_datasource = tsc.DatasourceItem(project.id) # get tableau data source
+            self.tableau_datasource = tsc.DatasourceItem(project.id) # Create new datasource
 
     def open(self, schema):
         """
         :param schema:
-        :return:
         """
         logger.info("Call to open method in upload exporter ...")
         cache_absolute_path = get_cache_location_from_user_config()
@@ -139,11 +132,9 @@ class TableauHyperExporter(Exporter):
         self.writer.schema_converter.set_dss_storage_types(schema)
         self.writer.create_schema(schema, self.output_file)
         logger.info("Define the temporary output file: {}".format(self.output_file))
-        return None
 
     def open_to_file(self, schema, destination_file_path):
-        """
-        """
+        # Leave method empty here
         pass
 
     def write_row(self, row):
@@ -153,8 +144,6 @@ class TableauHyperExporter(Exporter):
         :param row: a tuple with N strings matching the schema passed to open
         """
         self.writer.write_row(row)
-        self.writer.row_index += 1
-        return True
 
     def close(self):
         """
@@ -169,4 +158,3 @@ class TableauHyperExporter(Exporter):
         except Exception as err:
             logger.warning("Failed to remove the temporary file...")
             raise err
-        return True

@@ -21,7 +21,7 @@
             "name": "site_id",
             "label":"Site ID",
             "type": "STRING",
-            "description":"The site_id is the subpath of your full site URL. (See the README.md for details)"
+            "description":"The site_id is the subpath of your full site URL."
         },
         {
             "name": "username",

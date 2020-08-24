@@ -16,8 +16,7 @@ class TableauHyperExporter(Exporter):
         :param config: the dict of the configuration of the object
         :param plugin_config: contains the plugin settings
         """
-        self.config = config
-        self.plugin_config = plugin_config
+        Exporter.__init__(self, config, plugin_config)
 
         schema_name = self.config.get("schema_name", "Extract")
         table_name = self.config.get("table_name", "Extract")
@@ -32,7 +31,7 @@ class TableauHyperExporter(Exporter):
 
     def open(self, schema):
         # Leave method empty here
-        return None
+        pass
 
     def open_to_file(self, schema, destination_file_path):
         """
@@ -50,15 +49,12 @@ class TableauHyperExporter(Exporter):
         """
         Handle one row of data to export
 
-        :param row: a tuple with N strings matching the schema passed to open.
+        :param row: a tuple with N strings matching the schema passed to open
         """
         self.writer.write_row(row)
-        self.writer.row_index += 1
-        return True
 
     def close(self):
         """
         Called when closing the table.
         """
         self.writer.close()
-        return True

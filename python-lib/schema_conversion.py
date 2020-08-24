@@ -23,12 +23,10 @@ def dss_is_geo(dss_schema):
     :return Boolean{input dataset contains at least one geopoint column}
 
     """
-    contains_geo = False
     for column in dss_schema['columns']:
         if column['type'] == 'geopoint':
-            contains_geo = True
-            return contains_geo
-    return contains_geo
+            return True
+    return False
 
 
 def geo_to_text(dss_schema):

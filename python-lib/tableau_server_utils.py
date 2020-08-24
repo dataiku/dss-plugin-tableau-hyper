@@ -18,17 +18,23 @@ def get_project_from_name(server, project_name):
     :return: couple (Boolean{target project exists on server}, project)
     """
     page_nb = 1
-    while True:
+
+    all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
+    pages_in_total = (pag_it.total_available // pag_it.page_size) + 1
+
+    while page_nb <= pages_in_total:
         all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
         filtered_projects = list(
-            filter(lambda x: x.name == project_name, all_project_items)
+            filter(lambda x: x.name.encode('utf-8') == project_name, all_project_items)
         )
         if filtered_projects:
+            if len(filtered_projects) > 1:
+                logger.warning('Detected multiple projects associated with the target name {}'.format(project_name))
             return True, filtered_projects[0]
-        if pag_it.page_number == (pag_it.total_available // pag_it.page_size) + 1:
-            logger.info('Project {} does not exist on server'.format(project_name))
-            return False, None
         page_nb += 1
+
+    logger.info('Project {} does not exist on server'.format(project_name))
+    return False, None
 
 
 def get_full_list_of_projects(server):
@@ -38,9 +44,17 @@ def get_full_list_of_projects(server):
     :return:
     """
     page_nb = 1
-    while True:
+    all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
+    pages_in_total = (pag_it.total_available // pag_it.page_size) + 1
+    all_projects = set()
+
+    while page_nb <= pages_in_total:
+
         all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
-        project_names = [x.name for x in all_project_items]
-        if pag_it.page_number == (pag_it.total_available // pag_it.page_size) + 1:
-            return project_names
+        project_names = [x.name.encode('utf-8') for x in all_project_items]
+        for name in project_names:
+            all_projects.add(name)
+
         page_nb += 1
+
+    return all_projects

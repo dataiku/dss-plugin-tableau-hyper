@@ -136,15 +136,15 @@ class TypeConversion(object):
             examples:
             >>> SqlType.big_int()
         """
-        if dss_type not in self.mapping_dss_to_hyper:
-            logger.warning("Invalid DSS storage type {}".format(dss_type))
-            raise ValueError("Invalid DSS storage type {}".format(dss_type))
-        elif self.mapping_dss_to_hyper[dss_type] is None:
-            logger.warning("DSS type not supported in conversion: {}".format(dss_type))
-            logger.warning("Setting the target conversion type to `SqlType.text()`")
-            return SqlType.text()
-        else:
-            return self.mapping_dss_to_hyper[dss_type][0]
+        try:
+            (tag, function) = self.mapping_dss_to_hyper.get(dss_type, (None, None))
+            if tag is None:
+                logger.warning("Invalid DSS storage type {}".format(dss_type))
+                raise ValueError("Invalid DSS storage type {}".format(dss_type))
+            else:
+                return tag
+        except Exception as err:
+            raise err
 
     def hyper_type_to_dss(self, hyper_type):
         """
@@ -157,15 +157,15 @@ class TypeConversion(object):
             examples:
             >>> 'bigint'
         """
-        if hyper_type not in self.mapping_hyper_to_dss:
-            logger.warning("Invalid Hyper storage type {}".format(hyper_type))
-            raise ValueError("Invalid Hyper storage type {}".format(hyper_type))
-        elif self.mapping_hyper_to_dss[hyper_type] is None:
-            logger.warning("Tableau Hyper type not supported in conversion: {}".format(hyper_type))
-            logger.warning("Setting the target conversion type to `string`")
-            return 'string'
-        else:
-            return self.mapping_hyper_to_dss[hyper_type][0]
+        try:
+            (dss_type, function) = self.mapping_hyper_to_dss.get(hyper_type, (None, None))
+            if dss_type is None:
+                logger.warning("Invalid DSS storage type {}".format(hyper_type))
+                raise ValueError("Invalid DSS storage type {}".format(hyper_type))
+            else:
+                return dss_type
+        except Exception as err:
+            raise err
 
     def dss_value_to_hyper(self, value, dss_type='string'):
         """
