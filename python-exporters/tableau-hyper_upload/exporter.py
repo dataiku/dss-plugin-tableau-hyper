@@ -56,6 +56,7 @@ class TableauHyperExporter(Exporter):
 
         # Init output file location
         self.output_file = None
+        self.tmp_output_dir = None
 
         # Extract preset configuration from general configuration
         preset_config = config.pop('tableau_server_connection')

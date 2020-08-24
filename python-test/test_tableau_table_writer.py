@@ -107,7 +107,7 @@ class TestTableauTableWriter(TestCase):
 
         # ===> Create a DSS-like exporter
         exporter = TableauHyperExporter(config, plugin_config)
-        output_path = "./test_outputs/"
+        output_path = "test_outputs/"
         output_file_name = get_random_alphanumeric_string(10) + '.hyper'
         destination_file_path = os.path.join(output_path, output_file_name)
         exporter.open_to_file(schema, destination_file_path)
@@ -213,7 +213,7 @@ class TestTableauTableWriter(TestCase):
 
         # ===> Create a DSS-like exporter
         exporter = TableauHyperExporter(config, plugin_config)
-        output_path = "./test_outputs/"
+        output_path = "test_outputs/"
         output_file_name = get_random_alphanumeric_string(10) + '.hyper'
         destination_file_path = os.path.join(output_path, output_file_name)
         exporter.open_to_file(schema, destination_file_path)

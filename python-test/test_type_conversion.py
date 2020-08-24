@@ -9,7 +9,7 @@ class TestTypeConversion(TestCase):
 
     def test_to_dss_date(self):
         schema_converter = SchemaConversion()
-        path_to_hyper = "./data/superstore_sample.hyper"
+        path_to_hyper = "data/superstore_sample.hyper"
         hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
         connection = Connection(hyper.endpoint, path_to_hyper)
         hyper_table = TableName('public', 'Orders')

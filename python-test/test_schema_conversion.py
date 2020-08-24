@@ -41,7 +41,7 @@ class TestSchemaConversion(TestCase):
 
     def test_hyper_columns_to_dss_columns(self):
         schema_converter = SchemaConversion()
-        path_to_hyper = "./data/superstore_sample.hyper"
+        path_to_hyper = "data/superstore_sample.hyper"
         hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
         connection = Connection(hyper.endpoint, path_to_hyper)
         hyper_table = connection.catalog.get_table_definition(TableName('public', 'Customer'))
