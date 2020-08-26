@@ -86,6 +86,7 @@ class TableauTableWriter(object):
                         TableName(self.schema_name, self.table_name),
                         self.schema_converter.dss_columns_to_hyper_columns(dss_columns))
 
+
         # Open connection to file
         self.hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
         self.connection = Connection(self.hyper.endpoint, self.output_file, CreateMode.CREATE_AND_REPLACE)
@@ -130,15 +131,15 @@ class TableauTableWriter(object):
         # if there is a geo table, create an intermediate and temporary table
         if self.is_geo_table:
 
+            print("WARNING:", self.tmp_table_definition.table_name)
             self.tmp_table_inserter = Inserter(self.connection, self.tmp_table_definition)
             self.tmp_table_inserter.add_rows(self.data)
             self.tmp_table_inserter.execute()
             self.tmp_table_inserter.close()
 
-            rows_count = self.connection.execute_command(
+            self.connection.execute_command(
                 command=f"INSERT INTO {self.output_table_definition.table_name} SELECT * FROM {self.tmp_table_definition.table_name};")
-            rows_count = self.connection.execute_command(
-                command=f"DROP TABLE {self.tmp_table_definition.table_name};")
+            self.connection.execute_command(command=f"TRUNCATE TABLE {self.tmp_table_definition.table_name};")
 
         else:
 
@@ -161,7 +162,8 @@ class TableauTableWriter(object):
             self.update_table()
             self.data = []
         logger.info("Closing Tableau Hyper connections...")
-
+        if self.is_geo_table:
+            self.connection.execute_command(command=f"DROP TABLE {self.tmp_table_definition.table_name};")
         self.hyper.close()
         self.connection.close()
         logger.info("Closed export")

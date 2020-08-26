@@ -9,6 +9,7 @@ import os
 from tableauhyperapi import HyperProcess, Connection, Telemetry, TableName, TableDefinition
 import pandas as pd
 import numpy as np
+import tempfile
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Plugin: Testing - Tableau Hyper API | %(levelname)s - %(message)s')
@@ -32,6 +33,7 @@ class TableauHyperExporter(object):
         schema_name = self.config.get("schema_name", "Extract")
         table_name = self.config.get("table_name", "Extract")
         self.writer = TableauTableWriter(schema_name=schema_name, table_name=table_name)
+        self.writer.batch_size = 1
         self.output_file = None
 
     def open_to_file(self, schema, destination_file_path):
@@ -62,13 +64,8 @@ class TableauHyperExporter(object):
 
 class TestTableauTableWriter(TestCase):
 
-    def test_tableau_table_writer(self):
-        """
-        Generic test on the export using the class provided in python-lib.
-        Both export to file and upload to server are based on this class.
-        :return:
-        """
-        assert True
+    def setUp(self):
+        self.output_path = tempfile.gettempdir()
 
     def test_export_null_values(self):
         """
@@ -107,9 +104,8 @@ class TestTableauTableWriter(TestCase):
 
         # ===> Create a DSS-like exporter
         exporter = TableauHyperExporter(config, plugin_config)
-        output_path = "test_outputs/"
         output_file_name = get_random_alphanumeric_string(10) + '.hyper'
-        destination_file_path = os.path.join(output_path, output_file_name)
+        destination_file_path = os.path.join(self.output_path, output_file_name)
         exporter.open_to_file(schema, destination_file_path)
         for row in rows:
             exporter.write_row(row)
@@ -130,10 +126,6 @@ class TestTableauTableWriter(TestCase):
                 a, b = row_dss[j], row_hyper[j]
                 if (pd.isna(a) and pd.isna(b)) or (a == b):
                     valid += 1
-                else:
-                    print("WARNING: Values are not strictly equals...\n "
-                          "Value from DSS: {} \n "
-                          "and value from hyper: {}".format(a, b))
                 count += 1
 
         os.remove(destination_file_path)
@@ -166,9 +158,9 @@ class TestTableauTableWriter(TestCase):
 
         # ===> Create a DSS-like exporter
         exporter = TableauHyperExporter(config, plugin_config)
-        output_path = "test_outputs/"
+        exporter.writer.batch_size = 1
         output_file_name = get_random_alphanumeric_string(10) + '.hyper'
-        destination_file_path = os.path.join(output_path, output_file_name)
+        destination_file_path = os.path.join(self.output_path, output_file_name)
         exporter.open_to_file(schema, destination_file_path)
         for row in rows:
             exporter.write_row(row)
@@ -189,10 +181,6 @@ class TestTableauTableWriter(TestCase):
                 a, b = row_dss[j], row_hyper[j]
                 if (pd.isna(a) and pd.isna(b)) or (a == b):
                     valid += 1
-                else:
-                    print("WARNING: Values are not strictly equals...\n "
-                          "Value from DSS: {} \n "
-                          "and value from hyper: {}".format(a, b))
                 count += 1
 
         os.remove(destination_file_path)
@@ -213,9 +201,8 @@ class TestTableauTableWriter(TestCase):
 
         # ===> Create a DSS-like exporter
         exporter = TableauHyperExporter(config, plugin_config)
-        output_path = "test_outputs/"
         output_file_name = get_random_alphanumeric_string(10) + '.hyper'
-        destination_file_path = os.path.join(output_path, output_file_name)
+        destination_file_path = os.path.join(self.output_path, output_file_name)
         exporter.open_to_file(schema, destination_file_path)
         for row in rows:
             exporter.write_row(row)
@@ -236,10 +223,6 @@ class TestTableauTableWriter(TestCase):
                 a, b = row_dss[j], row_hyper[j]
                 if (pd.isna(a) and pd.isna(b)) or (a == b):
                     valid += 1
-                else:
-                    print("WARNING: Values are not strictly equals...\n "
-                          "Value from DSS: {} \n "
-                          "and value from hyper: {}".format(a, b))
                 count += 1
 
         os.remove(destination_file_path)
