@@ -33,9 +33,9 @@ class TableauTableWriter(object):
         :param schema_name: name of the target schema
         :param table_name: name of the target table
         """
-        self.row_index = 0 # initial buffer index
-        self.data = [] # buffer
-        self.batch_size = 2000 # buffer size
+        self.row_index = 0
+        self.data = []
+        self.batch_size = 2000
 
         self.schema_name = schema_name
         self.table_name = table_name
