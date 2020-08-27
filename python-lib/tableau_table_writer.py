@@ -131,7 +131,6 @@ class TableauTableWriter(object):
         # if there is a geo table, create an intermediate and temporary table
         if self.is_geo_table:
 
-            print("WARNING:", self.tmp_table_definition.table_name)
             self.tmp_table_inserter = Inserter(self.connection, self.tmp_table_definition)
             self.tmp_table_inserter.add_rows(self.data)
             self.tmp_table_inserter.execute()
