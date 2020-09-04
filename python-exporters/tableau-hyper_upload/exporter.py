@@ -77,7 +77,7 @@ class TableauHyperExporter(Exporter):
         assert_not_none(password, 'password')
         server_name = config.get('server_url', None)
         assert_not_none(server_name, 'server_url')
-        site_name = config.get('site_id', None) # site name is optional
+        site_name = config.get('site_id', '') # site name is optional
 
         logger.info("Detected following user input configuration:\n"
                     "     username: {},\n"
