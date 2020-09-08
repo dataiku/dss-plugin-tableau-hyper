@@ -84,8 +84,8 @@ class TableauTableWriter(object):
         # Create the Tableau Hyper schema from the DSS schema
         self.output_table_definition = TableDefinition(
                         TableName(self.schema_name, self.table_name),
-                        self.schema_converter.dss_columns_to_hyper_columns(dss_columns))
-
+                        self.schema_converter.dss_columns_to_hyper_columns(dss_columns)
+        )
 
         # Open connection to file
         self.hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
