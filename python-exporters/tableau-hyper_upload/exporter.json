@@ -56,7 +56,8 @@
             "label": "SSL certificate",
             "type": "STRING",
             "description": "(optional) Full path to your tableau SSL certificate",
-            "mandatory": false
+            "mandatory": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         },
         {
             "label":"Destination",
