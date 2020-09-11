@@ -105,24 +105,24 @@ class TypeConversion(object):
 
         # Mapping Tableau Hyper to DSS types
         self.mapping_hyper_to_dss = {
-            TypeTag.BIG_INT: ('bigint', lambda x: None if math.isnan(x) else int(x)),
-            TypeTag.BYTES: ('string', lambda x: None if x is None else str(x)),
-            TypeTag.BOOL: ('bool', lambda x: None if x is None else bool(x)),
-            TypeTag.CHAR: ('string', lambda x: None if x is None else str(x)),
-            TypeTag.DATE: ('date', lambda x: None if x is None else to_dss_date(x)),
-            TypeTag.DOUBLE: ('double', lambda x: None if math.isnan(x) else float(x)),
-            TypeTag.GEOGRAPHY: ('geopoint', lambda x: None if x is None else to_dss_geopoint(x)),
-            TypeTag.INT: ('int', lambda x: None if math.isnan(x) else int(x)),
-            TypeTag.INTERVAL: ('string', lambda x: None if x is None else str(x)),
-            TypeTag.JSON: ('string', lambda x: None if x is None else str(x)),
-            TypeTag.NUMERIC: ('double', lambda x: None if math.isnan(x) else float(x)),
-            TypeTag.OID: ('string', lambda x: None if x is None else str(x)),
-            TypeTag.SMALL_INT: ('int', lambda x: None if math.isnan(x) else int(x)),
-            TypeTag.TEXT: ('string', lambda x: None if x is None else str(x)),
-            TypeTag.TIME: ('string', lambda x: None if x is None else str(x)),
-            TypeTag.TIMESTAMP: ('date', lambda x: None if x is None else to_dss_timestamp(x)),
-            TypeTag.TIMESTAMP_TZ: ('string', lambda x: None if x is None else str(x)),
-            TypeTag.VARCHAR: ('string', lambda x: None if x is None else str(x))
+            TypeTag.BIG_INT: ('bigint', handle_null(int)),
+            TypeTag.BYTES: ('string', handle_null(str)),
+            TypeTag.BOOL: ('bool', handle_null(bool)),
+            TypeTag.CHAR: ('string', handle_null(str)),
+            TypeTag.DATE: ('date', handle_null(to_dss_date)),
+            TypeTag.DOUBLE: ('double', handle_null(float)),
+            TypeTag.GEOGRAPHY: ('geopoint', handle_null(to_dss_geopoint)),
+            TypeTag.INT: ('int', handle_null(int)),
+            TypeTag.INTERVAL: ('string', handle_null(str)),
+            TypeTag.JSON: ('string', handle_null(str)),
+            TypeTag.NUMERIC: ('double', handle_null(float)),
+            TypeTag.OID: ('string', handle_null(str)),
+            TypeTag.SMALL_INT: ('int', handle_null(int)),
+            TypeTag.TEXT: ('string', handle_null(str)),
+            TypeTag.TIME: ('string', handle_null(str)),
+            TypeTag.TIMESTAMP: ('date', handle_null(to_dss_timestamp)),
+            TypeTag.TIMESTAMP_TZ: ('string', handle_null(str)),
+            TypeTag.VARCHAR: ('string', handle_null(str))
         }
 
     def dss_type_to_hyper(self, dss_type):
