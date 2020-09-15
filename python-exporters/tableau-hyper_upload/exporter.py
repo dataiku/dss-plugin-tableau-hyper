@@ -34,9 +34,9 @@ def remove_empty_keys(dictionary):
 
 def check_null_values(variable_value, variable_name):
     """
-    Thow excpetion if input variable is not defined
-    :param variable: value of the variable
-    :param var_name: name of the input variable
+    Throw exception if input variable is not defined
+    :param variable_value: value of the variable
+    :param variable_name: name of the input variable
     """
     if (variable_value is None) or (variable_value == ''):
         raise InvalidPluginParameter(variable_name=variable_name, variable_value=variable_value)
