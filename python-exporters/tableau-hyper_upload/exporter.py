@@ -11,6 +11,7 @@ from tableau_table_writer import TableauTableWriter
 from tableau_server_utils import get_project_from_name
 from tableau_server_utils import get_full_list_of_projects
 import tempfile
+from custom_exceptions import InvalidPluginParameter
 
 import tableauserverclient as tsc
 
@@ -31,13 +32,14 @@ def remove_empty_keys(dictionary):
         del dictionary[key]
 
 
-def assert_not_none(variable, var_name):
+def check_null_values(variable_value, variable_name):
     """
     Thow excpetion if input variable is not defined
     :param variable: value of the variable
     :param var_name: name of the input variable
     """
-    assert ((variable is not None) and variable != ''), "Parameter {} should be defined".format(var_name)
+    if (variable_value is None) or (variable_value == ''):
+        raise InvalidPluginParameter(variable_name=variable_name, variable_value=variable_value)
 
 
 class TableauHyperExporter(Exporter):
@@ -72,12 +74,13 @@ class TableauHyperExporter(Exporter):
 
         # Retrieve credentials parameters
         username = config.get('username', None)
-        assert_not_none(username, 'username')
+        check_null_values(username, 'username')
         password = config.get('password', None)
-        assert_not_none(password, 'password')
+        check_null_values(password, 'password')
         server_name = config.get('server_url', None)
-        assert_not_none(server_name, 'server_url')
-        site_name = config.get('site_id', '') # site name is optional
+        check_null_values(server_name, 'server_url')
+        # The site name is optional in Tableau Server, default value should not be None but empty String
+        site_name = config.get('site_id', '')
 
         logger.info("Detected following user input configuration:\n"
                     "     username: {},\n"

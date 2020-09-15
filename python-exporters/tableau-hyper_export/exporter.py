@@ -2,6 +2,7 @@ import logging
 
 from dataiku.exporter import Exporter
 from tableau_table_writer import TableauTableWriter
+from custom_exceptions import InvalidPluginParameter
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(levelname)s - %(message)s')
@@ -20,6 +21,10 @@ class TableauHyperExporter(Exporter):
 
         schema_name = self.config.get("schema_name", "Extract")
         table_name = self.config.get("table_name", "Extract")
+        if schema_name == '':
+            raise InvalidPluginParameter('schema_name', schema_name)
+        if table_name == '':
+            raise InvalidPluginParameter('table_name', table_name)
 
         logger.info("Detected schema_name: {}".format(schema_name))
         logger.info("Detected table_name: {}".format(table_name))
