@@ -13,11 +13,10 @@ unit-tests:
 		python3 -m venv env/; \
 		source env/bin/activate; \
 		pip3 install --upgrade pip;\
-		pip install --no-cache-dir -r python-test/requirements.txt; \
+		pip install --no-cache-dir -r tests/python/requirements.txt; \
 		pip install --no-cache-dir -r code-env/python/spec/requirements.txt; \
 		export PYTHONPATH="$(PYTHONPATH):$(PWD)/python-lib"; \
 		echo "PYTHONPATH=$(PYTHONPATH)";\
-		echo "suis je debile? $(PYTHONPATH):$(PWD)/python-lib"; \
         pytest --junitxml=unit.xml tests/python/unit || true; \
 		deactivate; \
 	)
