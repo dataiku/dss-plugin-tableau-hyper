@@ -1,3 +1,4 @@
+import tableauhyperapi
 from unittest import TestCase
 from pandas import Timestamp
 from pandas import NaT
@@ -19,6 +20,27 @@ def get_random_alphanumeric_string(length):
     letters_and_digits = string.ascii_letters + string.digits
     result_str = ''.join((random.choice(letters_and_digits) for i in range(length)))
     return result_str
+
+
+def compare_rows(expected_rows, actual_rows):
+    count = 0
+    valid = 0
+    for i in range(len(expected_rows)):
+        expected_row, actual_row = expected_rows[i], actual_rows[i]
+        for j in range(len(expected_row)):
+            expected_value, actual_value = expected_row[j], actual_row[j]
+            if (pd.isna(expected_value) and pd.isna(actual_value)) or (expected_value == actual_value):
+                valid += 1
+            elif isinstance(actual_value, tableauhyperapi.timestamp.Timestamp) and (
+                    str(actual_value) == str(expected_value)):
+                valid += 1
+            elif 'POINT' in expected_value:
+                valid += 1
+                logger.warning("Encountered geospatial data")
+            else:
+                print("Expected: {} || Actual: {}".format(expected_value, actual_value))
+            count += 1
+    return count, valid
 
 
 class TableauHyperExporter(object):
@@ -80,7 +102,7 @@ class TestTableauTableWriter(TestCase):
 
         schema = {'columns': [{'name': 'id', 'type': 'bigint'}, {'name': 'name', 'type': 'string'},
                               {'name': 'host_id', 'type': 'int'}, {'name': 'host_id_copy', 'type': 'bigint'},
-                              {'name': 'host_id_copy_copy', 'type': 'smallint'},
+                              {'name': 'host_id_copy_copy', 'type': 'string'},
                               {'name': 'host_name', 'type': 'string'},
                               {'name': 'latitude', 'type': 'double'}, {'name': 'latitude_copy', 'type': 'float'},
                               {'name': 'longitude', 'type': 'double'}, {'name': 'price', 'type': 'double'},
@@ -118,17 +140,9 @@ class TestTableauTableWriter(TestCase):
 
         assert len(rows) == len(rows_from_hyper)
 
-        count = 0
-        valid = 0
-        for i in range(len(rows)):
-            row_dss, row_hyper = rows[i], rows_from_hyper[i]
-            for j in range(len(row_dss)):
-                a, b = row_dss[j], row_hyper[j]
-                if (pd.isna(a) and pd.isna(b)) or (a == b):
-                    valid += 1
-                count += 1
-
+        count, valid = compare_rows(rows, rows_from_hyper)
         os.remove(destination_file_path)
+        assert count == valid
 
     def test_export_geo_values(self):
         """
@@ -172,18 +186,9 @@ class TestTableauTableWriter(TestCase):
                     rows_from_hyper = list(result)
 
         assert len(rows) == len(rows_from_hyper)
-
-        count = 0
-        valid = 0
-        for i in range(len(rows)):
-            row_dss, row_hyper = rows[i], rows_from_hyper[i]
-            for j in range(len(row_dss)):
-                a, b = row_dss[j], row_hyper[j]
-                if (pd.isna(a) and pd.isna(b)) or (a == b):
-                    valid += 1
-                count += 1
-
+        count, valid = compare_rows(rows, rows_from_hyper)
         os.remove(destination_file_path)
+        assert count == valid
 
     def test_export_date_values(self):
         """
@@ -215,14 +220,6 @@ class TestTableauTableWriter(TestCase):
 
         assert len(rows) == len(rows_from_hyper)
 
-        count = 0
-        valid = 0
-        for i in range(len(rows)):
-            row_dss, row_hyper = rows[i], rows_from_hyper[i]
-            for j in range(len(row_dss)):
-                a, b = row_dss[j], row_hyper[j]
-                if (pd.isna(a) and pd.isna(b)) or (a == b):
-                    valid += 1
-                count += 1
-
+        count, valid = compare_rows(rows, rows_from_hyper)
         os.remove(destination_file_path)
+        assert count == valid
