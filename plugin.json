@@ -4,7 +4,7 @@
     "meta": {
         "label": "Tableau Hyper format",
         "description": "Export datasets to Tableau .hyper format.",
-        "author": "Dataiku",
+        "author": "Dataiku (Thibault DESFONTAINES)",
         "icon": "icon-tableau",
         "licenseInfo": "Apache Software License",
         "url": "https://www.dataiku.com/dss/plugins/info/tableau-hyper-export.html",
