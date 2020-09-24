@@ -1,19 +1,16 @@
-PLUGIN_VERSION=0.1.0
-PLUGIN_ID=tableau-hyper-export
+# Test procedure
 
-plugin:
-	cat plugin.json|json_pp > /dev/null
-	rm -rf dist
-	mkdir dist
-	zip -r dist/dss-plugin-${PLUGIN_ID}-${PLUGIN_VERSION}.zip code-env parameter-sets python-exporters python-formats python-lib plugin.json
+Running the tests in console using pytest.
 
+Add the following into the Makefile:
+```bash
 unit-tests:
 	@echo "[START] Running unit tests..."
 	@( \
 		python3 -m venv env/; \
 		source env/bin/activate; \
 		pip3 install --upgrade pip;\
-		pip install --no-cache-dir -r python-test/requirements.txt; \
+		pip install --no-cache-dir -r tests/python/requirements.txt; \
 		pip install --no-cache-dir -r code-env/python/spec/requirements.txt; \
 		export PYTHONPATH="$(PYTHONPATH):$(PWD)/python-lib"; \
 		echo "PYTHONPATH=$(PYTHONPATH)";\
@@ -29,3 +26,17 @@ integration-tests:
 	@echo "[SUCCESS] Running integration tests: Done!"
 
 tests: unit-tests integration-tests
+```
+
+## Testing scope
+
+Index of the tests:
+- test_null_values.py
+- test_schema_conversion.py
+- test_type_conversion.py
+
+test_null_values.py
+- test the export to hyper on a file with lot of nan values
+- run analysis on the output file with the standard API of the Hyper file
+
+test_geopoints.py

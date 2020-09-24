@@ -1,0 +1,37 @@
+{
+    "meta" : {
+        "id": "Hyper",
+        "label": "Tableau Hyper (.hyper)",
+        "description": "Tableau Hyper format",
+        "icon": "icon-tableau"
+    },
+
+    "canBeDatasetFormat": true,
+    "canRead": true,
+    "canWrite": false,
+    "canExtractSchema": true,
+
+    "exportOptions": [],
+
+    "mime" : {
+        "mimeType": "text/plain",
+        "extension": ".csv"
+    },
+
+    "params": [
+        {
+            "name": "schema_name",
+            "label": "Schema name",
+            "type": "STRING",
+            "description": "Name of the schema in the Hyper file",
+            "mandatory": true
+        },
+        {
+            "name": "table_name",
+            "label": "Table name",
+            "type": "STRING",
+            "description": "Name of the table in the Hyper file",
+            "mandatory": true
+        }
+    ]
+}

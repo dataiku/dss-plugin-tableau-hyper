@@ -1,1 +1,13 @@
+.journal
+.mainlock
+.wlock
+.ts
+.git
 *.pyc
+.coverage
+.htmlcov
+.DS_Store
+.idea
+venv
+**/hyperd*.log
+dist

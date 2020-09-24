@@ -17,29 +17,47 @@
             "type": "SEPARATOR"
         },
         {
+            "name": "usePreset",
+            "label" : "Use preset",
+            "type": "BOOLEAN",
+            "mandatory": false,
+            "description":"Get the Tableau Server connection parameters from a shared configuration in DSS"
+        },
+        {
+            "name": "tableau_server_connection",
+            "label": "Tableau Server Preset",
+            "type": "PRESET",
+            "parameterSetId": "tableau-server-connection",
+            "visibilityCondition": "model.usePreset == true"
+        },
+        {
             "name": "server_url",
             "label":"URL",
             "type": "STRING",
-            "mandatory": true
+            "mandatory": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         },
         {
             "name": "username",
             "label":"Username",
             "type": "STRING",
-            "mandatory": true
+            "mandatory": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         },
         {
             "name": "password",
             "label":"Password",
             "type": "PASSWORD",
-            "mandatory": true
+            "mandatory": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         },
         {
             "name": "ssl_cert_path",
             "label": "SSL certificate",
             "type": "STRING",
             "description": "(optional) Full path to your tableau SSL certificate",
-            "mandatory": false
+            "mandatory": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         },
         {
             "label":"Destination",
@@ -66,7 +84,9 @@
             "name": "site_id",
             "label":"Site ID",
             "type": "STRING",
-            "description":"optional, default is empty"
+            "description":"The site_id is the subpath of your full site URL. (See the README.md for details)",
+            "mandatory": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         }
     ]
 }

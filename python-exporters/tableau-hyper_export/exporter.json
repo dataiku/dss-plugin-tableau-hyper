@@ -19,5 +19,17 @@
     ],
 
     "params": [
+        {
+            "name": "schema_name",
+            "label": "Schema name",
+            "type": "STRING",
+            "defaultValue": "Extract"
+        },
+        {
+            "name": "table_name",
+            "label":"Table name",
+            "type": "STRING",
+            "defaultValue": "Extract"
+        }
     ]
 }
