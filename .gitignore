@@ -10,3 +10,4 @@
 .idea
 venv
 **/hyperd*.log
+dist
