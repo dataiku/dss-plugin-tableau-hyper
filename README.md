@@ -86,3 +86,10 @@ Each time the DSS dataset is uploaded to Tableau Server or Tableau Online, it ov
 DSS enables dataset partitioning. When partitioned datasets on DSS are exported to file using the Tableau Hyper plugin, one folder per partition is created. One `.hyper` file per partition and folder will be created.
 
 An upload to server of a partitioned dataset will raise an error and is not supported. Before uploading, the dataset partitions have to be stacked together and merged as one. 
+
+## Run the tests
+
+From the tableau-hyper-export repository, run:
+```shell script
+PYTHONPATH=$PYTHONPATH:{path to plugin repository}/tableau-hyper-export/python-lib pytest
+```
