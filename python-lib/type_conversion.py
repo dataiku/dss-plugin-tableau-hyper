@@ -107,7 +107,7 @@ class TypeConversion(object):
         self.mapping_hyper_to_dss = {
             TypeTag.BIG_INT: ('bigint', handle_null(int)),
             TypeTag.BYTES: ('string', handle_null(str)),
-            TypeTag.BOOL: ('bool', handle_null(bool)),
+            TypeTag.BOOL: ('boolean', handle_null(bool)),
             TypeTag.CHAR: ('string', handle_null(str)),
             TypeTag.DATE: ('date', handle_null(to_dss_date)),
             TypeTag.DOUBLE: ('double', handle_null(float)),
