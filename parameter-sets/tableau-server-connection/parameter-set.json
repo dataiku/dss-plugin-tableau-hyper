@@ -40,7 +40,17 @@
             "label": "SSL certificate",
             "type": "STRING",
             "description": "(optional) Full path to your tableau SSL certificate",
-            "mandatory": false
+            "mandatory": false,
+            "visibilityCondition": "model.ignore_ssl == false"
+
+        },
+        {
+            "name": "ignore_ssl",
+            "label" : "Ignore SSL",
+            "type": "BOOLEAN",
+            "mandatory": false,
+            "description": "Ignore SSL",
+            "defaultValue": false
         }
     ]
 }
