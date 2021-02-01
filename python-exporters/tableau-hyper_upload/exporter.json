@@ -94,7 +94,8 @@
             "type": "BOOLEAN",
             "mandatory": false,
             "description": "Ignore SSL",
-            "defaultValue": false
+            "defaultValue": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         }
     ]
 }
