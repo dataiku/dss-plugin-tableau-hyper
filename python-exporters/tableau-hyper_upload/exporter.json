@@ -60,6 +60,15 @@
             "visibilityCondition": "(model.usePreset == false || model.tableau_server_connection.mode == 'NONE') && model.ignore_ssl == false"
         },
         {
+            "name": "ignore_ssl",
+            "label" : "Ignore SSL",
+            "type": "BOOLEAN",
+            "mandatory": false,
+            "description": "Ignore SSL",
+            "defaultValue": false,
+            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
+        },
+        {
             "label":"Destination",
             "type": "SEPARATOR"
         },
@@ -86,15 +95,6 @@
             "type": "STRING",
             "description": "The site_id is the subpath of your full site URL. (See the README.md for details)",
             "mandatory": false,
-            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
-        },
-        {
-            "name": "ignore_ssl",
-            "label" : "Ignore SSL",
-            "type": "BOOLEAN",
-            "mandatory": false,
-            "description": "Ignore SSL",
-            "defaultValue": false,
             "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         }
     ]
