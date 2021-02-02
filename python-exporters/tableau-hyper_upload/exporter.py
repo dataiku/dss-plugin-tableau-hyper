@@ -163,7 +163,6 @@ class TableauHyperExporter(Exporter):
         If same DataSource exists, it will be overwritten
         """
         self.writer.close()
-        # By default should not ignore SSL
         with self.server.auth.sign_in(self.tableau_auth):
             self.server.datasources.publish(self.tableau_datasource, self.output_file, 'Overwrite')
         try:
