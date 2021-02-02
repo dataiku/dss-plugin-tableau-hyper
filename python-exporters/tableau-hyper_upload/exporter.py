@@ -160,6 +160,7 @@ class TableauHyperExporter(Exporter):
         If same DataSource exists, it will be overwritten
         """
         self.writer.close()
+        self.server.add_http_options({'verify': self.ignore_ssl})
         with self.server.auth.sign_in(self.tableau_auth):
             self.server.datasources.publish(self.tableau_datasource, self.output_file, 'Overwrite')
         try:
