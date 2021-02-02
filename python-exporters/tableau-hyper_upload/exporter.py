@@ -118,6 +118,9 @@ class TableauHyperExporter(Exporter):
         # Open connection to Tableau Server
         self.tableau_auth = tsc.TableauAuth(username, password, site_id=site_name)
         self.server = tsc.Server(server_name)
+        if self.ignore_ssl:
+            self.server.add_http_options({'verify': False})
+            logger.info("Server sign-in is ignoring SSL check.")
 
         # Retrieve target project from Tableau Server/Online
         with self.server.auth.sign_in(self.tableau_auth):
@@ -161,9 +164,6 @@ class TableauHyperExporter(Exporter):
         """
         self.writer.close()
         # By default should not ignore SSL
-        self.server.add_http_options({'verify': self.ignore_ssl})
-        if self.ignore_ssl:
-            logger.warning("Server sign-in is ignoring SSL check.")
         with self.server.auth.sign_in(self.tableau_auth):
             self.server.datasources.publish(self.tableau_datasource, self.output_file, 'Overwrite')
         try:
