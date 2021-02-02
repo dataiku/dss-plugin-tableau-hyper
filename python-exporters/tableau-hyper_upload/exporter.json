@@ -52,14 +52,6 @@
             "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         },
         {
-            "name": "ssl_cert_path",
-            "label": "SSL certificate",
-            "type": "STRING",
-            "description": "(optional) Full path to your tableau SSL certificate",
-            "mandatory": false,
-            "visibilityCondition": "(model.usePreset == false || model.tableau_server_connection.mode == 'NONE') && model.ignore_ssl == false"
-        },
-        {
             "name": "ignore_ssl",
             "label" : "Ignore SSL",
             "type": "BOOLEAN",
@@ -67,6 +59,14 @@
             "description": "Ignore SSL",
             "defaultValue": false,
             "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
+        },
+        {
+            "name": "ssl_cert_path",
+            "label": "SSL certificate",
+            "type": "STRING",
+            "description": "(optional) Full path to your tableau SSL certificate",
+            "mandatory": false,
+            "visibilityCondition": "(model.usePreset == false || model.tableau_server_connection.mode == 'NONE') && model.ignore_ssl == false"
         },
         {
             "label":"Destination",
