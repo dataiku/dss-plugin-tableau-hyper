@@ -36,6 +36,14 @@
             "mandatory": true
         },
         {
+            "name": "ignore_ssl",
+            "label" : "Ignore SSL",
+            "type": "BOOLEAN",
+            "mandatory": false,
+            "description": "Ignore SSL",
+            "defaultValue": false
+        },
+        {
             "name": "ssl_cert_path",
             "label": "SSL certificate",
             "type": "STRING",
@@ -43,14 +51,6 @@
             "mandatory": false,
             "visibilityCondition": "model.ignore_ssl == false"
 
-        },
-        {
-            "name": "ignore_ssl",
-            "label" : "Ignore SSL",
-            "type": "BOOLEAN",
-            "mandatory": false,
-            "description": "Ignore SSL",
-            "defaultValue": false
         }
     ]
 }
