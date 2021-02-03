@@ -50,7 +50,6 @@
             "description": "(optional) Full path to your tableau SSL certificate",
             "mandatory": false,
             "visibilityCondition": "model.ignore_ssl == false"
-
         }
     ]
 }
