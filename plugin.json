@@ -6,6 +6,7 @@
         "description": "Export datasets to Tableau .hyper format.",
         "author": "Dataiku (Thibault DESFONTAINES)",
         "icon": "icon-tableau",
+        "supportLevel": "TIER2_SUPPORT",
         "licenseInfo": "Apache Software License",
         "url": "https://www.dataiku.com/dss/plugins/info/tableau-hyper-export.html",
         "tags": ["Visualization", "Format"]
