@@ -1,11 +1,12 @@
 {
     "id": "tableau-hyper-export",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "meta": {
         "label": "Tableau Hyper format",
         "description": "Export datasets to Tableau .hyper format.",
         "author": "Dataiku (Thibault DESFONTAINES)",
         "icon": "icon-tableau",
+        "supportLevel": "TIER2_SUPPORT",
         "licenseInfo": "Apache Software License",
         "url": "https://www.dataiku.com/dss/plugins/info/tableau-hyper-export.html",
         "tags": ["Visualization", "Format"]

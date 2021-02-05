@@ -89,14 +89,16 @@ class TableauHyperExporter(Exporter):
 
         # Handle ssl certificates
         self.ssl_cert_path = config.get('ssl_cert_path', None)
+        self.ignore_ssl = config.get('ignore_ssl', False)
 
-        if self.ssl_cert_path:
-            if not os.path.isfile(self.ssl_cert_path):
-                raise ValueError('SSL certificate file %s does not exist' % self.ssl_cert_path)
-            else:
-                # default variables handled by python requests to validate cert (used by underlying tableauserverclient)
-                os.environ['REQUESTS_CA_BUNDLE'] = self.ssl_cert_path
-                os.environ['CURL_CA_BUNDLE'] = self.ssl_cert_path
+        if not self.ignore_ssl:
+            if self.ssl_cert_path:
+                if not os.path.isfile(self.ssl_cert_path):
+                    raise ValueError('SSL certificate file %s does not exist' % self.ssl_cert_path)
+                else:
+                    # default variables handled by python requests to validate cert (used by underlying tableauserverclient)
+                    os.environ['REQUESTS_CA_BUNDLE'] = self.ssl_cert_path
+                    os.environ['CURL_CA_BUNDLE'] = self.ssl_cert_path
 
         # Retrieve Tableau Hyper and Server/Online locations and table configurations
         self.output_file_name = config.get('output_table', 'my_dss_table')
@@ -116,6 +118,9 @@ class TableauHyperExporter(Exporter):
         # Open connection to Tableau Server
         self.tableau_auth = tsc.TableauAuth(username, password, site_id=site_name)
         self.server = tsc.Server(server_name)
+        if self.ignore_ssl:
+            self.server.add_http_options({'verify': False})
+            logger.info("HTTP client is ignoring SSL check.")
 
         # Retrieve target project from Tableau Server/Online
         with self.server.auth.sign_in(self.tableau_auth):
