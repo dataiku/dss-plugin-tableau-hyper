@@ -226,3 +226,40 @@ class TestTableauTableWriter(TestCase):
                 count += 1
 
         os.remove(destination_file_path)
+
+    def test_export_int_values(self):
+        # ===> Define parameters input from DSS for exporter
+        config = {}
+        plugin_config = {}
+        schema = {'columns': [{'name': 'tiny_int', 'type': 'tinyint'}, {'name': 'small_int', 'type': 'smallint'}, {'name': 'big_int', 'type': 'bigint'}],
+                  'userModified': True}
+        rows = [(12, 370, 21474836470), (2, 1000, 2147483647), (15, 15000, 21474836477777777), (126, 32766, 2147483648), (127, 32767, 2147483648)]
+        # <===
+
+        # ===> Create a DSS-like exporter
+        exporter = TableauHyperExporter(config, plugin_config)
+        output_file_name = get_random_alphanumeric_string(10) + '.hyper'
+        destination_file_path = os.path.join(self.output_path, output_file_name)
+        exporter.open_to_file(schema, destination_file_path)
+        for row in rows:
+            exporter.write_row(row)
+        exporter.close()
+
+        with HyperProcess(telemetry=Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU) as hyper:
+            with Connection(endpoint=hyper.endpoint, database=destination_file_path) as connection:
+                with connection.execute_query(query=f"SELECT * FROM {TableName('Extract', 'Extract')}") as result:
+                    rows_from_hyper = list(result)
+
+        assert len(rows) == len(rows_from_hyper)
+
+        count = 0
+        valid = 0
+        for i in range(len(rows)):
+            row_dss, row_hyper = rows[i], rows_from_hyper[i]
+            for j in range(len(row_dss)):
+                a, b = row_dss[j], row_hyper[j]
+                if (pd.isna(a) and pd.isna(b)) or (a == b):
+                    valid += 1
+                count += 1
+
+        os.remove(destination_file_path)
