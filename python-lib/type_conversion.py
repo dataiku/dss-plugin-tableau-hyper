@@ -117,7 +117,7 @@ class TypeConversion(object):
             TypeTag.JSON: ('string', handle_null(str)),
             TypeTag.NUMERIC: ('double', handle_null(float)),
             TypeTag.OID: ('string', handle_null(str)),
-            TypeTag.SMALL_INT: ('int', handle_null(int)),
+            TypeTag.SMALL_INT: ('smallint', handle_null(int)),
             TypeTag.TEXT: ('string', handle_null(str)),
             TypeTag.TIME: ('string', handle_null(str)),
             TypeTag.TIMESTAMP: ('date', handle_null(to_dss_timestamp)),
