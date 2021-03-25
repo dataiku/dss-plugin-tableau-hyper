@@ -27,7 +27,7 @@ class TestTypeConversion(TestCase):
     def test_dss_type_to_hyper(self):
         type_converter = TypeConversion()
         hyper_type = type_converter.dss_type_to_hyper('bigint')
-        assert str(hyper_type.tag) == 'TypeTag.INT'
+        assert str(hyper_type.tag) == 'TypeTag.BIG_INT'
 
     def test_hyper_type_to_dss(self):
         type_converter = TypeConversion()

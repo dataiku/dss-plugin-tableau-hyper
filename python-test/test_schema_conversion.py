@@ -37,7 +37,7 @@ class TestSchemaConversion(TestCase):
         ]
         hyper_columns = schema_converter.dss_columns_to_hyper_columns(dss_columns)
         columns_tags = [str(column_.type.tag) for column_ in hyper_columns]
-        assert columns_tags == ['TypeTag.INT', 'TypeTag.GEOGRAPHY', 'TypeTag.DOUBLE']
+        assert columns_tags == ['TypeTag.BIG_INT', 'TypeTag.GEOGRAPHY', 'TypeTag.DOUBLE']
 
     def test_hyper_columns_to_dss_columns(self):
         schema_converter = SchemaConversion()
