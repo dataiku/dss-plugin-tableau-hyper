@@ -233,7 +233,7 @@ class TestTableauTableWriter(TestCase):
         plugin_config = {}
         schema = {'columns': [{'name': 'tiny_int', 'type': 'tinyint'}, {'name': 'small_int', 'type': 'smallint'}, {'name': 'big_int', 'type': 'bigint'}],
                   'userModified': True}
-        rows = [(12, 370, 21474836470), (2, 1000, 2147483647), (15, 15000, 21474836477777777), (126, 32766, 2147483648), (127, 32767, 2147483648)]
+        rows = [(12, 370, -9223372036854775808), (2, 1000, 2147483647), (15, 15000, 21474836477777777), (126, 32766, 2147483648), (127, 32767, 2147483648)]
         # <===
 
         # ===> Create a DSS-like exporter
