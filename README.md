@@ -16,7 +16,7 @@ This plugin offers the ability to interact with the Tableau Hyper format from a 
 
 ## Prerequisites
 
-This plugin requires DSS 5.0.2 or higher. The installation setup for this plugin follows the standard Dataiku code environment creation procedure. This plugin requires the [Tableau Server Client](https://tableau.github.io/server-client-python/) and 
+This plugin requires DSS 6.X or higher. The installation setup for this plugin follows the standard Dataiku code environment creation procedure. This plugin requires the [Tableau Server Client](https://tableau.github.io/server-client-python/) and 
 [Tableau Hyper API](https://help.tableau.com/current/api/hyper_api/en-us/index.html) Python modules. They will be installed automatically through Pip. Note that the Tableau Hyper API is compatible with Python 3.6 or Python 3.7 but not with older versions of Python.
 
 ## How it works  
