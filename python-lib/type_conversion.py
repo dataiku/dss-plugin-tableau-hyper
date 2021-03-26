@@ -88,7 +88,7 @@ class TypeConversion(object):
         # Mapping DSS to Tableau Hyper types
         self.mapping_dss_to_hyper = {
             'array': (SqlType.text(), handle_null(str)),
-            'bigint': (SqlType.int(), handle_null(int)),
+            'bigint': (SqlType.big_int(), handle_null(int)),
             'boolean': (SqlType.bool(), handle_null(bool)),
             'date': (SqlType.timestamp(), handle_null(to_hyper_timestamp)),
             'double': (SqlType.double(), handle_null(float)),
@@ -98,9 +98,9 @@ class TypeConversion(object):
             'int': (SqlType.int(), handle_null(int)),
             'map': (SqlType.text(), handle_null(str)),
             'object': (SqlType.text(), handle_null(str)),
-            'smallint': (SqlType.int(), handle_null(int)),
+            'smallint': (SqlType.small_int(), handle_null(int)),
             'string': (SqlType.text(), handle_null(str)),
-            'tinyint': (SqlType.int(), handle_null(int)),
+            'tinyint': (SqlType.small_int(), handle_null(int)),
         }
 
         # Mapping Tableau Hyper to DSS types
@@ -117,7 +117,7 @@ class TypeConversion(object):
             TypeTag.JSON: ('string', handle_null(str)),
             TypeTag.NUMERIC: ('double', handle_null(float)),
             TypeTag.OID: ('string', handle_null(str)),
-            TypeTag.SMALL_INT: ('int', handle_null(int)),
+            TypeTag.SMALL_INT: ('smallint', handle_null(int)),
             TypeTag.TEXT: ('string', handle_null(str)),
             TypeTag.TIME: ('string', handle_null(str)),
             TypeTag.TIMESTAMP: ('date', handle_null(to_dss_timestamp)),
