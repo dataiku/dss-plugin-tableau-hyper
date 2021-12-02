@@ -1,2 +1,2 @@
-tableauhyperapi==0.0.11249
-tableauserverclient==0.12
+tableauhyperapi==0.0.13287
+tableauserverclient==0.15.0
