@@ -1,4 +1,4 @@
-Current Version: 0.1.4 <br>
+Current Version: 0.1.5 <br>
 Compatible with DSS version: 6.X and higher<br>
 
 ## Plugin information
@@ -23,7 +23,7 @@ This plugin requires DSS 6.X or higher. The installation setup for this plugin f
 
 Once the plugin is successfully installed, the flow contains two exporters, available in the standard "Export" dialog of DSS, a file format component allowing creation of Dataiku dataset from Hyper files, and a plugin preset enabling Tableau Server or Tableau Online credentials to be accessible to selected users of the DSS instance containing the preset.
 
-Please refer to the [Dataiku Plugin webpage](https://www.dataiku.com/product/plugins/tableau-hyper-export/) for detailed usage information.
+Please refer to the [Dataiku Plugin webpage](https://www.dataiku.com/product/plugins/tableau-hyper-export) for detailed usage information.
 
 ## Overview of the components included in this plugin
 
