@@ -38,15 +38,15 @@
             "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         },
         {
-            "name": "username",
-            "label":"Username",
+            "name": "token_name",
+            "label":"Token Name",
             "type": "STRING",
             "mandatory": false,
             "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
         },
         {
-            "name": "password",
-            "label":"Password",
+            "name": "token_value",
+            "label":"Token Value",
             "type": "PASSWORD",
             "mandatory": false,
             "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"

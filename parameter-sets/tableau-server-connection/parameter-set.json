@@ -24,14 +24,14 @@
             "description":"The site_id is the subpath of your full site URL."
         },
         {
-            "name": "username",
-            "label":"Username",
+            "name": "token_name",
+            "label":"Token Name",
             "type": "STRING",
             "mandatory": true
         },
         {
-            "name": "password",
-            "label": "Password",
+            "name": "token_value",
+            "label": "Token Value",
             "type": "PASSWORD",
             "mandatory": true
         },

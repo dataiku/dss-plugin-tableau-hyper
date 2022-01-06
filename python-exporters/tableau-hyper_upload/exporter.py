@@ -73,19 +73,19 @@ class TableauHyperExporter(Exporter):
         self.config = config # final config
 
         # Retrieve credentials parameters
-        username = config.get('username', None)
-        check_null_values(username, 'username')
-        password = config.get('password', None)
-        check_null_values(password, 'password')
+        token_name = config.get('token_name', None)
+        check_null_values(token_name, 'token_name')
+        token_value = config.get('token_value', None)
+        check_null_values(token_value, 'token_value')
         server_name = config.get('server_url', None)
         check_null_values(server_name, 'server_url')
         # The site name is optional in Tableau Server, default value should not be None but empty String
         site_name = config.get('site_id', '')
 
         logger.info("Detected following user input configuration:\n"
-                    "     username: {},\n"
+                    "     token_name: {},\n"
                     "   server_url: {},\n"
-                    "    site_name: {}".format(username, server_name, site_name))
+                    "    site_name: {}".format(token_name, server_name, site_name))
 
         # Handle ssl certificates
         self.ssl_cert_path = config.get('ssl_cert_path', None)
@@ -116,7 +116,7 @@ class TableauHyperExporter(Exporter):
         # Instantiate Tableau Writer wrapper
         self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
         # Open connection to Tableau Server
-        self.tableau_auth = tsc.TableauAuth(username, password, site_id=site_name)
+        self.tableau_auth = tsc.PersonalAccessTokenAuth(token_name, token_value, site_id=site_name)
         self.server = tsc.Server(server_name)
         if self.ignore_ssl:
             self.server.add_http_options({'verify': False})

@@ -41,8 +41,8 @@ The parameter preset enables referencing of Tableau Server or Tableau Online cre
 
 * Tableau Server URL
 * Tableau Server Site ID
-* Tableau Server Username
-* Tableau Server Password
+* Tableau Server Personal access token name
+* Tableau Server Personal access token value
 
 Usage of those parameters are detailed on the documentation of the 
 [Tableau Server Client in Python](https://tableau.github.io/server-client-python/docs/):
@@ -51,7 +51,7 @@ Usage of those parameters are detailed on the documentation of the
 ```python
 import tableauserverclient as TSC
 
-tableau_auth = TSC.TableauAuth('USERNAME', 'PASSWORD', 'SITENAME')
+tableau_auth = TSC.PersonalAccessTokenAuth('TOKEN_NAME', 'TOKEN_VALUE', 'SITENAME')
 server = TSC.Server('SERVER_URL')
 
 with server.auth.sign_in(tableau_auth):
