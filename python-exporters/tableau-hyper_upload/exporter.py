@@ -102,7 +102,11 @@ class TableauHyperExporter(Exporter):
 
         # Retrieve Tableau Hyper and Server/Online locations and table configurations
         self.output_file_name = config.get('output_table', 'my_dss_table')
-        self.project_name = config.get('project', 'Default')
+        self.project_id = None
+        retrieve_project_list = config.get('retrieve_project_list', False)
+        if retrieve_project_list:
+            self.project_id = config.get('project_id')
+        self.project_name = config.get('project', 'default')
         self.schema_name = 'Extract'
         self.table_name = 'Extract'
 
@@ -124,13 +128,16 @@ class TableauHyperExporter(Exporter):
 
         # Retrieve target project from Tableau Server/Online
         with self.server.auth.sign_in(self.tableau_auth):
-            exists, project = get_project_from_name(self.server, self.project_name.encode("utf-8"))
-            if not exists:
-                project_names = get_full_list_of_projects(self.server)
-                logger.warning("Target project {} seems to be unexisting on server, projects accessible on server are:"
-                               "{}".format(self.project_name, project_names))
-                raise ValueError('The project {} does not exist on server.'.format(self.project_name))
-            self.tableau_datasource = tsc.DatasourceItem(project.id) # Create new datasource
+            if self.project_id:
+                self.tableau_datasource = tsc.DatasourceItem(self.project_id) # Create new datasource
+            else:
+                exists, project = get_project_from_name(self.server, self.project_name.encode("utf-8"))
+                if not exists:
+                    project_names = get_full_list_of_projects(self.server)
+                    logger.warning("Target project {} seems to be unexisting on server, projects accessible on server are:"
+                                "{}".format(self.project_name, project_names))
+                    raise ValueError('The project {} does not exist on server.'.format(self.project_name))
+                self.tableau_datasource = tsc.DatasourceItem(project.id) # Create new datasource
 
     def open(self, schema):
         """

@@ -58,3 +58,38 @@ def get_full_list_of_projects(server):
         page_nb += 1
 
     return all_projects
+
+
+def get_dict_of_projects_paths(server):
+    page_nb = 1
+    all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
+    pages_in_total = (pag_it.total_available // pag_it.page_size) + 1
+    all_projects = {}
+
+    while page_nb <= pages_in_total:
+
+        all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
+        for all_project_item in all_project_items:
+            all_projects[all_project_item.id] = {"name": all_project_item.name, "parent": all_project_item.parent_id}
+        page_nb += 1
+
+    return all_projects
+
+
+def build_directory_structure(all_projects):
+    file_system_structure = {}
+    for project_id in all_projects:
+        project = all_projects.get(project_id)
+        project_full_path = get_project_full_path(project, all_projects)
+        file_system_structure[project_full_path] = project_id
+    return file_system_structure
+
+
+def get_project_full_path(project, all_projects):
+    parent_project_id = project.get("parent")
+    if not parent_project_id:
+        return project.get("name")
+    else:
+        parent_project = all_projects.get(parent_project_id)
+        root = get_project_full_path(parent_project, all_projects)
+        return root + " / " + project.get("name")

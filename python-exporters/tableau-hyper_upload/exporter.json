@@ -10,7 +10,8 @@
             "label" : "Upload to Tableau Server (Hyper)"
         }
     ],
-
+    "kind": "PYTHON",
+    "paramsPythonSetup": "browse_projects.py",
     "params": [
         {
             "label":"Tableau Server",
@@ -73,11 +74,26 @@
             "type": "SEPARATOR"
         },
         {
+            "name": "retrieve_project_list",
+            "label":"Select project from list",
+            "description": "(DSS 10.0.4 and above)",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
             "name": "project",
             "label":"Project",
             "type": "TEXTAREA",
-            "defaultValue": "Default",
-            "description":"Upload the Hyper file to this project."
+            "defaultValue": "default",
+            "description":"Upload the Hyper file to this project.",
+            "visibilityCondition": "model.retrieve_project_list == false"
+        },
+        {
+            "name": "project_id",
+            "label":"Project",
+            "type": "SELECT",
+            "getChoicesFromPython": true,
+            "visibilityCondition": "model.retrieve_project_list == true"
         },
         {
             "name": "output_table",
