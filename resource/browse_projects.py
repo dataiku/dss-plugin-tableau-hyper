@@ -31,12 +31,17 @@ def do(payload, config, plugin_config, inputs):
         tableau_auth = client.TableauAuth(username, password, site_id=site_id)
         with server.auth.sign_in(tableau_auth):
             project_details = get_dict_of_projects_paths(server)
-            project_sorted = build_directory_structure(project_details)
+            projects = build_directory_structure(project_details)
         choices = []
-        for project_name in project_sorted:
+
+        # https://stackoverflow.com/questions/24728933/sort-dictionary-alphabetically-when-the-key-is-a-string-name
+        sorted_projects_names = sorted(projects.keys(), key=lambda name: name.lower())
+
+        for project_name in sorted_projects_names:
             choices.append({
                 "label": "{}".format(project_name),
-                "value": "{}".format(project_sorted.get(project_name))
+                "value": "{}".format(projects.get(project_name))
             })
+
         return build_select_choices(choices)
     return build_select_choices()
