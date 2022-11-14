@@ -96,7 +96,7 @@ def get_project_full_path(project, all_projects):
         return root + " / " + project.get("name")
 
 
-def get_tableau_server_connection(config):
+def get_legacy_tableau_server_connection(config):
     server_url = username = password = site_id = None
     use_preset = config.get('usePreset', False)
     if use_preset:
@@ -111,6 +111,42 @@ def get_tableau_server_connection(config):
     ssl_cert_path = configuration.get('ssl_cert_path', None)
     ignore_ssl = configuration.get('ignore_ssl', False)
 
+    setup_ssl(ignore_ssl, ssl_cert_path)
+
+    return server_url, username, password, site_id, ignore_ssl
+
+
+def get_tableau_server_connection(config):
+    server_url = username = password = site_id = None
+    auth_type = config.get("auth_type", None)
+
+    if auth_type == "legacy-login":
+        configuration = config
+    elif auth_type == "legacy-preset":
+        configuration = config.get('tableau_server_connection', {})
+    elif auth_type == "basic-oauth":
+        configuration = config.get('tableau_server_secure_connection', {})
+        tableau_secure_basic = configuration.get("tableau_secure_basic", {})
+        username = tableau_secure_basic.get("user")
+        password = tableau_secure_basic.get("password")
+    else: # the auth_type selector was never used, so old conf file, use legacy mode
+        server_url, username, password, site_id, ignore_ssl = get_legacy_tableau_server_connection(config)
+        return server_url, username, password, site_id, ignore_ssl
+
+    server_url = configuration.get('server_url', None)
+    username = configuration.get('username', username)
+    password = configuration.get('password', password)
+    site_id = configuration.get('site_id', '')
+
+    ssl_cert_path = configuration.get('ssl_cert_path', None)
+    ignore_ssl = configuration.get('ignore_ssl', False)
+
+    setup_ssl(ignore_ssl, ssl_cert_path)
+
+    return server_url, username, password, site_id, ignore_ssl
+
+
+def setup_ssl(ignore_ssl, ssl_cert_path):
     if not ignore_ssl and ssl_cert_path:
         if not os.path.isfile(ssl_cert_path):
             raise ValueError('SSL certificate file {} does not exist'.format(ssl_cert_path))
@@ -118,5 +154,3 @@ def get_tableau_server_connection(config):
             # default variables handled by python requests to validate cert (used by underlying tableauserverclient)
             os.environ['REQUESTS_CA_BUNDLE'] = ssl_cert_path
             os.environ['CURL_CA_BUNDLE'] = ssl_cert_path
-
-    return server_url, username, password, site_id, ignore_ssl
