@@ -3,6 +3,7 @@ Gives functions for interaction with Tableau Server through the Tableau Server C
 """
 
 import logging
+import os
 
 import tableauserverclient as tsc
 
@@ -58,3 +59,64 @@ def get_full_list_of_projects(server):
         page_nb += 1
 
     return all_projects
+
+
+def get_dict_of_projects_paths(server):
+    page_nb = 1
+    all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
+    pages_in_total = (pag_it.total_available // pag_it.page_size) + 1
+    all_projects = {}
+
+    while page_nb <= pages_in_total:
+
+        all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
+        for all_project_item in all_project_items:
+            all_projects[all_project_item.id] = {"name": all_project_item.name, "parent": all_project_item.parent_id}
+        page_nb += 1
+
+    return all_projects
+
+
+def build_directory_structure(all_projects):
+    file_system_structure = {}
+    for project_id in all_projects:
+        project = all_projects.get(project_id)
+        project_full_path = get_project_full_path(project, all_projects)
+        file_system_structure[project_full_path] = project_id
+    return file_system_structure
+
+
+def get_project_full_path(project, all_projects):
+    parent_project_id = project.get("parent")
+    if not parent_project_id:
+        return project.get("name")
+    else:
+        parent_project = all_projects.get(parent_project_id)
+        root = get_project_full_path(parent_project, all_projects)
+        return root + " / " + project.get("name")
+
+
+def get_tableau_server_connection(config):
+    server_url = username = password = site_id = None
+    use_preset = config.get('usePreset', False)
+    if use_preset:
+        configuration = config.get('tableau_server_connection', {})
+    else:
+        configuration = config
+    server_url = configuration.get('server_url', None)
+    username = configuration.get('username', None)
+    password = configuration.get('password', None)
+    site_id = configuration.get('site_id', '')
+
+    ssl_cert_path = configuration.get('ssl_cert_path', None)
+    ignore_ssl = configuration.get('ignore_ssl', False)
+
+    if not ignore_ssl and ssl_cert_path:
+        if not os.path.isfile(ssl_cert_path):
+            raise ValueError('SSL certificate file {} does not exist'.format(ssl_cert_path))
+        else:
+            # default variables handled by python requests to validate cert (used by underlying tableauserverclient)
+            os.environ['REQUESTS_CA_BUNDLE'] = ssl_cert_path
+            os.environ['CURL_CA_BUNDLE'] = ssl_cert_path
+
+    return server_url, username, password, site_id, ignore_ssl
