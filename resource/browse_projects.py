@@ -1,5 +1,10 @@
+import logging
 from tableau_server_utils import get_dict_of_projects_paths, build_directory_structure, get_tableau_server_connection
 import tableauserverclient as client
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(levelname)s - %(message)s')
 
 
 def build_select_choices(choices=None):
@@ -25,13 +30,21 @@ def do(payload, config, plugin_config, inputs):
         if not retrieve_project_list:
             return build_select_choices()
         server_url, username, password, site_id, ignore_ssl = get_tableau_server_connection(config)
-        server = client.Server(server_url, use_server_version=True)
+        try:
+            server = client.Server(server_url, use_server_version=True)
+        except Exception as err:
+            logger.error("Connection error for parameter {} : {}".format(parameter_name, err))
+            return build_select_choices("Check the connection details ({})".format(err))
         if ignore_ssl:
             server.add_http_options({'verify': False})
         tableau_auth = client.TableauAuth(username, password, site_id=site_id)
-        with server.auth.sign_in(tableau_auth):
-            project_details = get_dict_of_projects_paths(server)
-            projects = build_directory_structure(project_details)
+        try:
+            with server.auth.sign_in(tableau_auth):
+                project_details = get_dict_of_projects_paths(server)
+                projects = build_directory_structure(project_details)
+        except Exception as err:
+            logger.error("Authentication error for parameter {} : {}".format(parameter_name, err))
+            return build_select_choices("Check the authentication details")
         choices = []
 
         # https://stackoverflow.com/questions/24728933/sort-dictionary-alphabetically-when-the-key-is-a-string-name
