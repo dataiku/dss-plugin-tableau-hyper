@@ -24,7 +24,7 @@
             "selectChoices": [
                 {
                     "value": "basic-oauth",
-                    "label": "Secure preset"
+                    "label": "Personal preset"
                 },
                 {
                     "value": "legacy-preset",
@@ -45,10 +45,10 @@
             "visibilityCondition": false
         },
         {
-            "name": "tableau_server_secure_connection",
-            "label": "Tableau Server Secure Preset",
+            "name": "tableau_server_personal_connection",
+            "label": "Tableau Server Personal Preset",
             "type": "PRESET",
-            "parameterSetId": "secure-connection",
+            "parameterSetId": "tableau-personal-connection",
             "visibilityCondition": "model.auth_type == 'basic-oauth'"
         },
         {

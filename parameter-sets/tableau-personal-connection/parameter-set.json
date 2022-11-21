@@ -1,7 +1,7 @@
 {
     "meta" : {
-        "label": "Tableau Server Secure Preset",
-        "description": "Tableau Server Secure Preset",
+        "label": "Tableau Server Personal Preset",
+        "description": "Tableau Server Personal Preset",
         "icon": "icon-tableau"
     },
     "defaultDefinableInline": false,
@@ -40,7 +40,7 @@
             "visibilityCondition": "model.ignore_ssl == false"
         },
         {
-            "name": "tableau_secure_basic",
+            "name": "tableau_personal_basic",
             "type": "CREDENTIAL_REQUEST",
             "label": "Tableau basic login",
             "credentialRequestSettings": {

@@ -125,10 +125,10 @@ def get_tableau_server_connection(config):
     elif auth_type == "legacy-preset":
         configuration = config.get('tableau_server_connection', {})
     elif auth_type == "basic-oauth":
-        configuration = config.get('tableau_server_secure_connection', {})
-        tableau_secure_basic = configuration.get("tableau_secure_basic", {})
-        username = tableau_secure_basic.get("user")
-        password = tableau_secure_basic.get("password")
+        configuration = config.get('tableau_server_personal_connection', {})
+        tableau_personal_basic = configuration.get("tableau_personal_basic", {})
+        username = tableau_personal_basic.get("user")
+        password = tableau_personal_basic.get("password")
     else: # the auth_type selector was never used, so old conf file, use legacy mode
         server_url, username, password, site_id, ignore_ssl = get_legacy_tableau_server_connection(config)
         return server_url, username, password, site_id, ignore_ssl
