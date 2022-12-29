@@ -56,28 +56,28 @@
             "label": "Tableau Server Preset",
             "type": "PRESET",
             "parameterSetId": "tableau-server-connection",
-            "visibilityCondition": "model.auth_type == 'legacy-preset'"
+            "visibilityCondition": "model.auth_type == 'legacy-preset' || (model.auth_type == null && model.usePreset == true)"
         },
         {
             "name": "server_url",
             "label":"URL",
             "type": "STRING",
             "mandatory": false,
-            "visibilityCondition": "model.auth_type == 'legacy-login'"
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.usePreset == false && model.server_url != null)"
         },
         {
             "name": "username",
             "label":"Username",
             "type": "STRING",
             "mandatory": false,
-            "visibilityCondition": "model.auth_type == 'legacy-login'"
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.usePreset == false && model.server_url != null)"
         },
         {
             "name": "password",
             "label":"Password",
             "type": "PASSWORD",
             "mandatory": false,
-            "visibilityCondition": "model.auth_type == 'legacy-login'"
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.usePreset == false && model.server_url != null)"
         },
         {
             "name": "ignore_ssl",
@@ -86,7 +86,7 @@
             "mandatory": false,
             "description": "Ignore SSL",
             "defaultValue": false,
-            "visibilityCondition": "model.auth_type == 'legacy-login'"
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.server_url != null)"
         },
         {
             "name": "ssl_cert_path",
@@ -94,7 +94,7 @@
             "type": "STRING",
             "description": "(optional) Full path to your tableau SSL certificate",
             "mandatory": false,
-            "visibilityCondition": "(model.auth_type == 'legacy-login') && model.ignore_ssl == false"
+            "visibilityCondition": "(model.auth_type == 'legacy-login' || (model.auth_type == null && model.server_url != null)) && model.ignore_ssl == false"
         },
         {
             "label":"Destination",
@@ -138,7 +138,7 @@
             "type": "STRING",
             "description": "The site_id is the subpath of your full site URL. (See the README.md for details)",
             "mandatory": false,
-            "visibilityCondition": "model.auth_type == 'legacy-login'"
+            "visibilityCondition": "model.auth_type == 'legacy-login' || model.auth_type == null"
         }
     ]
 }
