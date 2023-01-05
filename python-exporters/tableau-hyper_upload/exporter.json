@@ -23,7 +23,7 @@
             "type": "SELECT",
             "selectChoices": [
                 {
-                    "value": "basic-oauth",
+                    "value": "basic-preset",
                     "label": "Personal preset"
                 },
                 {
@@ -49,7 +49,7 @@
             "label": "Tableau Server Personal Preset",
             "type": "PRESET",
             "parameterSetId": "tableau-personal-connection",
-            "visibilityCondition": "model.auth_type == 'basic-oauth'"
+            "visibilityCondition": "model.auth_type == 'basic-preset'"
         },
         {
             "name": "tableau_server_connection",

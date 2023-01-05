@@ -124,7 +124,7 @@ def get_tableau_server_connection(config):
         configuration = config
     elif auth_type == "legacy-preset":
         configuration = config.get('tableau_server_connection', {})
-    elif auth_type == "basic-oauth":
+    elif auth_type == "basic-preset":
         configuration = config.get('tableau_server_personal_connection', {})
         tableau_personal_basic = configuration.get("tableau_personal_basic", {})
         username = tableau_personal_basic.get("user")
