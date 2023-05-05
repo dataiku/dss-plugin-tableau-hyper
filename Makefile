@@ -12,6 +12,8 @@ plugin:
 	@mkdir dist
 	@echo "{\"remote_url\":\"${remote_url}\",\"last_commit_id\":\"${last_commit_id}\"}" > release_info.json
 	@git archive -v -9 --format zip -o dist/${archive_file_name} HEAD
+	@zip --delete dist/${archive_file_name} "tests/*"
+	@zip --delete dist/${archive_file_name} "data/*"
 	@zip -u dist/${archive_file_name} release_info.json
 	@rm release_info.json
 	@echo "[SUCCESS] Archiving plugin to dist/ folder: Done!"
@@ -35,9 +37,15 @@ unit-tests:
 	@echo "[SUCCESS] Running unit tests: Done!"
 
 integration-tests:
-	@echo "[START] Running integration tests..."
-	# TODO add integration tests
-	@echo "[SUCCESS] Running integration tests: Done!"
+	@echo "Running integration tests..."
+	@( \
+		rm -rf ./env/; \
+		python3 -m venv env/; \
+		source env/bin/activate; \
+		pip3 install --upgrade pip;\
+		pip install --no-cache-dir -r tests/python/integration/requirements.txt; \
+		pytest tests/python/integration --alluredir=tests/allure_report || ret=$$?; exit $$ret \
+	)
 
 tests: unit-tests integration-tests
 
