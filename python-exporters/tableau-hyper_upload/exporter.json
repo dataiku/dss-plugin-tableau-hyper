@@ -18,39 +18,66 @@
             "type": "SEPARATOR"
         },
         {
+            "name": "auth_type",
+            "label": "Authentication type",
+            "type": "SELECT",
+            "selectChoices": [
+                {
+                    "value": "basic-preset",
+                    "label": "Personal preset"
+                },
+                {
+                    "value": "legacy-preset",
+                    "label": "Preset (legacy)"
+                },
+                {
+                    "value": "legacy-login",
+                    "label": "User name / password (legacy)"
+                }
+            ]
+        },
+        {
             "name": "usePreset",
             "label" : "Use preset",
             "type": "BOOLEAN",
             "mandatory": false,
-            "description":"Get the Tableau Server connection parameters from a shared configuration in DSS"
+            "description":"Get the Tableau Server connection parameters from a shared configuration in DSS. Legacy: we just keep it to let existing flow working.",
+            "visibilityCondition": false
+        },
+        {
+            "name": "tableau_server_personal_connection",
+            "label": "Tableau Server Personal Preset",
+            "type": "PRESET",
+            "parameterSetId": "tableau-personal-connection",
+            "visibilityCondition": "model.auth_type == 'basic-preset'"
         },
         {
             "name": "tableau_server_connection",
             "label": "Tableau Server Preset",
             "type": "PRESET",
             "parameterSetId": "tableau-server-connection",
-            "visibilityCondition": "model.usePreset == true"
+            "visibilityCondition": "model.auth_type == 'legacy-preset' || (model.auth_type == null && model.usePreset == true)"
         },
         {
             "name": "server_url",
             "label":"URL",
             "type": "STRING",
             "mandatory": false,
-            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.usePreset == false && model.server_url != null)"
         },
         {
             "name": "username",
             "label":"Username",
             "type": "STRING",
             "mandatory": false,
-            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.usePreset == false && model.server_url != null)"
         },
         {
             "name": "password",
             "label":"Password",
             "type": "PASSWORD",
             "mandatory": false,
-            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.usePreset == false && model.server_url != null)"
         },
         {
             "name": "ignore_ssl",
@@ -59,7 +86,7 @@
             "mandatory": false,
             "description": "Ignore SSL",
             "defaultValue": false,
-            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.server_url != null)"
         },
         {
             "name": "ssl_cert_path",
@@ -67,7 +94,7 @@
             "type": "STRING",
             "description": "(optional) Full path to your tableau SSL certificate",
             "mandatory": false,
-            "visibilityCondition": "(model.usePreset == false || model.tableau_server_connection.mode == 'NONE') && model.ignore_ssl == false"
+            "visibilityCondition": "(model.auth_type == 'legacy-login' || (model.auth_type == null && model.server_url != null)) && model.ignore_ssl == false"
         },
         {
             "label":"Destination",
@@ -111,7 +138,7 @@
             "type": "STRING",
             "description": "The site_id is the subpath of your full site URL. (See the README.md for details)",
             "mandatory": false,
-            "visibilityCondition": "model.usePreset == false || model.tableau_server_connection.mode == 'NONE'"
+            "visibilityCondition": "model.auth_type == 'legacy-login' || model.auth_type == null"
         }
     ]
 }

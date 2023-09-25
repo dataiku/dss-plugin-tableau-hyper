@@ -1,0 +1,51 @@
+{
+    "meta" : {
+        "label": "Tableau Server Personal Preset",
+        "description": "Tableau Server Personal Preset",
+        "icon": "icon-tableau"
+    },
+    "defaultDefinableInline": false,
+    "defaultDefinableAtProjectLevel": false,
+
+    "pluginParams": [],
+
+    "params": [
+        {
+            "name": "server_url",
+            "label":"URL",
+            "type": "STRING",
+            "mandatory": true,
+            "description": "URL of your Tableau server without subpaths. \nFor local Tableau servers, an example would be: https://www.MY_SERVER.com. For Tableau Online, \nan example would be: https://10ax.online.tableau.com/."
+        },
+        {
+            "name": "site_id",
+            "label":"Site ID",
+            "type": "STRING",
+            "description":"The site_id is the subpath of your full site URL."
+        },
+        {
+            "name": "ignore_ssl",
+            "label" : "Ignore SSL",
+            "type": "BOOLEAN",
+            "mandatory": false,
+            "description": "(not recommended)",
+            "defaultValue": false
+        },
+        {
+            "name": "ssl_cert_path",
+            "label": "SSL certificate",
+            "type": "STRING",
+            "description": "(optional) Full path to your tableau SSL certificate",
+            "mandatory": false,
+            "visibilityCondition": "model.ignore_ssl == false"
+        },
+        {
+            "name": "tableau_personal_basic",
+            "type": "CREDENTIAL_REQUEST",
+            "label": "Tableau basic login",
+            "credentialRequestSettings": {
+                "type": "BASIC"
+            }
+        }
+    ]
+}
