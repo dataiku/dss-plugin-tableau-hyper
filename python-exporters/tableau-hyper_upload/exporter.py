@@ -8,8 +8,7 @@ import os
 from cache_utils import get_cache_location_from_user_config
 from dataiku.exporter import Exporter
 from tableau_table_writer import TableauTableWriter
-from tableau_server_utils import get_project_from_name
-from tableau_server_utils import get_full_list_of_projects
+from tableau_server_utils import get_project_from_name, get_full_list_of_projects, get_tableau_server_connection
 import tempfile
 from custom_exceptions import InvalidPluginParameter
 
@@ -60,45 +59,12 @@ class TableauHyperExporter(Exporter):
         self.output_file = None
         self.tmp_output_dir = None
 
-        # Extract preset configuration from general configuration
-        preset_config = config.pop('tableau_server_connection')
-
-        # Sanitize the two configurations
-        logger.info("Processing user interface input parameters...")
-        remove_empty_keys(preset_config)
-        remove_empty_keys(config)
-
-        # Preset configuration will overwrite the manual configuration
-        config = {**config, **preset_config}
-        self.config = config # final config
-
-        # Retrieve credentials parameters
-        username = config.get('username', None)
-        check_null_values(username, 'username')
-        password = config.get('password', None)
-        check_null_values(password, 'password')
-        server_name = config.get('server_url', None)
-        check_null_values(server_name, 'server_url')
-        # The site name is optional in Tableau Server, default value should not be None but empty String
-        site_name = config.get('site_id', '')
-
+        server_name, username, password, site_name, self.ignore_ssl = get_tableau_server_connection(config)
+        
         logger.info("Detected following user input configuration:\n"
                     "     username: {},\n"
                     "   server_url: {},\n"
                     "    site_name: {}".format(username, server_name, site_name))
-
-        # Handle ssl certificates
-        self.ssl_cert_path = config.get('ssl_cert_path', None)
-        self.ignore_ssl = config.get('ignore_ssl', False)
-
-        if not self.ignore_ssl:
-            if self.ssl_cert_path:
-                if not os.path.isfile(self.ssl_cert_path):
-                    raise ValueError('SSL certificate file %s does not exist' % self.ssl_cert_path)
-                else:
-                    # default variables handled by python requests to validate cert (used by underlying tableauserverclient)
-                    os.environ['REQUESTS_CA_BUNDLE'] = self.ssl_cert_path
-                    os.environ['CURL_CA_BUNDLE'] = self.ssl_cert_path
 
         # Retrieve Tableau Hyper and Server/Online locations and table configurations
         self.output_file_name = config.get('output_table', 'my_dss_table')
