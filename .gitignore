@@ -9,5 +9,7 @@
 **/.DS_Store
 .idea
 venv
+env
 **/hyperd*.log
 dist
+tests/allure_report

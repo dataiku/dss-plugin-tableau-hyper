@@ -1,6 +1,6 @@
 # Changelog
 
-## [Version 0.1.7](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.1.7) - Feature release - 2023-06-21
+## [Version 0.2.1](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.1) - Feature release - 2023-06-21
 
 - Feature: add secure personal preset
 
