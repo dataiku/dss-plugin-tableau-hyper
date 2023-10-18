@@ -27,6 +27,10 @@
                     "label": "Personal preset"
                 },
                 {
+                    "value": "pta-preset",
+                    "label": "Personal Access Token preset"
+                },
+                {
                     "value": "legacy-preset",
                     "label": "Preset (legacy)"
                 },
@@ -50,6 +54,13 @@
             "type": "PRESET",
             "parameterSetId": "tableau-personal-connection",
             "visibilityCondition": "model.auth_type == 'basic-preset'"
+        },
+        {
+            "name": "tableau_server_pta_connection",
+            "label": "Tableau Server PTA Preset",
+            "type": "PRESET",
+            "parameterSetId": "tableau-pta-connection",
+            "visibilityCondition": "model.auth_type == 'pta-preset'"
         },
         {
             "name": "tableau_server_connection",
