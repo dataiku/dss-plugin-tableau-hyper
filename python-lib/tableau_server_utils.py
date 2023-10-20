@@ -131,9 +131,9 @@ def get_tableau_server_connection(config):
         password = tableau_personal_basic.get("password")
     elif auth_type == "pta-preset":
         configuration = config.get('tableau_server_pta_connection', {})
-        tableau_personal_basic = configuration.get("tableau_pta", {})
-        username = tableau_personal_basic.get("user")
-        password = tableau_personal_basic.get("password")
+        personal_access_token = configuration.get("personal_access_token", {})
+        username = personal_access_token.get("user")
+        password = personal_access_token.get("password")
     else: # the auth_type selector was never used, so old conf file, use legacy mode
         server_url, username, password, site_id, ignore_ssl = get_legacy_tableau_server_connection(config)
         return server_url, username, password, site_id, ignore_ssl

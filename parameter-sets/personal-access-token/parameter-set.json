@@ -1,6 +1,6 @@
 {
     "meta" : {
-        "label": "Tableau PTA Preset",
+        "label": "PAT Preset",
         "description": "Personal Access Tokens",
         "icon": "icon-tableau"
     },
@@ -40,7 +40,7 @@
             "visibilityCondition": "model.ignore_ssl == false"
         },
         {
-            "name": "tableau_pta",
+            "name": "personal_access_token",
             "type": "CREDENTIAL_REQUEST",
             "label": "Tableau Personal Access Token",
             "credentialRequestSettings": {

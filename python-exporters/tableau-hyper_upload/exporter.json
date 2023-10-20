@@ -59,7 +59,7 @@
             "name": "tableau_server_pta_connection",
             "label": "Tableau Server PTA Preset",
             "type": "PRESET",
-            "parameterSetId": "tableau-pta-connection",
+            "parameterSetId": "personal-access-token",
             "visibilityCondition": "model.auth_type == 'pta-preset'"
         },
         {
