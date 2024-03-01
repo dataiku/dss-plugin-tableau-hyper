@@ -52,6 +52,14 @@ def to_hyper_timestamp(dss_date):
     :param dss_date: A DSS date value
     :return: Tableau Hyper date value
     """
+    if isinstance(dss_date, str):
+        try:
+            dss_date = pd.to_datetime(dss_date)
+        except:
+            return
+    if pd.isna(dss_date):
+        # Tableau does not handle NaT, so replacing them with None
+        return
     return dss_date
 
 
