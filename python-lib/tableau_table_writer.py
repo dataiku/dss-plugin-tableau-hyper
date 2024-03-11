@@ -120,7 +120,7 @@ class TableauTableWriter(object):
                 self.update_table() # send data to hyper file, flush buffer
                 self.data = []
         except Exception as err:
-            logger.warning("Failed to perform writing on following row:\n{}".format(row))
+            logger.warning("Failed to perform writing on following batch:\n{}".format(self.data))
             raise err
         return True
 

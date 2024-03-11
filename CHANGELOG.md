@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 0.2.2](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.2) - Bugfix release - 2024-03-11
+
+- Dumping faulty batch instead of last row in case of upload error
+
 ## [Version 0.2.1](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.1) - Feature release - 2023-06-21
 
 - Feature: add secure personal preset
