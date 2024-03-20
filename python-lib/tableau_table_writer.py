@@ -156,14 +156,19 @@ class TableauTableWriter(object):
         Release the Tableau Hyper connections
         """
         logger.info("Closing export ...")
-        if self.data:
-            logger.info("Performing final data update...")
-            self.update_table()
-            self.data = []
-        logger.info("Closing Tableau Hyper connections...")
-        if self.is_geo_table:
-            self.connection.execute_command(command=f"DROP TABLE {self.tmp_table_definition.table_name};")
-        self.hyper.close()
-        self.connection.close()
-        logger.info("Closed export")
+        try:
+            if self.data:
+                logger.info("Performing final data update...")
+                self.update_table()
+                self.data = []
+            logger.info("Closing Tableau Hyper connections...")
+            if self.is_geo_table:
+                self.connection.execute_command(command=f"DROP TABLE {self.tmp_table_definition.table_name};")
+        except Exception as err:
+            logger.warning("Failed to perform writing on the last rows")
+            raise err
+        finally:
+            self.hyper.close()
+            self.connection.close()
+            logger.info("Closed export")
         return True
