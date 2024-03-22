@@ -29,7 +29,7 @@ def do(payload, config, plugin_config, inputs):
         retrieve_project_list = config.get('retrieve_project_list', False)
         if not retrieve_project_list:
             return build_select_choices()
-        server_url, username, password, site_id, ignore_ssl = get_tableau_server_connection(config)
+        server_url, username, password, site_id, ignore_ssl, auth_type = get_tableau_server_connection(config)
         try:
             server = client.Server(server_url, use_server_version=True)
         except Exception as err:
@@ -37,7 +37,10 @@ def do(payload, config, plugin_config, inputs):
             return build_select_choices("Check the connection details ({})".format(err))
         if ignore_ssl:
             server.add_http_options({'verify': False})
-        tableau_auth = client.TableauAuth(username, password, site_id=site_id)
+        if auth_type=="pta-preset":
+            tableau_auth = client.PersonalAccessTokenAuth(username, password, site_id=site_id)
+        else:
+            tableau_auth = client.TableauAuth(username, password, site_id=site_id)
         try:
             with server.auth.sign_in(tableau_auth):
                 project_details = get_dict_of_projects_paths(server)

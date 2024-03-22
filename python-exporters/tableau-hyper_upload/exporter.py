@@ -59,7 +59,7 @@ class TableauHyperExporter(Exporter):
         self.output_file = None
         self.tmp_output_dir = None
 
-        server_name, username, password, site_name, self.ignore_ssl = get_tableau_server_connection(config)
+        server_name, username, password, site_name, self.ignore_ssl, auth_type = get_tableau_server_connection(config)
         
         logger.info("Detected following user input configuration:\n"
                     "     username: {},\n"
@@ -86,7 +86,10 @@ class TableauHyperExporter(Exporter):
         # Instantiate Tableau Writer wrapper
         self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
         # Open connection to Tableau Server
-        self.tableau_auth = tsc.TableauAuth(username, password, site_id=site_name)
+        if auth_type == "pta-preset":
+            self.tableau_auth = tsc.PersonalAccessTokenAuth(username, password, site_id=site_name)
+        else:
+            self.tableau_auth = tsc.TableauAuth(username, password, site_id=site_name)
         self.server = tsc.Server(server_name)
         if self.ignore_ssl:
             self.server.add_http_options({'verify': False})
