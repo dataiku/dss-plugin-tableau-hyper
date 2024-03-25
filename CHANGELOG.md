@@ -4,6 +4,7 @@
 
 - Feature: add secure personal access token preset 
 - Fix: issue with date columns containing empty cells
+- Fix: properly close resources if an error occcurs while writing the last lines of the .hyper file
 
 ## [Version 0.2.1](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.1) - Feature release - 2023-06-21
 
