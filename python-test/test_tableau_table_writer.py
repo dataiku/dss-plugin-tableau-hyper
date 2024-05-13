@@ -6,9 +6,8 @@ import logging
 import string
 import random
 import os
-from tableauhyperapi import HyperProcess, Connection, Telemetry, TableName, TableDefinition
+from tableauhyperapi import HyperProcess, Connection, Telemetry, TableName
 import pandas as pd
-import numpy as np
 import tempfile
 
 logger = logging.getLogger(__name__)
@@ -17,7 +16,7 @@ logging.basicConfig(level=logging.INFO, format='Plugin: Testing - Tableau Hyper 
 
 def get_random_alphanumeric_string(length):
     letters_and_digits = string.ascii_letters + string.digits
-    result_str = ''.join((random.choice(letters_and_digits) for i in range(length)))
+    result_str = ''.join((random.choice(letters_and_digits) for _i in range(length)))
     return result_str
 
 
@@ -190,8 +189,6 @@ class TestTableauTableWriter(TestCase):
         Test the export of geo values (DSS geopoint storage type)
         :return:
         """
-        nan = float("nan")
-
         # ===> Define parameters input from DSS for exporter
         config = {}
         plugin_config = {}

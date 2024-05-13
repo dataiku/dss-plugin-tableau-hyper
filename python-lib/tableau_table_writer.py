@@ -5,7 +5,6 @@ The exporters (to file and to server) as Tableau Hyper files rely on this class.
 """
 
 import logging
-import os
 
 from tableauhyperapi import TableDefinition
 from tableauhyperapi import HyperProcess
@@ -55,7 +54,7 @@ class TableauTableWriter(object):
 
     def create_schema(self, schema_dss, destination_file_path):
         """
-        Read the Tableau Hyper file an.
+        Creates the Tableau Hyper schema from the DSS dataset schema.
 
         :param schema_dss: DSS schema from the DSS dataset to export
             example: [{"columns": [{"name": "customer_id", "type": "bigint"}, ...]}, ...]
