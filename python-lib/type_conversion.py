@@ -1,7 +1,5 @@
 import datetime
 import logging
-import math
-import numpy as np
 import pandas as pd
 
 from tableauhyperapi import SqlType
@@ -145,7 +143,7 @@ class TypeConversion(object):
             >>> SqlType.big_int()
         """
         try:
-            (tag, function) = self.mapping_dss_to_hyper.get(dss_type, (None, None))
+            (tag, _function) = self.mapping_dss_to_hyper.get(dss_type, (None, None))
             if tag is None:
                 logger.warning("Invalid DSS storage type {}".format(dss_type))
                 raise ValueError("Invalid DSS storage type {}".format(dss_type))
@@ -166,7 +164,7 @@ class TypeConversion(object):
             >>> 'bigint'
         """
         try:
-            (dss_type, function) = self.mapping_hyper_to_dss.get(hyper_type, (None, None))
+            (dss_type, _function) = self.mapping_hyper_to_dss.get(hyper_type, (None, None))
             if dss_type is None:
                 logger.warning("Invalid DSS storage type {}".format(hyper_type))
                 raise ValueError("Invalid DSS storage type {}".format(hyper_type))

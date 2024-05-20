@@ -15,7 +15,6 @@ import base64
 import datetime
 import json
 import logging
-import os
 import pandas
 
 from tableau_table_reader import TableauTableReader
@@ -109,7 +108,7 @@ class MyFormatExtractor(FormatExtractor):
     Read the input format
     """
 
-    def __init__(self, stream, schema, table_name=None, schema_name=None):
+    def __init__(self, stream, _schema, table_name=None, schema_name=None):
         """
         Initialize the extractor
         :param stream: the stream to read the formatted data from
