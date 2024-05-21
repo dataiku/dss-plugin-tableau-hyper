@@ -136,7 +136,7 @@ def get_tableau_server_connection(config):
         password = personal_access_token.get("password")
     else: # the auth_type selector was never used, so old conf file, use legacy mode
         server_url, username, password, site_id, ignore_ssl = get_legacy_tableau_server_connection(config)
-        return server_url, username, password, site_id, ignore_ssl
+        return server_url, username, password, site_id, ignore_ssl, auth_type
 
     server_url = configuration.get('server_url', None)
     username = configuration.get('username', username)
