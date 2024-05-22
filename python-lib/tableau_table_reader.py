@@ -99,7 +99,7 @@ class TableauTableReader(object):
             while line:
                 line = stream.read(1024)
                 f.write(line)
-        logger.info("Stored the full stream as bytes")
+        logger.info("Stored the full stream as bytes in {}".format(self.path_to_hyper))
 
     def open_connection(self):
         """
@@ -153,7 +153,7 @@ class TableauTableReader(object):
             self.rows.append(row)
             new_row_count += 1
 
-        logger.info("Fetched new row: {} ".format(result))
+        logger.info("Fetched new row: {} ".format(new_row_count))
 
     def close_connection(self):
         """
@@ -174,9 +174,9 @@ class TableauTableReader(object):
 
     def read_row(self):
         """
-        Reads one row from the stored data
+        Reads the next row from the hyper database
 
-        Rows are fetched from the hyper file, by batches of `self.limit` size, with `fetch_rows` method.
+        Rows are fetched from the hyper file and added to `rows`, by batches of `self.limit` size, with `fetch_rows` method.
         For the first row reading or once reaching an empty list of rows, `fetch_rows` is called.
         If `fetch_rows` fetches no new rows, the hyper database has been read entirely.
         """
@@ -189,7 +189,7 @@ class TableauTableReader(object):
             self.fetch_rows(self.offset, self.limit)
             self.offset += self.limit
 
-
+        # New rows could have been fetched
         if len(self.rows) == 0:
             logger.info("Reached 0 rows: closing connection - {}".format(self.path_to_hyper))
             self.close_connection()
