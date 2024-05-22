@@ -137,22 +137,29 @@ class TableauTableReader(object):
 
     def fetch_rows(self, offset, limit):
         """
-        Retrieve all the rows from the Tableau Hyper file, convert values on the fly
+        Retrieve rows from `offset` to `limit` from the Tableau Hyper file, converting values on the fly
         """
+        logger.info("Fetching new row from {} to {}".format(offset, limit))
         sql_hyper_query = f'SELECT {build_query(self.hyper_columns)} FROM {self.hyper_table} OFFSET {offset} LIMIT {limit}'
-        logger.warning("SQL query: {} ".format(sql_hyper_query))
+        logger.info("SQL query: {} ".format(sql_hyper_query))
         try:
             result = self.connection.execute_query(sql_hyper_query)
         except Exception as err:
             logger.fatal("Tried to execute query but was unsuccessful.")
             raise err
+
+        new_row_count = 0
         for row in result:
             self.rows.append(row)
+            new_row_count += 1
+
+        logger.info("Fetched new row: {} ".format(result))
 
     def close_connection(self):
         """
         Close the connection to the Tableau Hyper file
         """
+        logger.info("Closing connection - {}".format(self.path_to_hyper))
         self.connection.close()
         self.hyper.close()
         if os.path.exists(self.path_to_hyper):
@@ -167,15 +174,24 @@ class TableauTableReader(object):
 
     def read_row(self):
         """
-        Read one row from the stored data
+        Reads one row from the stored data
+
+        Rows are fetched from the hyper file, by batches of `self.limit` size, with `fetch_rows` method.
+        For the first row reading or once reaching an empty list of rows, `fetch_rows` is called.
+        If `fetch_rows` fetches no new rows, the hyper database has been read entirely.
         """
-        logger.info("Reading row: {}".format(len(self.rows)))
+        logger.info("Reading row: {} - {}".format(len(self.rows), self.path_to_hyper))
         if self.end_read:
             return None
+
         if len(self.rows) == 0:
+            logger.info("Reached 0 rows: fetch_rows - {}".format(self.path_to_hyper))
             self.fetch_rows(self.offset, self.limit)
             self.offset += self.limit
+
+
         if len(self.rows) == 0:
+            logger.info("Reached 0 rows: closing connection - {}".format(self.path_to_hyper))
             self.close_connection()
             self.end_read = True
             logger.info("Finished reading rows from hyper file...")
