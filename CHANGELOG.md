@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 0.2.3](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.3) - Feature release - 2024-05-21
+
+- Fix: issue with authentication selection on legacy flows
+
 ## [Version 0.2.2](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.2) - Feature release - 2023-10-18
 
 - Feature: add secure personal access token preset 
