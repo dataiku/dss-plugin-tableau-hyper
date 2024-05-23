@@ -8,7 +8,6 @@ import logging
 import os
 import tempfile
 
-from cache_utils import get_cache_location_from_user_config
 from schema_conversion import SchemaConversion
 from tableauhyperapi import HyperProcess
 from tableauhyperapi import Telemetry
@@ -81,11 +80,9 @@ class TableauTableReader(object):
     def create_tmp_hyper_file(self):
         """
         Create a temporary file to store the streaming buffer
-        :return: self.path_to_hyper: path to the temporary file
         """
-        cache_dir = get_cache_location_from_user_config()
-        # Set the delete parameter to False imperatively to avoid early deletion
-        self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=False, dir=cache_dir).name
+        # Sets the delete parameter to False imperatively to avoid early deletion
+        self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=False).name
         logger.info("Created temporary file to store future buffer stream from Hyper: {} ".format(self.path_to_hyper))
 
     def read_buffer(self, stream):
@@ -139,7 +136,7 @@ class TableauTableReader(object):
         """
         Retrieve rows from `offset` to `limit` from the Tableau Hyper file, converting values on the fly
         """
-        logger.info("Fetching new row from {} to {}".format(offset, limit))
+        logger.info("Fetching new row from {} to max {}".format(offset, limit))
         sql_hyper_query = f'SELECT {build_query(self.hyper_columns)} FROM {self.hyper_table} OFFSET {offset} LIMIT {limit}'
         logger.info("SQL query: {} ".format(sql_hyper_query))
         try:
@@ -148,18 +145,14 @@ class TableauTableReader(object):
             logger.fatal("Tried to execute query but was unsuccessful.")
             raise err
 
-        new_row_count = 0
         for row in result:
             self.rows.append(row)
-            new_row_count += 1
-
-        logger.info("Fetched new row: {} ".format(new_row_count))
 
     def close_connection(self):
         """
         Close the connection to the Tableau Hyper file
         """
-        logger.info("Closing connection - {}".format(self.path_to_hyper))
+        logger.info("Closing connection to {}".format(self.path_to_hyper))
         self.connection.close()
         self.hyper.close()
         if os.path.exists(self.path_to_hyper):
@@ -180,18 +173,15 @@ class TableauTableReader(object):
         For the first row reading or once reaching an empty list of rows, `fetch_rows` is called.
         If `fetch_rows` fetches no new rows, the hyper database has been read entirely.
         """
-        logger.info("Reading row: {} - {}".format(len(self.rows), self.path_to_hyper))
         if self.end_read:
             return None
 
         if len(self.rows) == 0:
-            logger.info("Reached 0 rows: fetch_rows - {}".format(self.path_to_hyper))
             self.fetch_rows(self.offset, self.limit)
             self.offset += self.limit
 
         # New rows could have been fetched
         if len(self.rows) == 0:
-            logger.info("Reached 0 rows: closing connection - {}".format(self.path_to_hyper))
             self.close_connection()
             self.end_read = True
             logger.info("Finished reading rows from hyper file...")
