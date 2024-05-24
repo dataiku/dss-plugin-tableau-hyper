@@ -8,7 +8,6 @@ import logging
 import os
 import tempfile
 
-from cache_utils import get_cache_location_from_user_config
 from schema_conversion import SchemaConversion
 from tableauhyperapi import HyperProcess
 from tableauhyperapi import Telemetry
@@ -81,12 +80,10 @@ class TableauTableReader(object):
     def create_tmp_hyper_file(self):
         """
         Create a temporary file to store the streaming buffer
-        :return: self.path_to_hyper: path to the temporary file
         """
-        cache_dir = get_cache_location_from_user_config()
-        # Set the delete parameter to False imperatively to avoid early deletion
-        self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=False, dir=cache_dir).name
-        logger.info("Creating temporary file to store future buffer stream from Hyper: {} ".format(self.path_to_hyper))
+        # Sets the delete parameter to False imperatively to avoid early deletion
+        self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=False).name
+        logger.info("Created temporary file to store future buffer stream from Hyper: {} ".format(self.path_to_hyper))
 
     def read_buffer(self, stream):
         """
@@ -99,7 +96,7 @@ class TableauTableReader(object):
             while line:
                 line = stream.read(1024)
                 f.write(line)
-        logger.info("Stored the full stream as bytes")
+        logger.info("Stored the full stream as bytes in {}".format(self.path_to_hyper))
 
     def open_connection(self):
         """
@@ -137,15 +134,17 @@ class TableauTableReader(object):
 
     def fetch_rows(self, offset, limit):
         """
-        Retrieve all the rows from the Tableau Hyper file, convert values on the fly
+        Retrieve rows from `offset` to `limit` from the Tableau Hyper file, converting values on the fly
         """
+        logger.info("Fetching new row from {} to max {}".format(offset, limit))
         sql_hyper_query = f'SELECT {build_query(self.hyper_columns)} FROM {self.hyper_table} OFFSET {offset} LIMIT {limit}'
-        logger.warning("SQL query: {} ".format(sql_hyper_query))
+        logger.info("SQL query: {} ".format(sql_hyper_query))
         try:
             result = self.connection.execute_query(sql_hyper_query)
         except Exception as err:
             logger.fatal("Tried to execute query but was unsuccessful.")
             raise err
+
         for row in result:
             self.rows.append(row)
 
@@ -153,6 +152,7 @@ class TableauTableReader(object):
         """
         Close the connection to the Tableau Hyper file
         """
+        logger.info("Closing connection to {}".format(self.path_to_hyper))
         self.connection.close()
         self.hyper.close()
         if os.path.exists(self.path_to_hyper):
@@ -167,13 +167,20 @@ class TableauTableReader(object):
 
     def read_row(self):
         """
-        Read one row from the stored data
+        Reads the next row from the hyper database
+
+        Rows are fetched from the hyper file and added to `rows`, by batches of `self.limit` size, with `fetch_rows` method.
+        For the first row reading or once reaching an empty list of rows, `fetch_rows` is called.
+        If `fetch_rows` fetches no new rows, the hyper database has been read entirely.
         """
         if self.end_read:
             return None
+
         if len(self.rows) == 0:
             self.fetch_rows(self.offset, self.limit)
             self.offset += self.limit
+
+        # New rows could have been fetched
         if len(self.rows) == 0:
             self.close_connection()
             self.end_read = True

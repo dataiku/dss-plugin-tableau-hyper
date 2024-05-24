@@ -29,10 +29,10 @@ unit-tests:
 		python3 -m venv env/; \
 		source env/bin/activate; \
 		pip3 install --upgrade pip; \
-		pip install --no-cache-dir -r python-test/requirements.txt; \
+		pip install --no-cache-dir -r tests/python/unit/requirements.txt; \
 		pip install --no-cache-dir -r code-env/python/spec/requirements.txt; \
 		export PYTHONPATH="$(PYTHONPATH):$(PWD)/python-lib"; \
-		pytest -o junit_family=xunit2 --junitxml=unit.xml python-test || true; \
+		pytest tests/python/unit --alluredir=tests/allure_report || ret=$$?; exit $$ret \
 	)
 	@echo "[SUCCESS] Running unit tests: Done!"
 
@@ -44,7 +44,7 @@ integration-tests:
 		source env/bin/activate; \
 		pip3 install --upgrade pip;\
 		pip install --no-cache-dir -r tests/python/integration/requirements.txt; \
-		pytest tests/python/integration --alluredir=tests/allure_report || ret=$$?; exit $$ret \
+		pytest tests/python/integration --alluredir=tests/allure_report --exclude-dss-targets="DSS11" || ret=$$?; exit $$ret \
 	)
 
 tests: unit-tests integration-tests

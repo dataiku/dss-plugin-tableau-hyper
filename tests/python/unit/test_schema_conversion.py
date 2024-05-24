@@ -2,8 +2,7 @@ from schema_conversion import dss_is_geo, geo_to_text
 from schema_conversion import SchemaConversion
 from unittest import TestCase
 
-from tableauhyperapi import HyperProcess, Telemetry, Connection, CreateMode, NOT_NULLABLE, NULLABLE, SqlType, \
-    TableDefinition, Inserter, escape_name, escape_string_literal, HyperException, TableName
+from tableauhyperapi import HyperProcess, Telemetry, Connection, TableName
 
 
 class TestSchemaConversion(TestCase):

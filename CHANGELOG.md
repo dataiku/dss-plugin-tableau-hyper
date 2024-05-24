@@ -1,5 +1,10 @@
 # Changelog
 
+## [Version 0.2.4](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.4) - Feature release - 2024-05-24
+
+- Chore: Removed usage of `.cache` directory, letting `tempfile` handle the location of the temporary file
+- Chore: Added Jenkinsfile to trigger integration tests as part of our plugin CI
+
 ## [Version 0.2.3](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.3) - Feature release - 2024-05-21
 
 - Fix: issue with authentication selection on legacy flows

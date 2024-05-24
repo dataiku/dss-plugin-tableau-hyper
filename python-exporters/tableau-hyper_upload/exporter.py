@@ -5,7 +5,6 @@ Exporter to Tableau Server or Tableau Online
 import logging
 import os
 
-from cache_utils import get_cache_location_from_user_config
 from dataiku.exporter import Exporter
 from tableau_table_writer import TableauTableWriter
 from tableau_server_utils import get_project_from_name, get_full_list_of_projects, get_tableau_server_connection
@@ -113,13 +112,14 @@ class TableauHyperExporter(Exporter):
         :param schema:
         """
         logger.info("Call to open method in upload exporter ...")
-        cache_absolute_path = get_cache_location_from_user_config()
-        # Create a random file path for the temporary write
-        self.tmp_output_dir = tempfile.TemporaryDirectory(dir=cache_absolute_path)
+        
+        # Defines a file path using the given output_file_name and inside a newly created temporary directory
+        self.tmp_output_dir = tempfile.TemporaryDirectory()
         self.output_file = os.path.join(self.tmp_output_dir.name, self.output_file_name + ".hyper")
+
         self.writer.schema_converter.set_dss_storage_types(schema)
         self.writer.create_schema(schema, self.output_file)
-        logger.info("Define the temporary output file: {}".format(self.output_file))
+        logger.info("Defined the temporary output file: {}".format(self.output_file))
 
     def open_to_file(self, schema, destination_file_path):
         # Leave method empty here

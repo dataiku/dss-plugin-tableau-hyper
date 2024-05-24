@@ -13,3 +13,4 @@ env
 **/hyperd*.log
 dist
 tests/allure_report
+unit.xml
