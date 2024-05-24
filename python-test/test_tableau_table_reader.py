@@ -12,8 +12,8 @@ class TestTableauTableReader(TestCase):
         """
         Reads rows from a file that has less rows than the batch size (10000)  
         """
-        file_test_abs_path = "./data/revenue_prediction.hyper"
-        self.stream = open(file_test_abs_path, "rb")
+        file_test_path = "./data/revenue_prediction.hyper"
+        self.stream = open(file_test_path, "rb")
 
         tableau_reader = TableauTableReader(table_name='Extract', schema_name='Extract')
         tableau_reader.create_tmp_hyper_file()
@@ -37,8 +37,8 @@ class TestTableauTableReader(TestCase):
 
         A second `fetch_rows` will be called.
         """
-        file_test_abs_path = "./data/ranked_customers_18766-rows.hyper"
-        self.stream = open(file_test_abs_path, "rb")
+        file_test_path = "./data/ranked_customers_18766-rows.hyper"
+        self.stream = open(file_test_path, "rb")
 
         tableau_reader = TableauTableReader(table_name='Extract', schema_name='Extract')
         tableau_reader.create_tmp_hyper_file()
