@@ -6,9 +6,8 @@ import logging
 import string
 import random
 import os
-from tableauhyperapi import HyperProcess, Connection, Telemetry, TableName, TableDefinition
+from tableauhyperapi import HyperProcess, Connection, Telemetry, TableName
 import pandas as pd
-import numpy as np
 import tempfile
 
 logger = logging.getLogger(__name__)
