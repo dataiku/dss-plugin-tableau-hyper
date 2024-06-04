@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 0.2.5](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.5) - Feature release - 2024-06-04
+
+- Fix: Invalid page number when querying Tableau server
+
 ## [Version 0.2.4](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.4) - Feature release - 2024-05-24
 
 - Chore: Removed usage of `.cache` directory, letting `tempfile` handle the location of the temporary file
