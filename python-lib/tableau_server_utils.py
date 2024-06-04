@@ -18,13 +18,13 @@ def get_project_from_name(server, project_name):
     :param project_name: target project name
     :return: couple (Boolean{target project exists on server}, project)
     """
+    logger.info(f"Searching for project {project_name}")
+    pages_in_total = compute_total_pages_for_projects(server)
+
     page_nb = 1
 
-    all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
-    pages_in_total = (pag_it.total_available // pag_it.page_size) + 1
-
     while page_nb <= pages_in_total:
-        all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
+        all_project_items, _pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
         filtered_projects = list(
             filter(lambda x: x.name.encode('utf-8') == project_name, all_project_items)
         )
@@ -44,14 +44,14 @@ def get_full_list_of_projects(server):
     :param server:
     :return:
     """
-    page_nb = 1
-    all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
-    pages_in_total = (pag_it.total_available // pag_it.page_size) + 1
+    pages_in_total = compute_total_pages_for_projects(server)
+    
     all_projects = set()
+    page_nb = 1
 
     while page_nb <= pages_in_total:
 
-        all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
+        all_project_items, _pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
         project_names = [x.name.encode('utf-8') for x in all_project_items]
         for name in project_names:
             all_projects.add(name)
@@ -62,14 +62,17 @@ def get_full_list_of_projects(server):
 
 
 def get_dict_of_projects_paths(server):
-    page_nb = 1
-    all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
-    pages_in_total = (pag_it.total_available // pag_it.page_size) + 1
+    """
+    Computes a dictionary of all the available projects from a Tableau server 
+    """
+    pages_in_total = compute_total_pages_for_projects(server)
+    
     all_projects = {}
+    page_nb = 1
 
     while page_nb <= pages_in_total:
 
-        all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
+        all_project_items, _pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
         for all_project_item in all_project_items:
             all_projects[all_project_item.id] = {"name": all_project_item.name, "parent": all_project_item.parent_id}
         page_nb += 1
@@ -159,3 +162,24 @@ def setup_ssl(ignore_ssl, ssl_cert_path):
             # default variables handled by python requests to validate cert (used by underlying tableauserverclient)
             os.environ['REQUESTS_CA_BUNDLE'] = ssl_cert_path
             os.environ['CURL_CA_BUNDLE'] = ssl_cert_path
+
+
+def compute_total_pages_for_projects(server) -> int:
+    """
+    Computes the number of pages necessary to query all the projects available on a Tableau server
+
+    :param server: tableau server
+    :return: Total number of pages
+    """
+    _project_items, pag_it = server.projects.get(
+        req_options=tsc.RequestOptions(pagenumber=1)
+    )
+
+    partial_page = 1 if pag_it.total_available % pag_it.page_size > 0 else 0
+    pages_in_total = (pag_it.total_available // pag_it.page_size) + partial_page
+
+    logger.info(
+        f"{pag_it.total_available} projects, divided in {pages_in_total} pages ({partial_page} partial page) with a page size of {pag_it.page_size}"
+    )
+
+    return pages_in_total
