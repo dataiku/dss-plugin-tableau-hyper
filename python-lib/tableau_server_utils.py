@@ -19,9 +19,13 @@ def get_project_from_name(server, project_name):
     :return: couple (Boolean{target project exists on server}, project)
     """
     page_nb = 1
-
     all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
-    pages_in_total = (pag_it.total_available // pag_it.page_size) + 1
+
+    partial_page = 1 if pag_it.total_available % pag_it.page_size > 0 else 0
+    pages_in_total = (pag_it.total_available // pag_it.page_size) + partial_page
+    logger.info(
+        f"Searching for project {project_name} in {pag_it.total_available} projects, querying {pages_in_total} pages ({partial_page} partial page) with page size: {pag_it.page_size}"
+    )
 
     while page_nb <= pages_in_total:
         all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
@@ -46,7 +50,13 @@ def get_full_list_of_projects(server):
     """
     page_nb = 1
     all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
-    pages_in_total = (pag_it.total_available // pag_it.page_size) + 1
+
+    partial_page = 1 if pag_it.total_available % pag_it.page_size > 0 else 0
+    pages_in_total = (pag_it.total_available // pag_it.page_size) + partial_page
+    logger.info(
+        f"Getting full list of {pag_it.total_available} projects, querying {pages_in_total} pages ({partial_page} partial page) with page size: {pag_it.page_size}"
+    )
+    
     all_projects = set()
 
     while page_nb <= pages_in_total:
@@ -62,9 +72,18 @@ def get_full_list_of_projects(server):
 
 
 def get_dict_of_projects_paths(server):
+    """
+    Computes a dictionary of all the available projects from a Tableau server 
+    """
     page_nb = 1
     all_project_items, pag_it = server.projects.get(req_options=tsc.RequestOptions(pagenumber=page_nb))
-    pages_in_total = (pag_it.total_available // pag_it.page_size) + 1
+
+    partial_page = 1 if pag_it.total_available % pag_it.page_size > 0 else 0
+    pages_in_total = (pag_it.total_available // pag_it.page_size) + partial_page
+    logger.info(
+        f"Getting dict of {pag_it.total_available} projects, querying {pages_in_total} pages ({partial_page} partial page) with page size: {pag_it.page_size}"
+    )
+    
     all_projects = {}
 
     while page_nb <= pages_in_total:
