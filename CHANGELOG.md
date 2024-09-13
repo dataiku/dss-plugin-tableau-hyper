@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 0.2.6](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.6) - Feature release - 2024-09-13
+
+- Allow preset's site ID override
+
 ## [Version 0.2.5](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.5) - Feature release - 2024-06-04
 
 - Fix: Correctly compute the total number of pages needed to query projects from a Tableau server to avoid invalid page number errors
