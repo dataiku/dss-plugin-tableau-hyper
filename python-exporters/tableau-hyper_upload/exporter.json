@@ -140,8 +140,15 @@
             "defaultValue": "DSS_extract"
         },
         {
+            "name": "show_advanced_parameters",
+            "label" : "Show advanced parameters",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
             "label":"Advanced",
-            "type": "SEPARATOR"
+            "type": "SEPARATOR",
+            "visibilityCondition": "model.auth_type == 'legacy-login' || model.auth_type == null || model.show_advanced_parameters == true"
         },
         {
             "name": "site_id",
@@ -149,7 +156,7 @@
             "type": "STRING",
             "description": "The site_id is the subpath of your full site URL. (See the README.md for details)",
             "mandatory": false,
-            "visibilityCondition": "model.auth_type == 'legacy-login' || model.auth_type == null"
+            "visibilityCondition": "model.auth_type == 'legacy-login' || model.auth_type == null || model.show_advanced_parameters == true"
         }
     ]
 }

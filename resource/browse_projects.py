@@ -29,7 +29,10 @@ def do(payload, config, plugin_config, inputs):
         retrieve_project_list = config.get('retrieve_project_list', False)
         if not retrieve_project_list:
             return build_select_choices()
-        server_url, username, password, site_id, ignore_ssl, auth_type = get_tableau_server_connection(config)
+        try:
+            server_url, username, password, site_id, ignore_ssl, auth_type = get_tableau_server_connection(config)
+        except Exception as err:
+            return build_select_choices("{}".format(err))
         try:
             server = client.Server(server_url, use_server_version=True)
         except Exception as err:

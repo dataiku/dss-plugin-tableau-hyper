@@ -24,6 +24,14 @@
             "description":"The site_id is the subpath of your full site URL."
         },
         {
+            "name": "is_site_id_overridable",
+            "label" : "Make site ID overridable",
+            "type": "BOOLEAN",
+            "mandatory": false,
+            "description": " ",
+            "defaultValue": false
+        },
+        {
             "name": "username",
             "label":"Username",
             "type": "STRING",

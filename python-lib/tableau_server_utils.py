@@ -144,7 +144,15 @@ def get_tableau_server_connection(config):
     server_url = configuration.get('server_url', None)
     username = configuration.get('username', username)
     password = configuration.get('password', password)
-    site_id = configuration.get('site_id', '')
+
+    is_site_id_overridable = configuration.get('is_site_id_overridable', False)
+    show_advanced_parameters = config.get("show_advanced_parameters", False)
+    site_id = configuration.get('site_id')
+    site_id_override = config.get('site_id')
+    if site_id_override and show_advanced_parameters and not is_site_id_overridable:
+        raise Exception("Site ID cannot be overridden on this preset")
+    if show_advanced_parameters and is_site_id_overridable:
+        site_id = site_id_override
 
     ssl_cert_path = configuration.get('ssl_cert_path', None)
     ignore_ssl = configuration.get('ignore_ssl', False)
