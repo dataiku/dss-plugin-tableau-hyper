@@ -1,5 +1,5 @@
 # Changelog
-## [Version 0.2.6](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.6) - Feature release - 2024-12-17
+## [Version 0.2.6](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.6) - Bugfix release - 2024-12-17
 
 - Fix: For datasets with large numbers of columns (approximately 150 and over) and over (approximately) 90,000 rows the export/upload hyper file did not contain the table exported. This led to the failure of uploads to Tableau and the export of unusable hyper files. This was due to a wrongly ordered close statements.
 
