@@ -168,7 +168,7 @@ class TableauTableWriter(object):
             logger.warning("Failed to perform writing on the last rows")
             raise err
         finally:
-            self.hyper.close()
             self.connection.close()
+            self.hyper.close()
             logger.info("Closed export")
         return True
