@@ -14,6 +14,7 @@ from tableauhyperapi import Telemetry
 from tableauhyperapi import Connection
 from tableauhyperapi import TableName
 from tableauhyperapi import HyperException
+from tableau_server_utils import get_hyper_process
 
 
 logger = logging.getLogger(__name__)
@@ -102,7 +103,7 @@ class TableauTableReader(object):
         """
         Open the connection to the Tableau Hyper file and the database
         """
-        self.hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
+        self.hyper = get_hyper_process()
         self.connection = Connection(self.hyper.endpoint, self.path_to_hyper)
         logger.info("Opened the connection to Tableau Hyper file")
 

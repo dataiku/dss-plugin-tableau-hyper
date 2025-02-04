@@ -3,6 +3,7 @@ from type_conversion import TypeConversion
 from schema_conversion import SchemaConversion
 from tableauhyperapi import TypeTag, HyperProcess, Connection, Telemetry, TableName
 from unittest import TestCase
+from tableau_server_utils import get_hyper_process
 
 
 class TestTypeConversion(TestCase):
@@ -10,7 +11,7 @@ class TestTypeConversion(TestCase):
     def test_to_dss_date(self):
         schema_converter = SchemaConversion()
         path_to_hyper = "data/superstore_sample.hyper"
-        hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
+        hyper = get_hyper_process()
         connection = Connection(hyper.endpoint, path_to_hyper)
         hyper_table = TableName('public', 'Orders')
         hyper_table_def = connection.catalog.get_table_definition(hyper_table)

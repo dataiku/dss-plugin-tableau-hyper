@@ -4,11 +4,19 @@ Gives functions for interaction with Tableau Server through the Tableau Server C
 
 import logging
 import os
-
+from tableauhyperapi import HyperProcess, Telemetry
 import tableauserverclient as tsc
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(levelname)s - %(message)s')
+
+def get_hyper_process_parameters():
+    # totally disable logging (cf/ https://tableau.github.io/hyper-db/docs/hyper-api/hyper_process/#log_config)
+    return {"log_config": ""}
+
+def get_hyper_process():
+    return HyperProcess(telemetry=Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU,
+                  parameters=get_hyper_process_parameters())
 
 
 def get_project_from_name(server, project_name):
