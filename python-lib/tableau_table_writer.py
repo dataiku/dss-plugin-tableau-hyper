@@ -18,6 +18,7 @@ from tableauhyperapi import TableName
 from schema_conversion import dss_is_geo
 from schema_conversion import geo_to_text
 from schema_conversion import SchemaConversion
+from tableau_server_utils import get_hyper_process
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(levelname)s - %(message)s')
@@ -88,7 +89,7 @@ class TableauTableWriter(object):
         )
 
         # Open connection to file
-        self.hyper = HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU)
+        self.hyper = get_hyper_process()
         self.connection = Connection(self.hyper.endpoint, self.output_file, CreateMode.CREATE_AND_REPLACE)
         assert self.connection is not None
         self.connection.catalog.create_schema(self.schema_name)

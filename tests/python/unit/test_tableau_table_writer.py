@@ -7,6 +7,7 @@ import string
 import random
 import os
 from tableauhyperapi import HyperProcess, Connection, Telemetry, TableName
+from tableau_server_utils import get_hyper_process
 import pandas as pd
 import tempfile
 
@@ -110,7 +111,7 @@ class TestTableauTableWriter(TestCase):
             exporter.write_row(row)
         exporter.close()
 
-        with HyperProcess(telemetry=Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU) as hyper:
+        with get_hyper_process() as hyper:
             with Connection(endpoint=hyper.endpoint, database=destination_file_path) as connection:
                 with connection.execute_query(query=f"SELECT * FROM {TableName('Extract', 'Extract')}") as result:
                     rows_from_hyper = list(result)
@@ -165,7 +166,7 @@ class TestTableauTableWriter(TestCase):
             exporter.write_row(row)
         exporter.close()
 
-        with HyperProcess(telemetry=Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU) as hyper:
+        with get_hyper_process() as hyper:
             with Connection(endpoint=hyper.endpoint, database=destination_file_path) as connection:
                 with connection.execute_query(query=f"SELECT * FROM {TableName('Extract', 'Extract')}") as result:
                     rows_from_hyper = list(result)
@@ -207,7 +208,7 @@ class TestTableauTableWriter(TestCase):
             exporter.write_row(row)
         exporter.close()
 
-        with HyperProcess(telemetry=Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU) as hyper:
+        with get_hyper_process() as hyper:
             with Connection(endpoint=hyper.endpoint, database=destination_file_path) as connection:
                 with connection.execute_query(query=f"SELECT * FROM {TableName('Extract', 'Extract')}") as result:
                     rows_from_hyper = list(result)
@@ -244,7 +245,7 @@ class TestTableauTableWriter(TestCase):
             exporter.write_row(row)
         exporter.close()
 
-        with HyperProcess(telemetry=Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU) as hyper:
+        with get_hyper_process() as hyper:
             with Connection(endpoint=hyper.endpoint, database=destination_file_path) as connection:
                 with connection.execute_query(query=f"SELECT * FROM {TableName('Extract', 'Extract')}") as result:
                     rows_from_hyper = list(result)
