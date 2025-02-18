@@ -160,6 +160,7 @@ class TableauTableWriter(object):
         try:
             if self.data:
                 logger.info("Performing final data update...")
+                logger.info("Writing {} lines to hyper file".format(len(self.data)))
                 self.update_table()
                 self.data = []
             logger.info("Closing Tableau Hyper connections...")
