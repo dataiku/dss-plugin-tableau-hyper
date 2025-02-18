@@ -75,15 +75,20 @@ class TableauHyperExporter(Exporter):
         self.schema_name = 'Extract'
         self.table_name = 'Extract'
 
+        batch_write_size = plugin_config.get("batch_write_size", 2000)
+        if not batch_write_size or batch_write_size < 1:
+            raise InvalidPluginParameter('batch_write_size', batch_write_size)
+
         logger.info("Detected following Tableau Hyper file configuration:\n"
+                    "   batch_write_size: {},\n"
                     "   output_file_name: {},\n"
                     "       project_name: {},\n"
                     "        schema_name: {},\n"
                     "         table_name: {},\n".format(
-            self.output_file_name, self.project_name, self.schema_name, self.table_name))
+            batch_write_size, self.output_file_name, self.project_name, self.schema_name, self.table_name))
 
         # Instantiate Tableau Writer wrapper
-        self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
+        self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name, batch_size=batch_write_size)
         # Open connection to Tableau Server
         if auth_type == "pta-preset":
             self.tableau_auth = tsc.PersonalAccessTokenAuth(username, password, site_id=site_name)
