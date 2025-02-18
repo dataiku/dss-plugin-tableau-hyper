@@ -19,8 +19,7 @@
             "description": "Number of rows that will be kept in a buffer before writing to Tableau. Increase this value up to 5000 to decrease export time. Beware that more memory will be consumed",
             "type": "INT",
             "defaultValue": 2000,
-            "minI": 1,
-            "maxI": 5000
+            "minI": 1
         }
     ]
 }

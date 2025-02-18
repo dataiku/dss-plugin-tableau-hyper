@@ -27,7 +27,7 @@ class TableauHyperExporter(Exporter):
             raise InvalidPluginParameter('table_name', table_name)
         
         batch_write_size = plugin_config.get("batch_write_size", 2000)
-        if not batch_write_size or batch_write_size < 1 or batch_write_size > 5000:
+        if not batch_write_size or batch_write_size < 1:
             raise InvalidPluginParameter('batch_write_size', batch_write_size)
 
         logger.info("Detected schema_name: {}".format(schema_name))
