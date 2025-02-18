@@ -1,6 +1,6 @@
 {
     "id": "tableau-hyper-export",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "meta": {
         "label": "Tableau Hyper format",
         "description": "Export datasets to Tableau .hyper format.",

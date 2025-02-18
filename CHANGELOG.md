@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 0.2.8](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.7) - Bugfix release - 2025-02-18
+
+- Offer the possibility through a plugin parameter to set write batch size while writing in the hyper file
+
 ## [Version 0.2.7](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.7) - Bugfix release - 2025-02-05
 
 - Remove hyper logs files
