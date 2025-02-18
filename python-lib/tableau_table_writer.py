@@ -29,14 +29,14 @@ class TableauTableWriter(object):
     Wrapper class for writing a Tableau Hyper file from a DSS dataset.
     """
 
-    def __init__(self, schema_name, table_name):
+    def __init__(self, schema_name, table_name, batch_size):
         """
         :param schema_name: name of the target schema
         :param table_name: name of the target table
         """
         self.row_index = 0
         self.data = []
-        self.batch_size = 2000
+        self.batch_size = batch_size
 
         self.schema_name = schema_name
         self.table_name = table_name

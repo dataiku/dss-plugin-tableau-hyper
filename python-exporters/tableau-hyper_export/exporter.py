@@ -25,12 +25,17 @@ class TableauHyperExporter(Exporter):
             raise InvalidPluginParameter('schema_name', schema_name)
         if table_name == '':
             raise InvalidPluginParameter('table_name', table_name)
+        
+        batch_write_size = plugin_config.get("batch_write_size", 2000)
+        if not batch_write_size or batch_write_size < 1 or batch_write_size > 5000:
+            raise InvalidPluginParameter('batch_write_size', batch_write_size)
 
         logger.info("Detected schema_name: {}".format(schema_name))
         logger.info("Detected table_name: {}".format(table_name))
+        logger.info("Detected batch_write_size: {}".format(batch_write_size))
 
         # Instantiate the Tableau custom writer
-        self.writer = TableauTableWriter(schema_name=schema_name, table_name=table_name)
+        self.writer = TableauTableWriter(schema_name=schema_name, table_name=table_name, batch_size=batch_write_size)
 
         self.output_file = None
 
