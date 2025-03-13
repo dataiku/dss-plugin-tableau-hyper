@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 0.2.8](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.8) - Bugfix release - 2025-03-13
+
+- Adding datetimenotz and dateonly DSS types
+
 ## [Version 0.2.7](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.7) - Bugfix release - 2025-02-05
 
 - Remove hyper logs files
