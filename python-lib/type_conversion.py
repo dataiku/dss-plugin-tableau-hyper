@@ -99,6 +99,8 @@ class TypeConversion(object):
             'bigint': (SqlType.big_int(), handle_null(int)),
             'boolean': (SqlType.bool(), handle_null(bool)),
             'date': (SqlType.timestamp(), handle_null(to_hyper_timestamp)),
+            'datetimenotz': (SqlType.timestamp(), handle_null(to_hyper_timestamp)),
+            'dateonly': (SqlType.timestamp(), handle_null(to_hyper_timestamp)),
             'double': (SqlType.double(), handle_null(float)),
             'float': (SqlType.double(), handle_null(float)),
             'geometry': (SqlType.text(), handle_null(str)),
