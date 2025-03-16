@@ -140,6 +140,16 @@
             "defaultValue": "DSS_extract"
         },
         {
+            "name": "temporal_export_mode",
+            "label":"Temporal types export mode",
+            "type": "SELECT",
+            "defaultValue": "LEGACY",
+            "selectChoices" : [
+                { "value": "LEGACY", "label": "Legacy"},
+                { "value": "MODERN", "label": "Modern"}
+            ]
+        },
+        {
             "label":"Advanced",
             "type": "SEPARATOR"
         },

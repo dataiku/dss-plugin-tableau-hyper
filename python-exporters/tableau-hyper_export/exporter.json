@@ -30,6 +30,16 @@
             "label":"Table name",
             "type": "STRING",
             "defaultValue": "Extract"
+        },
+        {
+            "name": "temporal_export_mode",
+            "label":"Temporal types export mode",
+            "type": "SELECT",
+            "defaultValue": "LEGACY",
+            "selectChoices" : [
+                { "value": "LEGACY", "label": "Legacy"},
+                { "value": "MODERN", "label": "Modern"}
+            ]
         }
     ]
 }

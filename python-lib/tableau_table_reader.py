@@ -46,7 +46,7 @@ def build_query(columns):
 
 class TableauTableReader(object):
 
-    def __init__(self, schema_name, table_name):
+    def __init__(self, config, schema_name, table_name):
         """
         Wrapper for the Tableau Hyper formatter
 
@@ -71,7 +71,7 @@ class TableauTableReader(object):
         self.hyper = None
         self.connection = None
 
-        self.schema_converter = SchemaConversion()
+        self.schema_converter = SchemaConversion(config)
 
         # Handle batch querying
         self.offset = 0
