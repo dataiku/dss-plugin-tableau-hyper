@@ -13,7 +13,9 @@ logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(le
 
 def to_dss_date_dateonly(hyper_date):
     """
-    Convert Tableau Hyper date to DSS date
+    To convert Tableau Hyper date (just a date) to a DSS date
+    (i.e. our legacy date time type which represents datetime with timestamp),
+    but only populating the date components.
     :param hyper_date: <class 'pandas._libs.tslibs.timestamps.Timestamp'>
     :return: A date object readable by DSS
     """
