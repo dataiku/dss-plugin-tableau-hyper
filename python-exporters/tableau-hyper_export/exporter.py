@@ -30,7 +30,7 @@ class TableauHyperExporter(Exporter):
         logger.info("Detected table_name: {}".format(table_name))
 
         # Instantiate the Tableau custom writer
-        self.writer = TableauTableWriter(schema_name=schema_name, table_name=table_name)
+        self.writer = TableauTableWriter(config=config, schema_name=schema_name, table_name=table_name)
 
         self.output_file = None
 

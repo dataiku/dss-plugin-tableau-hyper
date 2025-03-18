@@ -9,7 +9,7 @@ from tableau_server_utils import get_hyper_process
 class TestTypeConversion(TestCase):
 
     def test_to_dss_date(self):
-        schema_converter = SchemaConversion()
+        schema_converter = SchemaConversion(None)
         path_to_hyper = "data/superstore_sample.hyper"
         hyper = get_hyper_process()
         connection = Connection(hyper.endpoint, path_to_hyper)
@@ -26,22 +26,22 @@ class TestTypeConversion(TestCase):
         return True
 
     def test_dss_type_to_hyper(self):
-        type_converter = TypeConversion()
+        type_converter = TypeConversion(None)
         hyper_type = type_converter.dss_type_to_hyper('bigint')
         assert str(hyper_type.tag) == 'TypeTag.BIG_INT'
 
     def test_hyper_type_to_dss(self):
-        type_converter = TypeConversion()
+        type_converter = TypeConversion(None)
         dss_type = type_converter.hyper_type_to_dss(TypeTag.INT)
         assert dss_type == 'int'
 
     def test_dss_value_to_hyper(self):
-        type_converter = TypeConversion()
+        type_converter = TypeConversion(None)
         hyper_value = type_converter.dss_value_to_hyper("POINT(-90 89)", 'geopoint')
         assert hyper_value == 'point(-90 89)'
 
     def test_hyper_value_to_dss(self):
-        type_converter = TypeConversion()
+        type_converter = TypeConversion(None)
         dss_value = type_converter.hyper_value_to_dss("point(-90 80)", TypeTag.GEOGRAPHY)
         assert dss_value == "POINT(-90 80)"
         return True

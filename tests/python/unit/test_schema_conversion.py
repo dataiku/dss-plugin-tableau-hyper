@@ -28,7 +28,7 @@ class TestSchemaConversion(TestCase):
         assert regular_schema['columns'][1]['type'] == 'string'
 
     def test_dss_columns_to_hyper_columns(self):
-        schema_converter = SchemaConversion()
+        schema_converter = SchemaConversion(None)
         dss_columns = [
             {"name": "customer_id", "type": "bigint"},
             {"name": "location", "type": "geopoint"},
@@ -40,7 +40,7 @@ class TestSchemaConversion(TestCase):
         assert columns_tags == ['TypeTag.BIG_INT', 'TypeTag.GEOGRAPHY', 'TypeTag.DOUBLE']
 
     def test_hyper_columns_to_dss_columns(self):
-        schema_converter = SchemaConversion()
+        schema_converter = SchemaConversion(None)
         path_to_hyper = "data/superstore_sample.hyper"
         hyper = get_hyper_process()
         connection = Connection(hyper.endpoint, path_to_hyper)

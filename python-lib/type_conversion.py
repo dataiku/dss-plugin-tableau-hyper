@@ -11,9 +11,11 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Plugin: Tableau Hyper API | %(levelname)s - %(message)s')
 
 
-def to_dss_date(hyper_date):
+def to_dss_date_dateonly(hyper_date):
     """
-    Convert Tableau Hyper date to DSS date
+    To convert Tableau Hyper date (just a date) to a DSS date
+    (i.e. our legacy date time type which represents datetime with timestamp),
+    but only populating the date components.
     :param hyper_date: <class 'pandas._libs.tslibs.timestamps.Timestamp'>
     :return: A date object readable by DSS
     """
@@ -36,6 +38,8 @@ def to_dss_timestamp(hyper_timestamp):
         hyper_timestamp.second,
         hyper_timestamp.microsecond)
 
+def to_dss_timestamp_tz(hyper_timestamp):
+    return hyper_timestamp.to_datetime()
 
 def to_dss_geopoint(hyper_string):
     """
@@ -44,7 +48,6 @@ def to_dss_geopoint(hyper_string):
     :return: A pre-formatted string before export as geopoint
     """
     return hyper_string.upper()
-
 
 def to_hyper_timestamp(dss_date):
     """
@@ -62,6 +65,13 @@ def to_hyper_timestamp(dss_date):
         return
     return dss_date
 
+def to_hyper_date(dss_dateonly):
+    """
+    Format a dateonly object from DSS to Tableau Hyper
+    :param dss_dateonly: A DSS dateonly value
+    :return: Tableau Hyper date value
+    """
+    return dss_dateonly
 
 def to_hyper_geography(dss_geopoint):
     """
@@ -74,22 +84,12 @@ def to_hyper_geography(dss_geopoint):
 
 class TypeConversion(object):
 
-    def __init__(self):
+    def __init__(self, config):
+
+        self.config = config 
+
         """
         Handler for conversion of storage types between DSS and Tableau Hyper
-
-        DSS storage types:
-
-        "string","date","geopoint","geometry","array","map","object","double",
-        "boolean","float","bigint","int","smallint","tinyint"
-
-        Tableau Hyper storage types:
-
-        TypeTag.BOOL, TypeTag.BIG_INT, TypeTag.SMALL_INT, TypeTag.INT, TypeTag.NUMERIC,
-        TypeTag.DOUBLE, TypeTag.OID, TypeTag.BYTES, TypeTag.TEXT, TypeTag.VARCHAR, TypeTag.CHAR,
-        TypeTag.JSON, TypeTag.DATE, TypeTag.INTERVAL, TypeTag.TIME, TypeTag.TIMESTAMP,
-        TypeTag.TIMESTAMP_TZ, TypeTag.GEOGRAPHY
-
         """
         handle_null = lambda f: lambda x: None if pd.isna(x) else f(x)
 
@@ -98,7 +98,8 @@ class TypeConversion(object):
             'array': (SqlType.text(), handle_null(str)),
             'bigint': (SqlType.big_int(), handle_null(int)),
             'boolean': (SqlType.bool(), handle_null(bool)),
-            'date': (SqlType.timestamp(), handle_null(to_hyper_timestamp)),
+            'dateonly': (SqlType.date(), handle_null(to_hyper_date)),
+            'datetimenotz': (SqlType.timestamp(), handle_null(to_hyper_timestamp)),
             'double': (SqlType.double(), handle_null(float)),
             'float': (SqlType.double(), handle_null(float)),
             'geometry': (SqlType.text(), handle_null(str)),
@@ -111,13 +112,18 @@ class TypeConversion(object):
             'tinyint': (SqlType.small_int(), handle_null(int)),
         }
 
+        # Legacy mode exported DSS "date" to Hyper "timestamp", which was wrong. Modern mode exports it as timestamp_tz
+        if self.config is None or self.config.get("temporal_export_mode", "LEGACY") == "LEGACY":
+            self.mapping_dss_to_hyper['date'] = (SqlType.timestamp(), handle_null(to_hyper_timestamp))
+        else:
+            self.mapping_dss_to_hyper['date'] = (SqlType.timestamp_tz(), handle_null(to_hyper_timestamp))
+
         # Mapping Tableau Hyper to DSS types
         self.mapping_hyper_to_dss = {
             TypeTag.BIG_INT: ('bigint', handle_null(int)),
             TypeTag.BYTES: ('string', handle_null(str)),
             TypeTag.BOOL: ('boolean', handle_null(bool)),
             TypeTag.CHAR: ('string', handle_null(str)),
-            TypeTag.DATE: ('date', handle_null(to_dss_date)),
             TypeTag.DOUBLE: ('double', handle_null(float)),
             TypeTag.GEOGRAPHY: ('geopoint', handle_null(to_dss_geopoint)),
             TypeTag.INT: ('int', handle_null(int)),
@@ -127,11 +133,19 @@ class TypeConversion(object):
             TypeTag.OID: ('string', handle_null(str)),
             TypeTag.SMALL_INT: ('smallint', handle_null(int)),
             TypeTag.TEXT: ('string', handle_null(str)),
-            TypeTag.TIME: ('string', handle_null(str)),
-            TypeTag.TIMESTAMP: ('date', handle_null(to_dss_timestamp)),
-            TypeTag.TIMESTAMP_TZ: ('string', handle_null(str)),
             TypeTag.VARCHAR: ('string', handle_null(str))
         }
+
+        if self.config is None or self.config.get("temporal_import_mode", "LEGACY") == "LEGACY":
+            self.mapping_hyper_to_dss[TypeTag.DATE] = ('date', handle_null(to_dss_date_dateonly))
+            self.mapping_hyper_to_dss[TypeTag.TIME] = ('string', handle_null(str))
+            self.mapping_hyper_to_dss[TypeTag.TIMESTAMP] = ('date', handle_null(to_dss_timestamp))
+            self.mapping_hyper_to_dss[TypeTag.TIMESTAMP_TZ] = ('string', handle_null(str))
+        else:
+            self.mapping_hyper_to_dss[TypeTag.DATE] = ('dateonly', handle_null(str))
+            self.mapping_hyper_to_dss[TypeTag.TIME] = ('string', handle_null(str))
+            self.mapping_hyper_to_dss[TypeTag.TIMESTAMP] = ('datetimenotz', handle_null(to_dss_timestamp))
+            self.mapping_hyper_to_dss[TypeTag.TIMESTAMP_TZ] = ('date', handle_null(to_dss_timestamp_tz))
 
     def dss_type_to_hyper(self, dss_type):
         """

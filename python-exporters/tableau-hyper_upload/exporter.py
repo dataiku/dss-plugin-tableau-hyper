@@ -83,7 +83,7 @@ class TableauHyperExporter(Exporter):
             self.output_file_name, self.project_name, self.schema_name, self.table_name))
 
         # Instantiate Tableau Writer wrapper
-        self.writer = TableauTableWriter(schema_name=self.schema_name, table_name=self.table_name)
+        self.writer = TableauTableWriter(config=config, schema_name=self.schema_name, table_name=self.table_name)
         # Open connection to Tableau Server
         if auth_type == "pta-preset":
             self.tableau_auth = tsc.PersonalAccessTokenAuth(username, password, site_id=site_name)

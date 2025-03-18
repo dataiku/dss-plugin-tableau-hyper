@@ -15,7 +15,7 @@ class TestTableauTableReader(TestCase):
         file_test_path = "./data/revenue_prediction.hyper"
         self.stream = open(file_test_path, "rb")
 
-        tableau_reader = TableauTableReader(table_name='Extract', schema_name='Extract')
+        tableau_reader = TableauTableReader(config=None, table_name='Extract', schema_name='Extract')
         tableau_reader.create_tmp_hyper_file()
         tableau_reader.read_buffer(self.stream)
         tableau_reader.open_connection()
@@ -40,7 +40,7 @@ class TestTableauTableReader(TestCase):
         file_test_path = "./data/ranked_customers_18766-rows.hyper"
         self.stream = open(file_test_path, "rb")
 
-        tableau_reader = TableauTableReader(table_name='Extract', schema_name='Extract')
+        tableau_reader = TableauTableReader(config=None, table_name='Extract', schema_name='Extract')
         tableau_reader.create_tmp_hyper_file()
         tableau_reader.read_buffer(self.stream)
         tableau_reader.open_connection()

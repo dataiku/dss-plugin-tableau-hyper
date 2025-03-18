@@ -32,7 +32,7 @@ class TableauHyperExporter(object):
         self.plugin_config = plugin_config
         schema_name = self.config.get("schema_name", "Extract")
         table_name = self.config.get("table_name", "Extract")
-        self.writer = TableauTableWriter(schema_name=schema_name, table_name=table_name)
+        self.writer = TableauTableWriter(config=config, schema_name=schema_name, table_name=table_name)
         self.writer.batch_size = 10
         self.output_file = None
 

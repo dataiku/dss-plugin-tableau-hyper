@@ -52,7 +52,7 @@ class MyFormatter(Formatter):
         """
         table_name = self.config['table_name']
         schema_name = self.config['schema_name']
-        return MyFormatExtractor(stream, schema, table_name=table_name, schema_name=schema_name)
+        return MyFormatExtractor(stream, schema, config=self.config, table_name=table_name, schema_name=schema_name)
 
 
 class MyOutputFormatter(OutputFormatter):
@@ -109,13 +109,13 @@ class MyFormatExtractor(FormatExtractor):
     Read the input format
     """
 
-    def __init__(self, stream, schema, table_name=None, schema_name=None):
+    def __init__(self, stream, schema, config, table_name=None, schema_name=None):
         """
         Initialize the extractor
         :param stream: the stream to read the formatted data from
         """
         FormatExtractor.__init__(self, stream)
-        self.tableau_reader = TableauTableReader(table_name=table_name, schema_name=schema_name)
+        self.tableau_reader = TableauTableReader(config=config, table_name=table_name, schema_name=schema_name)
         self.tableau_reader.create_tmp_hyper_file()
         self.tableau_reader.read_buffer(stream)
         self.tableau_reader.open_connection()

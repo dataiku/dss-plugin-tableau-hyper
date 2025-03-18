@@ -32,6 +32,16 @@
             "type": "STRING",
             "description": "Name of the table in the Hyper file",
             "mandatory": true
+        },
+        {
+            "name": "temporal_import_mode",
+            "label": "Temporal types import mode",
+            "type": "SELECT",
+            "defaultValue": "LEGACY",
+            "selectChoices": [
+                { "value": "LEGACY", "label": "Legacy"},
+                { "value": "MODERN", "label": "Modern"}
+            ]
         }
     ]
 }

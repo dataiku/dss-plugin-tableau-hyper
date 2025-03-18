@@ -1,5 +1,10 @@
 # Changelog
 
+## [Version 0.3.0](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.3.0) - Bugfix release - 2025-03-17
+
+- Add DSS 13.4 new date types
+- Add legacy/modern date handling switch
+
 ## [Version 0.2.7](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.2.7) - Bugfix release - 2025-02-05
 
 - Remove hyper logs files
