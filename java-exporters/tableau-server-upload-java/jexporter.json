@@ -1,0 +1,157 @@
+{
+    "meta" : {
+    "label" : "To Tableau server - New",
+    "description": "This exporter uploads data to a Tableau server with the Hyper format"
+    },
+
+    "exporterClass": "com.dataiku.dss.export.tableau.TableauUploadExporter",
+    "exportBehavior": "MANAGES_OUTPUT",
+    "exportOptions": [
+         {
+            "label" : "Upload to Tableau Server - New"
+        }
+    ],
+    
+     "paramsPythonSetup": "browse_projects.py",
+   
+    "params": [
+        {
+            "label":"Tableau Server",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "auth_type",
+            "label": "Authentication type",
+            "type": "SELECT",
+            "selectChoices": [
+                {
+                    "value": "basic-preset",
+                    "label": "Personal preset"
+                },
+                {
+                    "value": "pta-preset",
+                    "label": "Personal Access Token preset"
+                },
+                {
+                    "value": "legacy-preset",
+                    "label": "Preset (legacy)"
+                },
+                {
+                    "value": "legacy-login",
+                    "label": "User name / password (legacy)"
+                }
+            ]
+        },
+        {
+            "name": "usePreset",
+            "label" : "Use preset",
+            "type": "BOOLEAN",
+            "mandatory": false,
+            "description":"Get the Tableau Server connection parameters from a shared configuration in DSS. Legacy: we just keep it to let existing flow working.",
+            "visibilityCondition": false
+        },
+        {
+            "name": "tableau_server_personal_connection",
+            "label": "Tableau Server Personal Preset",
+            "type": "PRESET",
+            "parameterSetId": "tableau-personal-connection",
+            "visibilityCondition": "model.auth_type == 'basic-preset'"
+        },
+        {
+            "name": "tableau_server_pta_connection",
+            "label": "Tableau Server PTA Preset",
+            "type": "PRESET",
+            "parameterSetId": "personal-access-token",
+            "visibilityCondition": "model.auth_type == 'pta-preset'"
+        },
+        {
+            "name": "tableau_server_connection",
+            "label": "Tableau Server Preset",
+            "type": "PRESET",
+            "parameterSetId": "tableau-server-connection",
+            "visibilityCondition": "model.auth_type == 'legacy-preset' || (model.auth_type == null && model.usePreset == true)"
+        },
+        {
+            "name": "server_url",
+            "label":"URL",
+            "type": "STRING",
+            "mandatory": false,
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.usePreset == false && model.server_url != null)"
+        },
+        {
+            "name": "username",
+            "label":"Username",
+            "type": "STRING",
+            "mandatory": false,
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.usePreset == false && model.server_url != null)"
+        },
+        {
+            "name": "password",
+            "label":"Password",
+            "type": "PASSWORD",
+            "mandatory": false,
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.usePreset == false && model.server_url != null)"
+        },
+        {
+            "name": "ignore_ssl",
+            "label" : "Ignore SSL",
+            "type": "BOOLEAN",
+            "mandatory": false,
+            "description": "Ignore SSL",
+            "defaultValue": false,
+            "visibilityCondition": "model.auth_type == 'legacy-login' || (model.auth_type == null && model.server_url != null)"
+        },
+        {
+            "name": "ssl_cert_path",
+            "label": "SSL certificate",
+            "type": "STRING",
+            "description": "(optional) Full path to your tableau SSL certificate",
+            "mandatory": false,
+            "visibilityCondition": "(model.auth_type == 'legacy-login' || (model.auth_type == null && model.server_url != null)) && model.ignore_ssl == false"
+        },
+        {
+            "label":"Destination",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "retrieve_project_list",
+            "label":"Select project from list",
+            "description": "(DSS 10.0.4 and above)",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        },
+        {
+            "name": "project",
+            "label":"Project",
+            "type": "TEXTAREA",
+            "defaultValue": "default",
+            "description":"Upload the Hyper file to this project.",
+            "visibilityCondition": "model.retrieve_project_list == false"
+        },
+        {
+            "name": "project_id",
+            "label":"Project",
+            "type": "SELECT",
+            "getChoicesFromPython": true,
+            "visibilityCondition": "model.retrieve_project_list == true"
+        },
+        {
+            "name": "output_table",
+            "label":"Output table",
+            "type": "STRING",
+            "defaultValue": "DSS_extract"
+        },
+        {
+            "label":"Advanced",
+            "type": "SEPARATOR"
+        },
+        {
+            "name": "site_id",
+            "label":"Site ID",
+            "type": "STRING",
+            "description": "The site_id is the subpath of your full site URL. (See the README.md for details)",
+            "mandatory": false,
+            "visibilityCondition": "model.auth_type == 'legacy-login' || model.auth_type == null"
+        }
+    ]
+}

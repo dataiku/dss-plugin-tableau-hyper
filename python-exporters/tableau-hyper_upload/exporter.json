@@ -1,13 +1,13 @@
 {
     "meta" : {
-        "label" : "To Tableau server",
+        "label" : "To Tableau server - Legacy",
         "description": "This exporter uploads data to a Tableau server with the Hyper format. Beware, exporting a large dataset to Tableau server may take long. If your dataset contains several millions records, you may want for instance to have DSS write into a SQL database usable by Tableau."
     },
     "exportBehavior" : "MANAGES_OUTPUT",
 
     "exportOptions": [
         {
-            "label" : "Upload to Tableau Server (Hyper)"
+            "label" : "Upload to Tableau Server (Hyper) - Legacy"
         }
     ],
     "kind": "PYTHON",

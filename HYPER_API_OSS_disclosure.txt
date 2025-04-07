@@ -1,0 +1,33 @@
+Salesforce, Inc.
+HYPER API Open Source Software Disclosure (rev. February 20, 2020)
+
+HYPER API may contain one or more of the following open-source software packages. For more information, including copies
+of applicable open-source software licenses, or to request copies of open-source software, please contact legal@salesforce.com.
+For Instructional Purposes: The list below is organized in a tabular format. The first column on the left identifies the name
+or title of the open-source software package that the HYPER API may contain. The second column from the left identifies the
+applicable license(s) for the respective software package in that row. The third column from the left contains a text link
+to the applicable license for that open-source software package.
+
+Open-Source Software Package; License Information; License Link
+Apache Arrow; Apache License, Version 2.0; https://github.com/apache/arrow/blob/master/LICENSE.txt
+Apache Thrift; Apache License, Version 2.0: https://github.com/apache/thrift/blob/master/LICENSE
+AsmJit; zlib License; https://github.com/asmjit/asmjit/blob/master/LICENSE.md
+Boost; Boost Software License, Version 1.0; https://www.boost.org/LICENSE_1_0.txt
+CFFI; The MIT License; https://foss.heptapod.net/pypy/cffi/blob/branch/default/LICENSE
+dtoa Benchmark; The MIT License; https://github.com/miloyip/dtoa-benchmark/blob/master/license.txt
+Efficient Random Sampling — Vectorized, Cache-Efficient, and Online; The 2-Clause BSD License; https://github.com/lorenzhs/sampling/blob/master/LICENSE
+GeographicLib; The MIT License; https://geographiclib.sourceforge.io/html/LICENSE.txt
+GNU Compiler Collection (GCC); GNU General Public License, Version 3, with GCC Runtime Library Exception; https://www.gnu.org/licenses/gpl-3.0.html https://www.gnu.org/licenses/gcc-exception-3.1.en.html
+International Components for Unicode (ICU); Unicode Inc. License Agreement — Data Files and Software; https://github.com/unicode-org/icu/blob/icu-maint/maint-4-4/unicode-license.txt
+Java Native Access (JNA); Apache License, Version 2.0; https://raw.githubusercontent.com/java-native-access/jna/master/LICENSE
+LZ4; The 2-Clause BSD License; https://github.com/lz4/lz4/blob/dev/lib/LICENSE
+musl libc; The MIT License; https://git.musl-libc.org/cgit/musl/tree/COPYRIGHT
+OpenSSL; OpenSSL License and SSLeay License; https://github.com/openssl/openssl/blob/openssl-3.0/LICENSE.txt
+Pattern-defeating Quicksort (pdqsort); The zlib/libpng License; https://raw.githubusercontent.com/orlp/pdqsort/master/license.txt
+PostgreSQL; The PostgreSQL License; https://github.com/postgres/postgres/blob/master/COPYRIGHT
+RE2; The 3-Clause BSD License; https://raw.githubusercontent.com/google/re2/master/LICENSE
+robin-map; The MIT License; https://github.com/Tessil/robin-map
+snappy; The 3-Clause BSD License; https://github.com/google/snappy/blob/master/COPYING
+The LLVM Project; Apache License, Version 2.0 with LLVM Exceptions; https://releases.llvm.org/13.0.0/LICENSE.TXT
+zlib; The zlib/libpng License; https://www.zlib.net/zlib_license.html
+Zstandard; The 3-Clause BSD License; https://github.com/facebook/zstd/blob/dev/LICENSE
