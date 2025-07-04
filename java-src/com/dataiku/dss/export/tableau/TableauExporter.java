@@ -290,7 +290,7 @@ public class TableauExporter implements CustomExporter  {
             String sqlCommand = String.format("INSERT INTO %s SELECT * FROM %s",
                     this.tableauTable.getTableName(),
                     this.tableauTempTable.getTableName());
-            long rowsAffected = connection.executeCommand(sqlCommand).get();
+        long rowsAffected = connection.executeCommand(sqlCommand).getAsLong();
             logger.info(rowsAffected + " rows transferred to the final table.");
         }
     }
