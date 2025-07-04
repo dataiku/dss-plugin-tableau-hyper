@@ -3,6 +3,7 @@
 .wlock
 .ts
 .git
+/java-lib/hyper/hyperd
 **/*.pyc
 .coverage
 .htmlcov

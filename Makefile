@@ -5,20 +5,39 @@ archive_file_name="dss-plugin-${plugin_id}-${plugin_version}.zip"
 remote_url=`git config --get remote.origin.url`
 last_commit_id=`git rev-parse HEAD`
 
-plugin:
+
+HYPER_API_ZIP_URL := https://downloads.tableau.com/tssoftware//tableauhyperapi-java-linux-x86_64-release-main.0.0.22502.r99d1cc31.zip
+HYPER_API_ZIP_FILE := tableauhyperapi.zip
+HYPERD_TARGET_BINARY := java-lib/hyper/hyperd
+
+$(HYPERD_TARGET_BINARY):
+	@echo "[DEPENDENCY] Tableau Hyper API binary not found. Downloading..."
+	@mkdir -p $(dir $(HYPERD_TARGET_BINARY))
+	@curl -L -o $(HYPER_API_ZIP_FILE) $(HYPER_API_ZIP_URL)
+	@mkdir -p tmp_unzip
+	@unzip -q $(HYPER_API_ZIP_FILE) -d tmp_unzip
+	@mv tmp_unzip/*/lib/hyper/hyperd $(HYPERD_TARGET_BINARY)
+	@chmod +x $(HYPERD_TARGET_BINARY)
+	@rm $(HYPER_API_ZIP_FILE)
+	@rm -rf tmp_unzip
+	@echo "[DEPENDENCY] Tableau Hyper API binary is ready at $(HYPERD_TARGET_BINARY)"
+
+download-deps: $(HYPERD_TARGET_BINARY)
+
+plugin: $(HYPERD_TARGET_BINARY)
 	@echo "[START] Archiving plugin to dist/ folder..."
-	@cat plugin.json | json_pp > /dev/null
 	@rm -rf dist
 	@mkdir dist
 	@echo "{\"remote_url\":\"${remote_url}\",\"last_commit_id\":\"${last_commit_id}\"}" > release_info.json
-	@git archive -v -9 --format zip -o dist/${archive_file_name} HEAD
-	@zip --delete dist/${archive_file_name} "tests/*"
-	@zip --delete dist/${archive_file_name} "data/*"
-	@zip -u dist/${archive_file_name} release_info.json
+	
+	@zip -r -9 dist/$(archive_file_name) . -x ".git/*" "dist/*" "env/*" "tmp_unzip/*" "tests/*" "data/*" "*.zip" ".idea/*" "*.DS_Store" "Makefile" "build.xml" "Jenkinsfile" ".gitignore"
+	
+	@zip -g -j dist/$(archive_file_name) release_info.json
+	
 	@rm release_info.json
 	@echo "[SUCCESS] Archiving plugin to dist/ folder: Done!"
 
-unit-tests:
+unit-tests: $(HYPERD_TARGET_BINARY)
 	@echo "[START] Running unit tests..."
 	@( \
 		PYTHON_VERSION=`python3 -V 2>&1 | sed 's/[^0-9]*//g' | cut -c 1,2`; \
@@ -36,7 +55,7 @@ unit-tests:
 	)
 	@echo "[SUCCESS] Running unit tests: Done!"
 
-integration-tests:
+integration-tests: $(HYPERD_TARGET_BINARY)
 	@echo "Running integration tests..."
 	@( \
 		rm -rf ./env/; \
@@ -51,3 +70,6 @@ tests: unit-tests integration-tests
 
 dist-clean:
 	rm -rf dist
+
+clean: dist-clean
+	rm -rf java-lib/hyper
