@@ -120,6 +120,7 @@ public class TableauExporter implements CustomExporter  {
         Map<String, String> processParameters = new HashMap<>();
         processParameters.put("log_file_max_count", "2");
         processParameters.put("log_file_size_limit", "100M");
+        processParameters.put("log_config", "");
 
         process = new HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU, "dataiku", processParameters);
 
