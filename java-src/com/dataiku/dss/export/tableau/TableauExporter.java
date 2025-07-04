@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.dataiku.dip.coremodel.Schema;
@@ -43,7 +42,7 @@ import com.tableau.hyperapi.impl.SharedLibraryProvider;
 import java.util.ServiceLoader;
 
 public class TableauExporter implements CustomExporter  {
-     private static DKULogger logger = DKULogger.getLogger("dku.export.tableau");
+    private static DKULogger logger = DKULogger.getLogger("dku.export.tableau");
     private static LimitedLogContext llc = LimitedLogFactory.get(logger, "dku.export.tableau.errors");
 
     static {
@@ -55,7 +54,7 @@ public class TableauExporter implements CustomExporter  {
         logger.info("Working with clas loader " + cl);
         boolean hasNext0 = ServiceLoader.load(SharedLibraryProvider.class).iterator().hasNext();
         logger.info("has Next0: " + hasNext0);
-        
+
         boolean hasNext1 = ServiceLoader.load(SharedLibraryProvider.class, cl).iterator().hasNext();
         logger.info("has Next1: " + hasNext1);
 
@@ -104,18 +103,29 @@ public class TableauExporter implements CustomExporter  {
     public void initialize(JsonObject config, JsonObject pluginSettings, Schema schema, ColumnFactory cf, File destinationFile) throws Exception {
         this.cf = cf;
         this.schema = schema;
+        this.isGeoTable = schema.getColumns().stream().anyMatch(col -> col.getType() == Type.GEOPOINT);
 
         Thread.currentThread().setContextClassLoader(TableauExporter.class.getClassLoader());
 
         String tableauTableName = config.get("table_name") == null ? "Extract" : config.get("table_name").getAsString();
         String tableauSchemaName = config.get("schema_name") == null ? "Extract" : config.get("schema_name").getAsString();
 
-        tableauTable = new TableDefinition(
+        this.tableauTable = new TableDefinition(
                 new TableName(tableauSchemaName, tableauTableName),
                 schema.getColumns().stream()
                         .map(dssColumn -> new TableDefinition.Column(dssColumn.getName(), getTableauType(dssColumn), Nullability.NULLABLE))
                         .collect(Collectors.toList())
         );
+
+        if (this.isGeoTable) {
+            List<TableDefinition.Column> tempColumns = schema.getColumns().stream()
+                    .map(dssColumn -> {
+                        SqlType type = (dssColumn.getType() == Type.GEOPOINT) ? SqlType.text() : getTableauType(dssColumn);
+                        return new TableDefinition.Column(dssColumn.getName(), type, Nullability.NULLABLE);
+                    })
+                    .collect(Collectors.toList());
+            this.tableauTempTable = new TableDefinition(new TableName(tableauSchemaName, "tmp_" + tableauTableName), tempColumns);
+        }
 
         Map<String, String> processParameters = new HashMap<>();
         processParameters.put("log_file_max_count", "2");
@@ -125,7 +135,6 @@ public class TableauExporter implements CustomExporter  {
         process = new HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU, "dataiku", processParameters);
 
         Map<String, String> connectionParameters = new HashMap<>();
-        //connectionParameters.put("lc_time", "UTC");
 
         connection = new Connection(process.getEndpoint(),
                 destinationFile.getAbsolutePath(),
@@ -133,7 +142,10 @@ public class TableauExporter implements CustomExporter  {
                 connectionParameters);
 
         connection.getCatalog().createSchema(new SchemaName(tableauSchemaName));
-        connection.getCatalog().createTable(tableauTable);
+        connection.getCatalog().createTable(this.tableauTable);
+        if (this.isGeoTable) {
+            connection.getCatalog().createTable(this.tableauTempTable);
+        }
     }
 
     private ColumnFactory cf;
@@ -141,6 +153,8 @@ public class TableauExporter implements CustomExporter  {
     private HyperProcess process;
     private Connection connection;
     private TableDefinition tableauTable;
+    private TableDefinition tableauTempTable;
+    private boolean isGeoTable = false;
 
     private final DateTimeFormatter[] dateTimeNoTZFormatters = new DateTimeFormatter[]{
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"),
@@ -171,25 +185,22 @@ public class TableauExporter implements CustomExporter  {
             types.add(sc.getType());
         }
 
-        int addedRows = 0;
+        TableDefinition targetTableForInserter = this.isGeoTable ? this.tableauTempTable : this.tableauTable;
 
-        try (Inserter inserter = new Inserter(connection, tableauTable)) {
+        try (Inserter inserter = new Inserter(connection, targetTableForInserter)) {
             while (true) {
                 Row r = stream.next();
                 if (r == null) {
                     break;
                 }
 
-                int colIdx = 0;
-
-                for (colIdx = 0; colIdx < columns.size(); colIdx++) {
+                for (int colIdx = 0; colIdx < columns.size(); colIdx++) {
                     Column c = columns.get(colIdx);
                     String v = r.get(c);
                     if (v == null) {
                         inserter.addNull();
                     } else {
                         try {
-
                             switch (types.get(colIdx)) {
                             case GEOMETRY:
                             case ARRAY:
@@ -199,8 +210,10 @@ public class TableauExporter implements CustomExporter  {
                                 inserter.add(v);
                                 break;
                             }
-
-
+                            case GEOPOINT: {
+                                inserter.add(v);
+                                break;
+                            }
                             case DATE: {
                                 OffsetDateTime odt = OffsetDateTime.parse(v);
                                 inserter.add(odt);
@@ -216,9 +229,6 @@ public class TableauExporter implements CustomExporter  {
                                 inserter.add(ld);
                                 break;
                             }
-                            case GEOPOINT:
-                                throw new Exception("unhandled");
-
                             case FLOAT:
                             case DOUBLE: {
                                 Double dv = Doubles.tryParse(v);
@@ -229,12 +239,10 @@ public class TableauExporter implements CustomExporter  {
                                 }
                                 break;
                             }
-
                             case BOOLEAN: {
                                 inserter.add(Boolean.parseBoolean(v));
                                 break;
                             }
-
                             case BIGINT: {
                                 Long lv = Longs.tryParse(v);
                                 if (lv == null) {
@@ -272,17 +280,18 @@ public class TableauExporter implements CustomExporter  {
                     }
                 }
                 inserter.endRow();
-                ++addedRows;
-
-//                if (addedRows % 10000 == 0) {
-//                    logger.info("Doing partial execute");
-//                    inserter.execute();
-//                    logger.info("Done partial execute");
-//                }
             }
             logger.info("Doing final execute");
             inserter.execute();
             logger.info("Done final execute");
+        }
+
+        if (this.isGeoTable) {
+            String sqlCommand = String.format("INSERT INTO %s SELECT * FROM %s",
+                    this.tableauTable.getTableName(),
+                    this.tableauTempTable.getTableName());
+            long rowsAffected = connection.executeCommand(sqlCommand).get();
+            logger.info(rowsAffected + " rows transferred to the final table.");
         }
     }
 
@@ -293,8 +302,18 @@ public class TableauExporter implements CustomExporter  {
 
     @Override
     public void close() {
-        if (connection !=null) connection.close();
-        if (process != null) process.close();
+        if (connection != null) {
+            if (this.isGeoTable && this.tableauTempTable != null) {
+                try {
+                    connection.executeCommand("DROP TABLE " + this.tableauTempTable.getTableName());
+                } catch (Exception e) {
+                    logger.error("Failed to drop temporary geo table.", e);
+                }
+            }
+            connection.close();
+        }
+        if (process != null) {
+            process.close();
+        }
     }
-   
 }
