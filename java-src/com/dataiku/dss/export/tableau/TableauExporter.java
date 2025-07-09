@@ -45,28 +45,6 @@ public class TableauExporter implements CustomExporter  {
     private static DKULogger logger = DKULogger.getLogger("dku.export.tableau");
     private static LimitedLogContext llc = LimitedLogFactory.get(logger, "dku.export.tableau.errors");
 
-    static {
-        logger.info("reloading ServiceLoader");
-        java.util.ServiceLoader.load(SharedLibraryProvider.class).reload();;
-
-
-        ClassLoader cl = TableauExporter.class.getClassLoader();
-        logger.info("Working with clas loader " + cl);
-        boolean hasNext0 = ServiceLoader.load(SharedLibraryProvider.class).iterator().hasNext();
-        logger.info("has Next0: " + hasNext0);
-
-        boolean hasNext1 = ServiceLoader.load(SharedLibraryProvider.class, cl).iterator().hasNext();
-        logger.info("has Next1: " + hasNext1);
-
-        ServiceLoader.load(SharedLibraryProvider.class).reload();
-        boolean hasNext2 = ServiceLoader.load(SharedLibraryProvider.class).iterator().hasNext();
-        logger.info("has Next2: " + hasNext0);
-
-        ServiceLoader.load(SharedLibraryProvider.class, cl).reload();
-        boolean hasNext3 = ServiceLoader.load(SharedLibraryProvider.class, cl).iterator().hasNext();
-        logger.info("has Next3: " + hasNext1);
-    }
-
     private SqlType getTableauType(SchemaColumn dssColumn) {
         switch (dssColumn.getType()) {
         case STRING:
