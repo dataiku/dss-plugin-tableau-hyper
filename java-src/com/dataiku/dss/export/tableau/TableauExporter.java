@@ -132,19 +132,27 @@ public class TableauExporter implements CustomExporter  {
         processParameters.put("log_file_size_limit", "100M");
         processParameters.put("log_config", "");
 
-        process = new HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU, "dataiku", processParameters);
+        this.process = new HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU, "dataiku", processParameters);
 
-        Map<String, String> connectionParameters = new HashMap<>();
+        try {
+            Map<String, String> connectionParameters = new HashMap<>();
 
-        connection = new Connection(process.getEndpoint(),
-                destinationFile.getAbsolutePath(),
-                CreateMode.CREATE_AND_REPLACE,
-                connectionParameters);
+            this.connection = new Connection(this.process.getEndpoint(),
+                    destinationFile.getAbsolutePath(),
+                    CreateMode.CREATE_AND_REPLACE,
+                    connectionParameters);
 
-        connection.getCatalog().createSchema(new SchemaName(tableauSchemaName));
-        connection.getCatalog().createTable(this.tableauTable);
-        if (this.isGeoTable) {
-            connection.getCatalog().createTable(this.tableauTempTable);
+            connection.getCatalog().createSchema(new SchemaName(tableauSchemaName));
+            connection.getCatalog().createTable(this.tableauTable);
+            if (this.isGeoTable) {
+                connection.getCatalog().createTable(this.tableauTempTable);
+            }
+        } catch (Exception e) {
+            if (this.process != null) {
+                this.process.close();
+                this.process = null;
+            }
+            throw e;
         }
     }
 
@@ -262,10 +270,18 @@ public class TableauExporter implements CustomExporter  {
                     logger.error("Failed to drop temporary geo table.", e);
                 }
             }
-            connection.close();
+            try {
+                connection.close();
+            } catch (Exception e) {
+                logger.error("Failed to close connection.", e);
+            }
         }
         if (process != null) {
-            process.close();
+            try {
+                process.close();
+            } catch (Exception e) {
+                logger.error("Failed to close process.", e);
+            }
         }
     }
 }
