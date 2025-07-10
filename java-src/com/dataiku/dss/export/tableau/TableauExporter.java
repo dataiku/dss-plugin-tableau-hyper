@@ -173,24 +173,46 @@ public class TableauExporter implements CustomExporter  {
 
     @Override
     public void stream(RowInputStream stream) throws Exception {
-        TableDefinition targetTableForInserter = this.isGeoTable ? this.tableauTempTable : this.tableauTable;
-
-        try (Inserter inserter = new Inserter(connection, targetTableForInserter)) {
-            for (Row r; (r = stream.next()) != null; ) {
-                addRowToInserter(inserter, r);
-            }
-            logger.info("Doing final execute");
-            inserter.execute();
-            logger.info("Done final execute");
-        }
-
         if (this.isGeoTable) {
-            String sqlCommand = String.format("INSERT INTO %s SELECT * FROM %s",
-                    this.tableauTable.getTableName(),
-                    this.tableauTempTable.getTableName());
-        long rowsAffected = connection.executeCommand(sqlCommand).getAsLong();
-            logger.info(rowsAffected + " rows transferred to the final table.");
+            streamWithGeoProcessing(stream);
+        } else {
+            streamDirect(stream);
         }
+    }
+
+    private void streamDirect(RowInputStream stream) throws Exception {
+        try (Inserter inserter = new Inserter(connection, this.tableauTable)) {
+            insertRows(inserter, stream);
+        }
+    }
+
+    private void streamWithGeoProcessing(RowInputStream stream) throws Exception {
+        try (Inserter inserter = new Inserter(connection, this.tableauTempTable)) {
+            insertRows(inserter, stream);
+        }
+        
+        transferFromTempToFinalTable();
+    }
+
+    private void insertRows(Inserter inserter, RowInputStream stream) throws Exception {
+        for (Row r; (r = stream.next()) != null; ) {
+            addRowToInserter(inserter, r);
+        }
+        logger.info("Doing final execute");
+        inserter.execute();
+        logger.info("Done final execute");
+    }
+
+    private void transferFromTempToFinalTable() throws Exception {
+        String sqlCommand = buildInsertFromTempTableSql();
+        long rowsAffected = connection.executeCommand(sqlCommand).getAsLong();
+        logger.info(rowsAffected + " rows transferred to the final table.");
+    }
+
+    private String buildInsertFromTempTableSql() {
+        return String.format("INSERT INTO %s SELECT * FROM %s",
+                this.tableauTable.getTableName(),
+                this.tableauTempTable.getTableName());
     }
 
     private void addRowToInserter(Inserter inserter, Row r) throws Exception {
