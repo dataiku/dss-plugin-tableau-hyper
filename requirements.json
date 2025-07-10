@@ -1,0 +1,11 @@
+{
+	"installScript" : "install.sh",
+
+	"custom" : [
+		{
+			"name" : "Set permissions to allow execution of the hyper database"
+		}
+	],
+
+	"disclaimer" : "This installation procedure allows for the execution of the hyperd binary file"
+}
