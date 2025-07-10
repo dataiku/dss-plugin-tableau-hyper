@@ -90,7 +90,7 @@ public class TableauExporter implements CustomExporter  {
         case TINYINT:
             return SqlType.smallInt();
         }
-        throw new Error("unreachable");
+        throw new IllegalStateException("Unsupported DSS column type: " + dssColumn.getType());
     }
 
     @Override
@@ -169,85 +169,7 @@ public class TableauExporter implements CustomExporter  {
 
         try (Inserter inserter = new Inserter(connection, targetTableForInserter)) {
             for (Row r; (r = stream.next()) != null; ) {
-                for (int colIdx = 0; colIdx < columns.size(); colIdx++) {
-                    String v = r.get(columns.get(colIdx));
-                    if (v == null) {
-                        inserter.addNull();
-                    } else {
-                        try {
-                            switch (types.get(colIdx)) {
-                            case GEOMETRY:
-                            case ARRAY:
-                            case MAP:
-                            case OBJECT:
-                            case STRING:
-                            case GEOPOINT: {
-                                inserter.add(v);
-                                break;
-                            }
-                            case DATE: {
-                                inserter.add(OffsetDateTime.parse(v));
-                                break;
-                            }
-                            case DATETIMENOTZ: {
-                                inserter.add(parseWithMultipleFormatters(v,dateTimeNoTZFormatters, LocalDateTime::parse));
-                                break;
-                            }
-                            case DATEONLY: {
-                                inserter.add(LocalDate.parse(v));
-                                break;
-                            }
-                            case FLOAT:
-                            case DOUBLE: {
-                                Double dv = Doubles.tryParse(v);
-                                if (dv == null) {
-                                    inserter.addNull();
-                                } else {
-                                    inserter.add(dv);
-                                }
-                                break;
-                            }
-                            case BOOLEAN: {
-                                inserter.add(Boolean.parseBoolean(v));
-                                break;
-                            }
-                            case BIGINT: {
-                                Long lv = Longs.tryParse(v);
-                                if (lv == null) {
-                                    inserter.addNull();
-                                } else {
-                                    inserter.add(lv);
-                                }
-                                break;
-                            }
-                            case INT: {
-                                Long lv = Longs.tryParse(v);
-                                if (lv == null) {
-                                    inserter.addNull();
-                                } else {
-                                    inserter.add(lv.intValue());
-                                }
-                                break;
-                            }
-                            case SMALLINT:
-                            case TINYINT: {
-                                Long lv = Longs.tryParse(v);
-                                if (lv == null) {
-                                    inserter.addNull();
-                                } else {
-                                    inserter.add(lv.shortValue());
-                                }
-                                break;
-                            }
-                            }
-                        } catch (Exception e) {
-                            llc.log("Failed to insert value in Tableau for col=" + columns.get(colIdx).getName() + " v=" + v + " e=" +
-                                    ExceptionUtils.getMessageWithCauses(e));
-                            inserter.addNull();
-                        }
-                    }
-                }
-                inserter.endRow();
+                addRowToInserter(inserter, r);
             }
             logger.info("Doing final execute");
             inserter.execute();
@@ -260,6 +182,67 @@ public class TableauExporter implements CustomExporter  {
                     this.tableauTempTable.getTableName());
         long rowsAffected = connection.executeCommand(sqlCommand).getAsLong();
             logger.info(rowsAffected + " rows transferred to the final table.");
+        }
+    }
+
+    private void addRowToInserter(Inserter inserter, Row r) {
+        for (int i = 0; i < columns.size(); i++) {
+            String value = r.get(columns.get(i));
+            if (value == null) {
+                inserter.addNull();
+            } else {
+                try {
+                    addValueToInserter(inserter, value, types.get(i));
+                } catch (Exception e) {
+                    llc.log("Failed to insert value in Tableau for col=" + columns.get(i).getName() + " v=" + value + " e=" +
+                            ExceptionUtils.getMessageWithCauses(e));
+                    inserter.addNull();
+                }
+            }
+        }
+        inserter.endRow();
+    }
+
+    private void addValueToInserter(Inserter inserter, String value, Type type) {
+        switch (type) {
+            case GEOMETRY:
+            case ARRAY:
+            case MAP:
+            case OBJECT:
+            case STRING:
+            case GEOPOINT:
+                inserter.add(value);
+                break;
+            case DATE:
+                inserter.add(OffsetDateTime.parse(value));
+                break;
+            case DATETIMENOTZ:
+                inserter.add(parseWithMultipleFormatters(value, dateTimeNoTZFormatters, LocalDateTime::parse));
+                break;
+            case DATEONLY:
+                inserter.add(LocalDate.parse(value));
+                break;
+            case FLOAT:
+            case DOUBLE:
+                Double dv = Doubles.tryParse(value);
+                if (dv != null) inserter.add(dv); else inserter.addNull();
+                break;
+            case BOOLEAN:
+                inserter.add(Boolean.parseBoolean(value));
+                break;
+            case BIGINT:
+                Long lvBig = Longs.tryParse(value);
+                if (lvBig != null) inserter.add(lvBig); else inserter.addNull();
+                break;
+            case INT:
+                Long lvInt = Longs.tryParse(value);
+                if (lvInt != null) inserter.add(lvInt.intValue()); else inserter.addNull();
+                break;
+            case SMALLINT:
+            case TINYINT:
+                Long lvShort = Longs.tryParse(value);
+                if (lvShort != null) inserter.add(lvShort.shortValue()); else inserter.addNull();
+                break;
         }
     }
 
