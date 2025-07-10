@@ -45,6 +45,22 @@ public class TableauExporter implements CustomExporter  {
     private static DKULogger logger = DKULogger.getLogger("dku.export.tableau");
     private static LimitedLogContext llc = LimitedLogFactory.get(logger, "dku.export.tableau.errors");
 
+    private ColumnFactory cf;
+    private Schema schema;
+    private HyperProcess process;
+    private Connection connection;
+    private TableDefinition tableauTable;
+    private TableDefinition tableauTempTable;
+    private boolean isGeoTable = false;
+    private List<Column> columns;
+    private List<Type> types;
+
+
+    private final DateTimeFormatter[] dateTimeNoTZFormatters = new DateTimeFormatter[]{
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    };
+
     private SqlType getTableauType(SchemaColumn dssColumn) {
         switch (dssColumn.getType()) {
         case STRING:
@@ -82,6 +98,12 @@ public class TableauExporter implements CustomExporter  {
         this.cf = cf;
         this.schema = schema;
         this.isGeoTable = schema.getColumns().stream().anyMatch(col -> col.getType() == Type.GEOPOINT);
+        this.columns = new ArrayList<>();
+        this.types = new ArrayList<>();
+        for (SchemaColumn sc : schema.getColumns()) {
+            this.columns.add(cf.getColumn(sc.getName()));
+            this.types.add(sc.getType());
+        }
 
         Thread.currentThread().setContextClassLoader(TableauExporter.class.getClassLoader());
 
@@ -126,19 +148,6 @@ public class TableauExporter implements CustomExporter  {
         }
     }
 
-    private ColumnFactory cf;
-    private Schema schema;
-    private HyperProcess process;
-    private Connection connection;
-    private TableDefinition tableauTable;
-    private TableDefinition tableauTempTable;
-    private boolean isGeoTable = false;
-
-    private final DateTimeFormatter[] dateTimeNoTZFormatters = new DateTimeFormatter[]{
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-    };
-
     private static <T> T parseWithMultipleFormatters(
             String input,
             DateTimeFormatter[] formatters,
@@ -156,25 +165,12 @@ public class TableauExporter implements CustomExporter  {
 
     @Override
     public void stream(RowInputStream stream) throws Exception {
-        List<Type> types = new ArrayList<>();
-        List<Column> columns = new ArrayList<>();
-        for (SchemaColumn sc : schema.getColumns()) {
-            columns.add(cf.getColumn(sc.getName()));
-            types.add(sc.getType());
-        }
-
         TableDefinition targetTableForInserter = this.isGeoTable ? this.tableauTempTable : this.tableauTable;
 
         try (Inserter inserter = new Inserter(connection, targetTableForInserter)) {
-            while (true) {
-                Row r = stream.next();
-                if (r == null) {
-                    break;
-                }
-
+            for (Row r; (r = stream.next()) != null; ) {
                 for (int colIdx = 0; colIdx < columns.size(); colIdx++) {
-                    Column c = columns.get(colIdx);
-                    String v = r.get(c);
+                    String v = r.get(columns.get(colIdx));
                     if (v == null) {
                         inserter.addNull();
                     } else {
@@ -184,27 +180,21 @@ public class TableauExporter implements CustomExporter  {
                             case ARRAY:
                             case MAP:
                             case OBJECT:
-                            case STRING: {
-                                inserter.add(v);
-                                break;
-                            }
+                            case STRING:
                             case GEOPOINT: {
                                 inserter.add(v);
                                 break;
                             }
                             case DATE: {
-                                OffsetDateTime odt = OffsetDateTime.parse(v);
-                                inserter.add(odt);
+                                inserter.add(OffsetDateTime.parse(v));
                                 break;
                             }
                             case DATETIMENOTZ: {
-                                LocalDateTime odt = parseWithMultipleFormatters(v,dateTimeNoTZFormatters, LocalDateTime::parse);
-                                inserter.add(odt);
+                                inserter.add(parseWithMultipleFormatters(v,dateTimeNoTZFormatters, LocalDateTime::parse));
                                 break;
                             }
                             case DATEONLY: {
-                                LocalDate ld = LocalDate.parse(v);
-                                inserter.add(ld);
+                                inserter.add(LocalDate.parse(v));
                                 break;
                             }
                             case FLOAT:
