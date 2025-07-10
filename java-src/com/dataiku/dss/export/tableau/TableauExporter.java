@@ -185,7 +185,7 @@ public class TableauExporter implements CustomExporter  {
         }
     }
 
-    private void addRowToInserter(Inserter inserter, Row r) {
+    private void addRowToInserter(Inserter inserter, Row r) throws Exception {
         for (int i = 0; i < columns.size(); i++) {
             String value = r.get(columns.get(i));
             if (value == null) {
@@ -194,9 +194,10 @@ public class TableauExporter implements CustomExporter  {
                 try {
                     addValueToInserter(inserter, value, types.get(i));
                 } catch (Exception e) {
-                    llc.log("Failed to insert value in Tableau for col=" + columns.get(i).getName() + " v=" + value + " e=" +
-                            ExceptionUtils.getMessageWithCauses(e));
-                    inserter.addNull();
+                    String errorMessage = "Failed to insert value in Tableau for col=" + columns.get(i).getName() + " v=" + value + " e=" +
+                            ExceptionUtils.getMessageWithCauses(e);
+                    llc.log(errorMessage);
+                    throw new Exception(errorMessage, e);
                 }
             }
         }
