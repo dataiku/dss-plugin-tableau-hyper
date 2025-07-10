@@ -49,86 +49,112 @@ import com.tableau.hyperapi.TableName;
 import com.tableau.hyperapi.Telemetry;
 
 public class TableauUploadExporter extends TableauExporter  {
-    CustomPythonExportersService customPythonExporterService;
-    IPluginsRegistryService pluginsService;
-    File pluginDir;
-    JsonObject config;
-    JsonObject pluginSettings;
-    File destinationFile;
+    private static final DKULogger logger = DKULogger.getLogger("dku.export.tableau.server");
+    
+    private CustomPythonExportersService customPythonExporterService;
+    private IPluginsRegistryService pluginsService;
+    private ICodeEnvResolutionService codeEnvService;
+    private File pluginDir;
+    private JsonObject config;
+    private JsonObject pluginSettings;
+    private File destinationFile;
+    private AutoDelete tmpDir;
+    private String envName;
 
-    AutoDelete tmpDir;
     @Override
     public void initialize(JsonObject config, JsonObject pluginSettings, Schema schema, ColumnFactory cf, File destinationFile) throws Exception {
         tmpDir = DSSTempUtils.getTempFolder("tableau-upload");
 
         String outputTableName = config.get("output_table") == null ? "DSS_extract" : config.get("output_table").getAsString();
-
         outputTableName = outputTableName.replaceAll("[^A-Za-z0-9_]*","");
-
         destinationFile = DKUFileUtils.getWithin(tmpDir, outputTableName + ".hyper");
 
         super.initialize(config, pluginSettings, schema, cf, destinationFile);
 
-        customPythonExporterService = SpringUtils.getBean(CustomPythonExportersService.class);
-        pluginsService = SpringUtils.getBean(IPluginsRegistryService.class);
-        pluginDir = pluginsService.getActualPluginFolder("tableau-hyper-export");
-
+        initializeServices();
+        
         this.config = config;
         this.pluginSettings = pluginSettings;
         this.destinationFile = destinationFile;
-
+        this.envName = new CodeEnvSelector().selectForCustomPythonRecipe("tableau-hyper-export");
     }
+
+    private void initializeServices() throws Exception {
+        try {
+            customPythonExporterService = SpringUtils.getBean(CustomPythonExportersService.class);
+            pluginsService = SpringUtils.getBean(IPluginsRegistryService.class);
+            codeEnvService = SpringUtils.getBean(ICodeEnvResolutionService.class);
+            pluginDir = pluginsService.getActualPluginFolder("tableau-hyper-export");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize required services", e);
+        }
+    }
+
     @Override
     public void close() {
+        if (tmpDir != null) {
+            try {
+                tmpDir.close();
+            } catch (Exception e) {
+                logger.warn("Failed to cleanup temporary directory", e);
+            }
+        }
     }
 
     public void stream(RowInputStream stream) throws Exception {
-        super.stream(stream);
-
-        super.close();
-
         try {
-            JsonObject uploaderConfig = new JsonObject();
-
-            uploaderConfig.add("config", config);
-
-            uploaderConfig.addProperty("hyperFilePath", destinationFile.getAbsolutePath());
-
-            JSON.prettyToFile(uploaderConfig, DKUFileUtils.getWithin(tmpDir, "uploader_config.json"));
-
-            String envName = new CodeEnvSelector().selectForCustomPythonRecipe("tableau-hyper-export");
-
-            logger.info("envName= " + envName);
-
-            ProcessBuilder pb = new ProcessBuilder();
-
-
-            List<String> pyCmd =  SpringUtils.getBean(ICodeEnvResolutionService.class).
-                    getPythonCmd(envName, "N/A", Lists.newArrayList(
-                            DKUFileUtils.getWithin(pluginDir, "java-driven-uploader", "uploader.py").getAbsolutePath()
-                    ));
-
-            pb.command(pyCmd);
-
-            KernelUtils.handlePythonAndRPath(null, null, false,
-                    ImmutableMap.of("plugin-lib", pluginsService.getPluginPythonlibFolder("tableau-hyper-export").getAbsolutePath()),
-                    tmpDir, false, pb);
-
-            pb.directory(tmpDir);
-
-            //Map<String, String> env = new HashMap<>();
-
-            logger.info("Executing pyCmd: " + JSON.json(pyCmd));
-            logger.info("ENV: " + JSON.json(pb.environment()));
-
-            DKUtils.execAndLogThrows(pb);
-
-            logger.info("Execution complete!");
-
+            processDataStream(stream);
+            createUploaderConfig();
+            executePythonUploader();
+            logger.info("Upload to Tableau completed successfully");
+        } catch (IOException e) {
+            throw new RuntimeException("IO error during Tableau upload", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Upload process was interrupted", e);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to upload to Tableau", e);
+            throw new RuntimeException("Failed to upload to Tableau: " + e.getMessage(), e);
         }
-
     }
-    private static DKULogger logger = DKULogger.getLogger("dku.export.tableau.server");
+
+    private void processDataStream(RowInputStream stream) throws Exception {
+        super.stream(stream);
+        super.close();
+    }
+
+    private void createUploaderConfig() throws IOException {
+        JsonObject uploaderConfig = new JsonObject();
+        uploaderConfig.add("config", config);
+        uploaderConfig.addProperty("hyperFilePath", destinationFile.getAbsolutePath());
+        JSON.prettyToFile(uploaderConfig, DKUFileUtils.getWithin(tmpDir, "uploader_config.json"));
+    }
+
+    private void executePythonUploader() throws Exception {
+        ProcessBuilder pb = createProcessBuilder();
+        logger.info("Executing Python uploader");
+        logProcessInfo(pb);
+        DKUtils.execAndLogThrows(pb);
+    }
+
+    private ProcessBuilder createProcessBuilder() throws IOException {
+        List<String> pyCmd = codeEnvService.getPythonCmd(envName, "N/A", Lists.newArrayList(
+                DKUFileUtils.getWithin(pluginDir, "java-driven-uploader", "uploader.py").getAbsolutePath()
+        ));
+
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.command(pyCmd);
+        pb.directory(tmpDir);
+
+        KernelUtils.handlePythonAndRPath(null, null, false,
+                ImmutableMap.of("plugin-lib", pluginsService.getPluginPythonlibFolder("tableau-hyper-export").getAbsolutePath()),
+                tmpDir, false, pb);
+
+        return pb;
+    }
+
+    private void logProcessInfo(ProcessBuilder pb) {
+        logger.info("Python command: " + pb.command().get(0) + " <script>");
+        logger.info("Working directory: " + pb.directory().getAbsolutePath());
+        logger.info("Environment name: " + envName);
+    }
 }
