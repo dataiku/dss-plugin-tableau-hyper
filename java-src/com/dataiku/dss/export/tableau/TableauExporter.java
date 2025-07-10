@@ -248,7 +248,8 @@ public class TableauExporter implements CustomExporter  {
                 inserter.add(OffsetDateTime.parse(value));
                 break;
             case DATETIMENOTZ:
-                inserter.add(parseWithMultipleFormatters(value, dateTimeNoTZFormatters, LocalDateTime::parse));
+                LocalDateTime dateTime = parseWithMultipleFormatters(value, dateTimeNoTZFormatters, LocalDateTime::parse);
+                inserter.add(dateTime.toLocalTime());
                 break;
             case DATEONLY:
                 inserter.add(LocalDate.parse(value));
