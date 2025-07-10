@@ -145,12 +145,17 @@ public class TableauUploadExporter extends TableauExporter  {
         pb.command(pyCmd);
         pb.directory(tmpDir);
 
-        KernelUtils.handlePythonAndRPath(null, null, false,
+        try {
+            KernelUtils.handlePythonAndRPath(null, null, false,
                 ImmutableMap.of("plugin-lib", pluginsService.getPluginPythonlibFolder("tableau-hyper-export").getAbsolutePath()),
                 tmpDir, false, pb);
+        } catch (Exception e) {
+            throw new RuntimeException("Security error while setting up Python path", e);
+        }
 
         return pb;
     }
+
 
     private void logProcessInfo(ProcessBuilder pb) {
         logger.info("Python command: " + pb.command().get(0) + " <script>");
