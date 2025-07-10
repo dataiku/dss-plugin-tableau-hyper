@@ -9,7 +9,7 @@ if [ -z "$DIP_HOME" ]; then
     exit 1
 fi
 
-HYPERD_BINARY_PATH="$DIP_HOME/java-lib/hyper/hyperd"
+HYPERD_BINARY_PATH="$DIP_HOME/plugins/installed/tableau-hyper-export/java-lib/hyper/hyperd"
 
 echo "[Plugin Install] Checking for binary at: $HYPERD_BINARY_PATH"
 
