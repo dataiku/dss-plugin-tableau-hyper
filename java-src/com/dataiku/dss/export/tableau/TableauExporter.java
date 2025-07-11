@@ -38,8 +38,6 @@ import com.tableau.hyperapi.SqlType;
 import com.tableau.hyperapi.TableDefinition;
 import com.tableau.hyperapi.TableName;
 import com.tableau.hyperapi.Telemetry;
-import com.tableau.hyperapi.impl.SharedLibraryProvider;
-import java.util.ServiceLoader;
 
 public class TableauExporter implements CustomExporter  {
     private static DKULogger logger = DKULogger.getLogger("dku.export.tableau");
@@ -98,12 +96,6 @@ public class TableauExporter implements CustomExporter  {
         this.cf = cf;
         this.schema = schema;
         this.isGeoTable = schema.getColumns().stream().anyMatch(col -> col.getType() == Type.GEOPOINT);
-        this.columns = new ArrayList<>();
-        this.types = new ArrayList<>();
-        for (SchemaColumn sc : schema.getColumns()) {
-            this.columns.add(cf.getColumn(sc.getName()));
-            this.types.add(sc.getType());
-        }
 
         Thread.currentThread().setContextClassLoader(TableauExporter.class.getClassLoader());
 
@@ -173,6 +165,13 @@ public class TableauExporter implements CustomExporter  {
 
     @Override
     public void stream(RowInputStream stream) throws Exception {
+        this.columns = new ArrayList<>();
+        this.types = new ArrayList<>();
+        for (SchemaColumn sc : this.schema.getColumns()) {
+            this.columns.add(this.cf.getColumn(sc.getName()));
+            this.types.add(sc.getType());
+        }
+
         if (this.isGeoTable) {
             streamWithGeoProcessing(stream);
         } else {
@@ -215,7 +214,7 @@ public class TableauExporter implements CustomExporter  {
                 this.tableauTempTable.getTableName());
     }
 
-    private void addRowToInserter(Inserter inserter, Row r) throws Exception {
+    private void addRowToInserter(Inserter inserter, Row r) {
         for (int i = 0; i < columns.size(); i++) {
             String value = r.get(columns.get(i));
             if (value == null) {
@@ -224,10 +223,9 @@ public class TableauExporter implements CustomExporter  {
                 try {
                     addValueToInserter(inserter, value, types.get(i));
                 } catch (Exception e) {
-                    String errorMessage = "Failed to insert value in Tableau for col=" + columns.get(i).getName() + " v=" + value + " e=" +
-                            ExceptionUtils.getMessageWithCauses(e);
-                    llc.log(errorMessage);
-                    throw new Exception(errorMessage, e);
+                    llc.log("Failed to insert value in Tableau for col=" + columns.get(i).getName() + " v=" + value + " e=" +
+                            ExceptionUtils.getMessageWithCauses(e));
+                    inserter.addNull();
                 }
             }
         }
@@ -249,7 +247,7 @@ public class TableauExporter implements CustomExporter  {
                 break;
             case DATETIMENOTZ:
                 LocalDateTime dateTime = parseWithMultipleFormatters(value, dateTimeNoTZFormatters, LocalDateTime::parse);
-                inserter.add(dateTime.toLocalTime());
+                inserter.add(dateTime);
                 break;
             case DATEONLY:
                 inserter.add(LocalDate.parse(value));
