@@ -157,7 +157,7 @@ public class TableauExporter implements CustomExporter  {
             try {
                 return parser.apply(input, formatter);
             } catch (DateTimeParseException e) {
-                // Continue trying
+                logger.debug("Failed to parse '" + input + "' with formatter " + formatter.toString() + ": " + e.getMessage());
             }
         }
         throw new IllegalArgumentException("Could not parse input: " + input);
