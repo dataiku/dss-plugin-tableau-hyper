@@ -299,6 +299,7 @@ public class TableauExporter implements CustomExporter  {
             if (this.isGeoTable && this.tableauTempTable != null) {
                 try {
                     connection.executeCommand("DROP TABLE " + this.tableauTempTable.getTableName());
+                    connection.getCatalog().dropTable(this.tableauTempTable.getTableName());
                 } catch (Exception e) {
                     logger.error("Failed to drop temporary geo table.", e);
                 }
