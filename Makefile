@@ -11,7 +11,7 @@ HYPER_API_ZIP_FILE := tableauhyperapi.zip
 HYPERD_TARGET_BINARY := java-lib/hyper/hyperd
 
 $(HYPERD_TARGET_BINARY):
-	@echo "[DEPENDENCY] Tableau Hyper API binary not found. Downloading..."
+	@echo "[DEPENDENCY] Downloading Tableau Hyper API binary..."
 	@mkdir -p $(dir $(HYPERD_TARGET_BINARY))
 	@curl -L -o $(HYPER_API_ZIP_FILE) $(HYPER_API_ZIP_URL)
 	@mkdir -p tmp_unzip
