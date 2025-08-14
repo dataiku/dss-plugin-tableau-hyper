@@ -165,7 +165,6 @@ class TableauTableWriter(object):
             logger.info("Closing Tableau Hyper connections...")
             if self.is_geo_table:
                 self.connection.execute_command(command=f"DROP TABLE {self.tmp_table_definition.table_name};")
-                self.connection.catalog.drop_table(self.tmp_table_definition.table_name)
         except Exception as err:
             logger.warning("Failed to perform writing on the last rows")
             raise err
