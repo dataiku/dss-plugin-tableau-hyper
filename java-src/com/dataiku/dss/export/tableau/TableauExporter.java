@@ -62,7 +62,6 @@ public class TableauExporter implements CustomExporter  {
     private SqlType getTableauType(SchemaColumn dssColumn) {
         switch (dssColumn.getType()) {
         case STRING:
-        case GEOMETRY:
         case ARRAY:
         case MAP:
         case OBJECT:
@@ -74,6 +73,7 @@ public class TableauExporter implements CustomExporter  {
         case DATEONLY:
             return SqlType.date();
         case GEOPOINT:
+        case GEOMETRY:
             return SqlType.geography();
         case DOUBLE:
         case FLOAT:
@@ -95,7 +95,7 @@ public class TableauExporter implements CustomExporter  {
     public void initialize(JsonObject config, JsonObject pluginSettings, Schema schema, ColumnFactory cf, File destinationFile) throws Exception {
         this.cf = cf;
         this.schema = schema;
-        this.isGeoTable = schema.getColumns().stream().anyMatch(col -> col.getType() == Type.GEOPOINT);
+        this.isGeoTable = schema.getColumns().stream().anyMatch(col -> col.getType() == Type.GEOPOINT || col.getType() == Type.GEOMETRY);
 
         Thread.currentThread().setContextClassLoader(TableauExporter.class.getClassLoader());
 
@@ -112,7 +112,7 @@ public class TableauExporter implements CustomExporter  {
         if (this.isGeoTable) {
             List<TableDefinition.Column> tempColumns = schema.getColumns().stream()
                     .map(dssColumn -> {
-                        SqlType type = (dssColumn.getType() == Type.GEOPOINT) ? SqlType.text() : getTableauType(dssColumn);
+                        SqlType type = (dssColumn.getType() == Type.GEOPOINT || dssColumn.getType() == Type.GEOMETRY) ? SqlType.text() : getTableauType(dssColumn);
                         return new TableDefinition.Column(dssColumn.getName(), type, Nullability.NULLABLE);
                     })
                     .collect(Collectors.toList());
@@ -212,7 +212,7 @@ public class TableauExporter implements CustomExporter  {
         List<String> selectColumns = new ArrayList<>();
         
         for (SchemaColumn dssColumn : this.schema.getColumns()) {
-            if (dssColumn.getType() == Type.GEOPOINT) {
+            if (dssColumn.getType() == Type.GEOPOINT || dssColumn.getType() == Type.GEOMETRY) {
                 selectColumns.add(String.format("CAST(\"%s\" AS TABLEAU.TABGEOGRAPHY)", dssColumn.getName()));
             } else {
                 selectColumns.add(String.format("\"%s\"", dssColumn.getName()));

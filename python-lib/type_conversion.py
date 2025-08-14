@@ -102,7 +102,7 @@ class TypeConversion(object):
             'datetimenotz': (SqlType.timestamp(), handle_null(to_hyper_timestamp)),
             'double': (SqlType.double(), handle_null(float)),
             'float': (SqlType.double(), handle_null(float)),
-            'geometry': (SqlType.text(), handle_null(str)),
+            'geometry': (SqlType.geography(), handle_null(to_hyper_geography)),
             'geopoint': (SqlType.geography(), handle_null(to_hyper_geography)),
             'int': (SqlType.int(), handle_null(int)),
             'map': (SqlType.text(), handle_null(str)),

@@ -24,7 +24,7 @@ def dss_is_geo(dss_schema):
 
     """
     for column in dss_schema['columns']:
-        if column['type'] == 'geopoint':
+        if column['type'] in ['geopoint', 'geometry']:
             return True
     return False
 
@@ -44,7 +44,7 @@ def geo_to_text(dss_schema):
     regular_schema = copy.deepcopy(dss_schema)
     for typed_column in regular_schema['columns']:
         name, dss_type = typed_column['name'], typed_column['type']
-        if dss_type == 'geopoint':
+        if dss_type in ['geopoint', 'geometry']:
             typed_column['type'] = 'string'
     return regular_schema
 
