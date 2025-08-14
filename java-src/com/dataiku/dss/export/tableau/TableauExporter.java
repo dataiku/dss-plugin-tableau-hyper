@@ -240,7 +240,8 @@ public class TableauExporter implements CustomExporter  {
             case OBJECT:
             case STRING:
             case GEOPOINT:
-                inserter.add(value);
+                String geoValue = value.toLowerCase();
+                inserter.add(geoValue);
                 break;
             case DATE:
                 inserter.add(OffsetDateTime.parse(value));
