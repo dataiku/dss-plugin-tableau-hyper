@@ -209,8 +209,19 @@ public class TableauExporter implements CustomExporter  {
     }
 
     private String buildInsertFromTempTableSql() {
-        return String.format("INSERT INTO %s SELECT * FROM %s",
+        List<String> selectColumns = new ArrayList<>();
+        
+        for (SchemaColumn dssColumn : this.schema.getColumns()) {
+            if (dssColumn.getType() == Type.GEOPOINT) {
+                selectColumns.add(String.format("CAST(\"%s\" AS TABLEAU.TABGEOGRAPHY)", dssColumn.getName()));
+            } else {
+                selectColumns.add(String.format("\"%s\"", dssColumn.getName()));
+            }
+        }
+        
+        return String.format("INSERT INTO %s SELECT %s FROM %s",
                 this.tableauTable.getTableName(),
+                String.join(", ", selectColumns),
                 this.tableauTempTable.getTableName());
     }
 
