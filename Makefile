@@ -24,7 +24,11 @@ $(HYPERD_TARGET_BINARY):
 
 download-deps: $(HYPERD_TARGET_BINARY)
 
-plugin: $(HYPERD_TARGET_BINARY)
+build:
+	@ant clean
+	@ant
+
+plugin: $(HYPERD_TARGET_BINARY) build
 	@echo "[START] Archiving plugin to dist/ folder..."
 	@rm -rf dist
 	@mkdir dist

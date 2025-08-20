@@ -5,6 +5,7 @@
 
     <target name="clean">
         <delete dir="${build.dir}" />
+        <delete file="${dist.dir}/dss-plugin-tableau-hyper-export.jar" />
     </target>
 
     <target name="jar">
