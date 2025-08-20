@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 0.4.0](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.4.0) - Feature release - 2025-08
+
+- New exporter working only on linux to speed up export time
+
 ## [Version 0.3.0](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.3.0) - Bugfix release - 2025-03-17
 
 - Add DSS 13.4 new date types
