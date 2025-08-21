@@ -1,6 +1,6 @@
 {
     "meta" : {
-        "label" : "To Tableau Hyper extract - Legacy",
+        "label" : "To Tableau Hyper extract",
         "description": "This exporter produces hyper (Tableau extract) files which you can then download to your local machine. Beware, that this plugin is incompatible with previous TDE plugin export and will make it unusable."
     },
 
@@ -13,7 +13,7 @@
 
     "exportOptions": [
         {
-            "label" : "Tableau hyper extract (.hyper) - Legacy",
+            "label" : "Tableau hyper extract (.hyper)",
             "compression" : "NONE"
         }
     ],

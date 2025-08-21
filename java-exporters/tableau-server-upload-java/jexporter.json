@@ -1,6 +1,6 @@
 {
     "meta" : {
-    "label" : "To Tableau server - New",
+    "label" : "To Tableau server - Java exporter",
     "description": "This exporter uploads data to a Tableau server with the Hyper format"
     },
 
@@ -8,7 +8,7 @@
     "exportBehavior": "MANAGES_OUTPUT",
     "exportOptions": [
          {
-            "label" : "Upload to Tableau Server - New"
+            "label" : "Upload to Tableau Server - Java exporter"
         }
     ],
     

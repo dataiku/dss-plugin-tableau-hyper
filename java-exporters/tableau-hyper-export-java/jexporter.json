@@ -1,6 +1,6 @@
 {
     "meta" : {
-        "label": "To Hyper Extract - New",
+        "label": "To Hyper Extract - Java exporter",
         "description": "This exporter produces hyper (Tableau extract) files which you can then download to your local machine"
 
     },
@@ -15,7 +15,7 @@
 
     "exportOptions": [
          {
-            "label" : "Tableau HyperExtract (.hyper) - New",
+            "label" : "Tableau HyperExtract (.hyper) - Java exporter",
             "compression" : "NONE"
         }
     ],
