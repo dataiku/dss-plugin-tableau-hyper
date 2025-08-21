@@ -59,6 +59,12 @@ public class TableauExporter implements CustomExporter  {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     };
 
+    private final DateTimeFormatter[] offsetDateTimeFormatters = new DateTimeFormatter[]{
+            DateTimeFormatter.ISO_OFFSET_DATE_TIME,
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXX"),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXX")
+    };
+
     private SqlType getTableauType(SchemaColumn dssColumn) {
         switch (dssColumn.getType()) {
         case STRING:
@@ -255,7 +261,8 @@ public class TableauExporter implements CustomExporter  {
                 inserter.add(geoValue);
                 break;
             case DATE:
-                inserter.add(OffsetDateTime.parse(value));
+                OffsetDateTime offsetDateTime = parseWithMultipleFormatters(value, offsetDateTimeFormatters, OffsetDateTime::parse);
+                inserter.add(offsetDateTime);
                 break;
             case DATETIMENOTZ:
                 LocalDateTime dateTime = parseWithMultipleFormatters(value, dateTimeNoTZFormatters, LocalDateTime::parse);
