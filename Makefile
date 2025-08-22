@@ -67,7 +67,7 @@ integration-tests: $(HYPERD_TARGET_BINARY)
 		source env/bin/activate; \
 		pip3 install --upgrade pip;\
 		pip install --no-cache-dir -r tests/python/integration/requirements.txt; \
-		pytest tests/python/integration --alluredir=tests/allure_report --exclude-dss-targets="DSS11" || ret=$$?; exit $$ret \
+		pytest tests/python/integration --alluredir=tests/allure_report || ret=$$?; exit $$ret \
 	)
 
 tests: unit-tests integration-tests
