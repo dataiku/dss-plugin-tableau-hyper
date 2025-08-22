@@ -227,6 +227,105 @@ class TestTableauTableWriter(TestCase):
 
         os.remove(destination_file_path)
 
+    def test_export_geometry_values(self):
+        """
+        Test the export of geometry values (DSS geometry storage type)
+        :return:
+        """
+        nan = float("nan")
+
+        # ===> Define parameters input from DSS for exporter
+        config = {}
+        plugin_config = {}
+        schema = {'columns': [{'name': 'id', 'type': 'bigint'}, {'name': 'name', 'type': 'string'},
+                              {'name': 'area', 'type': 'geometry'}], 'userModified': True}
+        rows = [
+            (1, 'Complex Area', 'MULTIPOLYGON(((0 0,4 0,4 4,0 4,0 0),(1 1,2 1,2 2,1 2,1 1)))'),
+            (2, 'Simple Area', 'POLYGON((0 0,3 0,3 3,0 3,0 0))'),
+            (3, 'No Area', nan)
+        ]
+        # <===
+
+        # ===> Create a DSS-like exporter
+        exporter = TableauHyperExporter(config, plugin_config)
+        exporter.writer.batch_size = 1
+        output_file_name = get_random_alphanumeric_string(10) + '.hyper'
+        destination_file_path = os.path.join(self.output_path, output_file_name)
+        exporter.open_to_file(schema, destination_file_path)
+        for row in rows:
+            exporter.write_row(row)
+        exporter.close()
+
+        with get_hyper_process() as hyper:
+            with Connection(endpoint=hyper.endpoint, database=destination_file_path) as connection:
+                with connection.execute_query(query=f"SELECT * FROM {TableName('Extract', 'Extract')}") as result:
+                    rows_from_hyper = list(result)
+
+        assert len(rows) == len(rows_from_hyper)
+
+        count = 0
+        valid = 0
+        for i in range(len(rows)):
+            row_dss, row_hyper = rows[i], rows_from_hyper[i]
+            for j in range(len(row_dss)):
+                a, b = row_dss[j], row_hyper[j]
+                if (pd.isna(a) and pd.isna(b)) or (a == b):
+                    valid += 1
+                count += 1
+
+        os.remove(destination_file_path)
+
+    def test_export_various_date_formats(self):
+        """
+        Test export of various date formats
+        :return:
+        """
+        nan = float("nan")
+
+        # ===> Define parameters input from DSS for exporter
+        config = {}
+        plugin_config = {}
+        schema = {'columns': [{'name': 'id', 'type': 'bigint'},
+                              {'name': 'date_only', 'type': 'dateonly'},
+                              {'name': 'datetime_tz', 'type': 'date'},
+                              {'name': 'datetime_notz', 'type': 'datetimenotz'}], 'userModified': True}
+        rows = [
+            (1, '2025-01-31', '2025-01-31T01:02:03+0200', '2025-01-31 01:02:03'),
+            (2, '2013-05-30', '2013-05-30T15:16:13.764+0200', '2013-05-30T15:16:13'),
+            (3, '2024-12-25', '2013-05-30T15:16:13.764Z', '2024-12-25 23:59:59'),
+            (4, nan, nan, nan)
+        ]
+        # <===
+
+        # ===> Create a DSS-like exporter
+        exporter = TableauHyperExporter(config, plugin_config)
+        exporter.writer.batch_size = 1
+        output_file_name = get_random_alphanumeric_string(10) + '.hyper'
+        destination_file_path = os.path.join(self.output_path, output_file_name)
+        exporter.open_to_file(schema, destination_file_path)
+        for row in rows:
+            exporter.write_row(row)
+        exporter.close()
+
+        with get_hyper_process() as hyper:
+            with Connection(endpoint=hyper.endpoint, database=destination_file_path) as connection:
+                with connection.execute_query(query=f"SELECT * FROM {TableName('Extract', 'Extract')}") as result:
+                    rows_from_hyper = list(result)
+
+        assert len(rows) == len(rows_from_hyper)
+
+        count = 0
+        valid = 0
+        for i in range(len(rows)):
+            row_dss, row_hyper = rows[i], rows_from_hyper[i]
+            for j in range(len(row_dss)):
+                a, b = row_dss[j], row_hyper[j]
+                if (pd.isna(a) and pd.isna(b)) or (a == b):
+                    valid += 1
+                count += 1
+
+        os.remove(destination_file_path)
+
     def test_export_int_values(self):
         # ===> Define parameters input from DSS for exporter
         config = {}

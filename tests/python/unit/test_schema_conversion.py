@@ -27,6 +27,21 @@ class TestSchemaConversion(TestCase):
         regular_schema = geo_to_text(dss_schema)
         assert regular_schema['columns'][1]['type'] == 'string'
 
+    def test_dss_is_geo_with_geometry(self):
+        dss_schema = {"columns": [
+            {"name": "customer_id", "type": "bigint"},
+            {"name": "area", "type": "geometry"}]}
+        is_geo = dss_is_geo(dss_schema)
+        assert is_geo
+
+    def test_geometry_to_text(self):
+        dss_schema = {"columns": [
+            {"name": "customer_id", "type": "bigint"},
+            {"name": "area", "type": "geometry"}
+        ]}
+        regular_schema = geo_to_text(dss_schema)
+        assert regular_schema['columns'][1]['type'] == 'string'
+
     def test_dss_columns_to_hyper_columns(self):
         schema_converter = SchemaConversion(None)
         dss_columns = [
