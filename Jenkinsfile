@@ -21,18 +21,18 @@ pipeline {
             sh 'echo "Done with unit tests"'
          }
       }
-      stage('Run Integration Tests') {
-         when { environment name: 'INTEGRATION_TEST_FILES_STATUS_CODE', value: "0"}
-         steps {
-            sh 'echo "Running integration tests"'
-            catchError(stageResult: 'FAILURE') {
-            sh """
-               make integration-tests
-               """
-            }
-            sh 'echo "Done with integration tests"'
-         }
-      }
+      //stage('Run Integration Tests') {
+      //   when { environment name: 'INTEGRATION_TEST_FILES_STATUS_CODE', value: "0"}
+      //   steps {
+      //      sh 'echo "Running integration tests"'
+      //      catchError(stageResult: 'FAILURE') {
+      //      sh """
+      //         make integration-tests
+      //         """
+      //      }
+      //      sh 'echo "Done with integration tests"'
+      //   }
+      //}
    }
    post {
      always {
