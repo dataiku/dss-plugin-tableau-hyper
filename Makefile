@@ -41,7 +41,7 @@ plugin: $(HYPERD_TARGET_BINARY) build
 	@rm release_info.json
 	@echo "[SUCCESS] Archiving plugin to dist/ folder: Done!"
 
-unit-tests: $(HYPERD_TARGET_BINARY)
+unit-tests:
 	@echo "[START] Running unit tests..."
 	@( \
 		PYTHON_VERSION=`python3 -V 2>&1 | sed 's/[^0-9]*//g' | cut -c 1,2`; \
@@ -59,7 +59,7 @@ unit-tests: $(HYPERD_TARGET_BINARY)
 	)
 	@echo "[SUCCESS] Running unit tests: Done!"
 
-integration-tests: $(HYPERD_TARGET_BINARY)
+integration-tests:
 	@echo "Running integration tests..."
 	@( \
 		rm -rf ./env/; \
