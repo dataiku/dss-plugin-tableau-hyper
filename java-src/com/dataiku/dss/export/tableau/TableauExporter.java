@@ -65,7 +65,7 @@ public class TableauExporter implements CustomExporter  {
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXX")
     };
 
-    private SqlType getTableauType(SchemaColumn dssColumn) {
+    public SqlType getTableauType(SchemaColumn dssColumn) {
         switch (dssColumn.getType()) {
         case STRING:
         case ARRAY:
