@@ -115,9 +115,8 @@ public class TableauExporterTest {
         List<SchemaColumn> geoColumns = new ArrayList<>();
         geoColumns.add(new SchemaColumn("id", Type.INT));
         geoColumns.add(new SchemaColumn("location", Type.GEOPOINT));
-        Schema geoSchema = new Schema(geoColumns);
         
-        boolean hasGeoPoint = geoSchema.getColumns().stream()
+        boolean hasGeoPoint = geoColumns.stream()
             .anyMatch(col -> col.getType() == Type.GEOPOINT);
         Assert.assertTrue("Schema should detect geopoint column", hasGeoPoint);
 
@@ -125,9 +124,8 @@ public class TableauExporterTest {
         List<SchemaColumn> geometryColumns = new ArrayList<>();
         geometryColumns.add(new SchemaColumn("id", Type.INT));
         geometryColumns.add(new SchemaColumn("area", Type.GEOMETRY));
-        Schema geometrySchema = new Schema(geometryColumns);
         
-        boolean hasGeometry = geometrySchema.getColumns().stream()
+        boolean hasGeometry = geometryColumns.stream()
             .anyMatch(col -> col.getType() == Type.GEOMETRY);
         Assert.assertTrue("Schema should detect geometry column", hasGeometry);
 
@@ -135,9 +133,8 @@ public class TableauExporterTest {
         List<SchemaColumn> regularColumns = new ArrayList<>();
         regularColumns.add(new SchemaColumn("id", Type.INT));
         regularColumns.add(new SchemaColumn("name", Type.STRING));
-        Schema regularSchema = new Schema(regularColumns);
         
-        boolean hasGeoTypes = regularSchema.getColumns().stream()
+        boolean hasGeoTypes = regularColumns.stream()
             .anyMatch(col -> col.getType() == Type.GEOPOINT || col.getType() == Type.GEOMETRY);
         Assert.assertFalse("Regular schema should not have geo types", hasGeoTypes);
     }
