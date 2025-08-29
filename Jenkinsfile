@@ -5,8 +5,26 @@ pipeline {
    agent { label 'dss-plugin-tests'}
    environment {
         PLUGIN_INTEGRATION_TEST_INSTANCE="$HOME/instance_config.json"
+        DKU_INSTALL_DIR = "${WORKSPACE}/dataiku-dss-14.1.0"
    }
    stages {
+      stage('Download DSS') {
+         steps {
+            sh 'echo "Downloading DSS"'
+            sh '''
+               DSS_URL="https://cdn.downloads.dataiku.com/public/studio/14.1.0/dataiku-dss-14.1.0.tar.gz"
+               
+               echo "Downloading DSS (version 14.1.0)"
+               wget -q ${DSS_URL} -O dataiku-dss.tar.gz
+               
+               echo "Extracting DSS"
+               tar -xzf dataiku-dss.tar.gz
+               
+               echo "DSS installed in: ${DKU_INSTALL_DIR}"
+            '''
+            sh 'echo "Done downloading DSS"'
+         }
+      }
       stage('Run Unit Tests') {
          steps {
             sh 'echo "Running unit tests"'

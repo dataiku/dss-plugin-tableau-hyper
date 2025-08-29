@@ -41,8 +41,22 @@ plugin: $(HYPERD_TARGET_BINARY) build
 	@rm release_info.json
 	@echo "[SUCCESS] Archiving plugin to dist/ folder: Done!"
 
-unit-tests:
-	@echo "[START] Running unit tests..."
+unit-tests: java-unit-tests python-unit-tests
+	@echo "[SUCCESS] All unit tests completed!"
+
+java-unit-tests:
+	@echo "[START] Running Java unit tests..."
+	@mkdir -p tests/java-build
+	@mkdir -p tests/allure_report
+	@javac -cp "$$DKU_INSTALL_DIR/lib/ivy/backend-run/*:$$DKU_INSTALL_DIR/lib/ivy/common-run/*:$$DKU_INSTALL_DIR/lib/shadelib/*:$$DKU_INSTALL_DIR/dist/dataiku-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-app-platform.jar:$$DKU_INSTALL_DIR/dist/dataiku-dss-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-scoring.jar:$$DKU_INSTALL_DIR/dist/dataiku-dip.jar:java-lib/*" \
+		-d tests/java-build \
+		java-src/com/dataiku/dss/export/tableau/*.java tests/java/unit/*.java
+	@java -cp "tests/java-build:$$DKU_INSTALL_DIR/lib/ivy/backend-run/*:$$DKU_INSTALL_DIR/lib/ivy/common-run/*:$$DKU_INSTALL_DIR/lib/shadelib/*:$$DKU_INSTALL_DIR/dist/dataiku-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-app-platform.jar:$$DKU_INSTALL_DIR/dist/dataiku-dss-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-scoring.jar:$$DKU_INSTALL_DIR/dist/dataiku-dip.jar:java-lib/*" \
+		org.junit.runner.JUnitCore com.dataiku.dss.export.tableau.TableauExporterTest
+	@echo "[SUCCESS] Java unit tests: Done!"
+
+python-unit-tests:
+	@echo "[START] Running Python unit tests..."
 	@( \
 		PYTHON_VERSION=`python3 -V 2>&1 | sed 's/[^0-9]*//g' | cut -c 1,2`; \
 		PYTHON_VERSION_IS_CORRECT=`cat code-env/python/desc.json | python3 -c "import sys, json; print(str($$PYTHON_VERSION) in [x[-2:] for x in json.load(sys.stdin)['acceptedPythonInterpreters']]);"`; \
@@ -57,7 +71,7 @@ unit-tests:
 		export PYTHONPATH="$(PYTHONPATH):$(PWD)/python-lib"; \
 		pytest tests/python/unit --alluredir=tests/allure_report || ret=$$?; exit $$ret \
 	)
-	@echo "[SUCCESS] Running unit tests: Done!"
+	@echo "[SUCCESS] Python unit tests: Done!"
 
 integration-tests:
 	@echo "Running integration tests..."
