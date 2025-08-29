@@ -3,12 +3,11 @@ pipeline {
         disableConcurrentBuilds()
    }
    agent { label 'dss-plugin-tests'}
-   tools {
-        jdk 'openjdk-17'
-   }
    environment {
         PLUGIN_INTEGRATION_TEST_INSTANCE="$HOME/instance_config.json"
         DKU_INSTALL_DIR = "${WORKSPACE}/dataiku-dss-14.1.0"
+        JAVA_HOME = "/usr/lib/jvm/java-17-openjdk"
+        PATH = "${JAVA_HOME}/bin:${PATH}"
    }
    stages {
       stage('Download DSS') {
