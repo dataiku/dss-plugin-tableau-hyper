@@ -10,6 +10,8 @@ from tableauhyperapi import HyperProcess, Connection, Telemetry, TableName
 from tableau_server_utils import get_hyper_process
 import pandas as pd
 import tempfile
+from datetime import date, datetime
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Plugin: Testing - Tableau Hyper API | %(levelname)s - %(message)s')
@@ -289,10 +291,12 @@ class TestTableauTableWriter(TestCase):
                               {'name': 'date_only', 'type': 'dateonly'},
                               {'name': 'datetime_tz', 'type': 'date'},
                               {'name': 'datetime_notz', 'type': 'datetimenotz'}], 'userModified': True}
+
+        
         rows = [
-            (1, '2025-01-31', '2025-01-31T01:02:03+0200', '2025-01-31 01:02:03'),
-            (2, '2013-05-30', '2013-05-30T15:16:13.764+0200', '2013-05-30T15:16:13'),
-            (3, '2024-12-25', '2013-05-30T15:16:13.764Z', '2024-12-25 23:59:59'),
+            (1, date(2025, 1, 31), pd.to_datetime('2025-01-31T01:02:03+0200'), datetime(2025, 1, 31, 1, 2, 3)),
+            (2, date(2013, 5, 30), pd.to_datetime('2013-05-30T15:16:13.764+0200'), datetime(2013, 5, 30, 15, 16, 13)),
+            (3, date(2024, 12, 25), pd.to_datetime('2013-05-30T15:16:13.764Z'), datetime(2024, 12, 25, 23, 59, 59)),
             (4, nan, nan, nan)
         ]
         # <===

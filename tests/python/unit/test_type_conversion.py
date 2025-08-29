@@ -3,6 +3,8 @@ from type_conversion import TypeConversion
 from schema_conversion import SchemaConversion
 from tableauhyperapi import TypeTag, HyperProcess, Connection, Telemetry, TableName
 from unittest import TestCase
+import pandas as pd
+
 from tableau_server_utils import get_hyper_process
 
 
@@ -70,17 +72,21 @@ class TestTypeConversion(TestCase):
         
         # Test date with timezone formats
         hyper_value = type_converter.dss_value_to_hyper("2025-01-31T01:02:03+0200", 'date')
-        assert hyper_value == "2025-01-31T01:02:03+0200"
+        expected_value = pd.to_datetime("2025-01-31T01:02:03+0200")
+        assert hyper_value == expected_value
         
         hyper_value = type_converter.dss_value_to_hyper("2013-05-30T15:16:13.764+0200", 'date')
-        assert hyper_value == "2013-05-30T15:16:13.764+0200"
+        expected_value = pd.to_datetime("2013-05-30T15:16:13.764+0200")
+        assert hyper_value == expected_value
         
         hyper_value = type_converter.dss_value_to_hyper("2013-05-30T15:16:13.764Z", 'date')
-        assert hyper_value == "2013-05-30T15:16:13.764Z"
+        expected_value = pd.to_datetime("2013-05-30T15:16:13.764Z")
+        assert hyper_value == expected_value
         
-        # Test datetimenotz format
+        # Test datetimenotz format - also returns Timestamp objects
         hyper_value = type_converter.dss_value_to_hyper("2025-01-31 01:02:03", 'datetimenotz')
-        assert hyper_value == "2025-01-31 01:02:03"
+        expected_value = pd.to_datetime("2025-01-31 01:02:03")
+        assert hyper_value == expected_value
 
     def test_date_type_mappings(self):
         type_converter = TypeConversion(None)
