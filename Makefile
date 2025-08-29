@@ -10,6 +10,9 @@ HYPER_API_ZIP_URL := https://downloads.tableau.com/tssoftware//tableauhyperapi-j
 HYPER_API_ZIP_FILE := tableauhyperapi.zip
 HYPERD_TARGET_BINARY := java-lib/hyper/hyperd
 
+JUNIT_JAR := java-lib/junit-4.13.2.jar
+HAMCREST_JAR := java-lib/hamcrest-core-1.3.jar
+
 $(HYPERD_TARGET_BINARY):
 	@echo "[DEPENDENCY] Downloading Tableau Hyper API binary..."
 	@mkdir -p $(dir $(HYPERD_TARGET_BINARY))
@@ -22,7 +25,19 @@ $(HYPERD_TARGET_BINARY):
 	@rm -rf tmp_unzip
 	@echo "[DEPENDENCY] Tableau Hyper API binary is ready at $(HYPERD_TARGET_BINARY)"
 
-download-deps: $(HYPERD_TARGET_BINARY)
+$(JUNIT_JAR):
+	@echo "[DEPENDENCY] Downloading JUnit..."
+	@mkdir -p $(dir $(JUNIT_JAR))
+	@curl -L -o $(JUNIT_JAR) "https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar"
+	@echo "[DEPENDENCY] JUnit downloaded at $(JUNIT_JAR)"
+
+$(HAMCREST_JAR):
+	@echo "[DEPENDENCY] Downloading Hamcrest..."
+	@mkdir -p $(dir $(HAMCREST_JAR))
+	@curl -L -o $(HAMCREST_JAR) "https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar"
+	@echo "[DEPENDENCY] Hamcrest download at $(HAMCREST_JAR)"
+
+download-deps: $(HYPERD_TARGET_BINARY) $(JUNIT_JAR) $(HAMCREST_JAR)
 
 build:
 	@ant clean
@@ -44,14 +59,14 @@ plugin: $(HYPERD_TARGET_BINARY) build
 unit-tests: java-unit-tests python-unit-tests
 	@echo "[SUCCESS] All unit tests completed!"
 
-java-unit-tests:
+java-unit-tests: $(JUNIT_JAR) $(HAMCREST_JAR)
 	@echo "[START] Running Java unit tests..."
 	@mkdir -p tests/java-build
 	@mkdir -p tests/allure_report
-	@javac -cp "$$DKU_INSTALL_DIR/lib/ivy/backend-run/*:$$DKU_INSTALL_DIR/lib/ivy/common-run/*:$$DKU_INSTALL_DIR/lib/shadelib/*:$$DKU_INSTALL_DIR/dist/dataiku-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-app-platform.jar:$$DKU_INSTALL_DIR/dist/dataiku-dss-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-scoring.jar:$$DKU_INSTALL_DIR/dist/dataiku-dip.jar:java-lib/*" \
+	@javac -cp "$$DKU_INSTALL_DIR/lib/ivy/backend-run/*:$$DKU_INSTALL_DIR/lib/ivy/common-run/*:$$DKU_INSTALL_DIR/lib/shadelib/*:$$DKU_INSTALL_DIR/dist/dataiku-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-app-platform.jar:$$DKU_INSTALL_DIR/dist/dataiku-dss-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-scoring.jar:$$DKU_INSTALL_DIR/dist/dataiku-dip.jar:java-lib/*:$(JUNIT_JAR):$(HAMCREST_JAR)" \
 		-d tests/java-build \
 		java-src/com/dataiku/dss/export/tableau/*.java tests/java/unit/*.java
-	@java -cp "tests/java-build:$$DKU_INSTALL_DIR/lib/ivy/backend-run/*:$$DKU_INSTALL_DIR/lib/ivy/common-run/*:$$DKU_INSTALL_DIR/lib/shadelib/*:$$DKU_INSTALL_DIR/dist/dataiku-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-app-platform.jar:$$DKU_INSTALL_DIR/dist/dataiku-dss-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-scoring.jar:$$DKU_INSTALL_DIR/dist/dataiku-dip.jar:java-lib/*" \
+	@java -cp "tests/java-build:$$DKU_INSTALL_DIR/lib/ivy/backend-run/*:$$DKU_INSTALL_DIR/lib/ivy/common-run/*:$$DKU_INSTALL_DIR/lib/shadelib/*:$$DKU_INSTALL_DIR/dist/dataiku-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-app-platform.jar:$$DKU_INSTALL_DIR/dist/dataiku-dss-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-scoring.jar:$$DKU_INSTALL_DIR/dist/dataiku-dip.jar:java-lib/*:$(JUNIT_JAR):$(HAMCREST_JAR)" \
 		org.junit.runner.JUnitCore com.dataiku.dss.export.tableau.TableauExporterTest
 	@echo "[SUCCESS] Java unit tests: Done!"
 

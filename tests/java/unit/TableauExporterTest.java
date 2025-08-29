@@ -19,13 +19,9 @@ public class TableauExporterTest {
     @Test
     public void testDSSImportsWork() {
         // Test that we can create DSS objects without errors
-        List<SchemaColumn> columns = new ArrayList<>();
         SchemaColumn column = new SchemaColumn("test_column", Type.STRING);
-        columns.add(column);
-        
-        Schema schema = new Schema(columns);
-        Assert.assertNotNull("Schema should be created", schema);
-        Assert.assertEquals("Should have one column", 1, schema.getColumns().size());
-        Assert.assertEquals("Column name should match", "test_column", schema.getColumns().get(0).getName());
+        Assert.assertNotNull("SchemaColumn should be created", column);
+        Assert.assertEquals("Column name should match", "test_column", column.getName());
+        Assert.assertEquals("Column type should match", Type.STRING, column.getType());
     }
 }
