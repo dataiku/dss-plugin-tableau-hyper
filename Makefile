@@ -48,7 +48,7 @@ java-unit-tests:
 	@echo "[START] Running Java unit tests..."
 	@mkdir -p tests/java-build
 	@mkdir -p tests/allure_report
-	@javac -cp "$$DKU_INSTALL_DIR/lib/ivy/backend-run/*:$$DKU_INSTALL_DIR/lib/ivy/common-run/*:$$DKU_INSTALL_DIR/lib/shadelib/*:$$DKU_INSTALL_DIR/dist/dataiku-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-app-platform.jar:$$DKU_INSTALL_DIR/dist/dataiku-dss-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-scoring.jar:$$DKU_INSTALL_DIR/dist/dataiku-dip.jar:java-lib/*" \
+	@javac -source 8 -target 8 -cp "$$DKU_INSTALL_DIR/lib/ivy/backend-run/*:$$DKU_INSTALL_DIR/lib/ivy/common-run/*:$$DKU_INSTALL_DIR/lib/shadelib/*:$$DKU_INSTALL_DIR/dist/dataiku-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-app-platform.jar:$$DKU_INSTALL_DIR/dist/dataiku-dss-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-scoring.jar:$$DKU_INSTALL_DIR/dist/dataiku-dip.jar:java-lib/*" \
 		-d tests/java-build \
 		java-src/com/dataiku/dss/export/tableau/*.java tests/java/unit/*.java
 	@java -cp "tests/java-build:$$DKU_INSTALL_DIR/lib/ivy/backend-run/*:$$DKU_INSTALL_DIR/lib/ivy/common-run/*:$$DKU_INSTALL_DIR/lib/shadelib/*:$$DKU_INSTALL_DIR/dist/dataiku-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-app-platform.jar:$$DKU_INSTALL_DIR/dist/dataiku-dss-core.jar:$$DKU_INSTALL_DIR/dist/dataiku-scoring.jar:$$DKU_INSTALL_DIR/dist/dataiku-dip.jar:java-lib/*" \
