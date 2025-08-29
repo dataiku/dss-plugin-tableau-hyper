@@ -154,7 +154,7 @@ public class TableauExporter implements CustomExporter  {
         }
     }
 
-    private static <T> T parseWithMultipleFormatters(
+    public static <T> T parseWithMultipleFormatters(
             String input,
             DateTimeFormatter[] formatters,
             BiFunction<String, DateTimeFormatter, T> parser) {
@@ -249,6 +249,11 @@ public class TableauExporter implements CustomExporter  {
         inserter.endRow();
     }
 
+    public String convertGeoValueToLowercase(String value) {
+        if (value == null) return null;
+        return value.toLowerCase();
+    }
+
     private void addValueToInserter(Inserter inserter, String value, Type type) {
         switch (type) {
             case GEOMETRY:
@@ -257,7 +262,7 @@ public class TableauExporter implements CustomExporter  {
             case OBJECT:
             case STRING:
             case GEOPOINT:
-                String geoValue = value.toLowerCase();
+                String geoValue = convertGeoValueToLowercase(value);
                 inserter.add(geoValue);
                 break;
             case DATE:
