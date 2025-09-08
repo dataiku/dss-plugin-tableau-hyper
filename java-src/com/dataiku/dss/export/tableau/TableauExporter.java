@@ -23,6 +23,8 @@ import com.dataiku.dip.datasets.Type;
 import com.dataiku.dip.logging.LimitedLogContext;
 import com.dataiku.dip.logging.LimitedLogFactory;
 import com.dataiku.dip.plugin.CustomExporter;
+import com.dataiku.dip.plugins.IPluginsRegistryService;
+import com.dataiku.dip.server.SpringUtils;
 import com.dataiku.dip.utils.DKULogger;
 import com.dataiku.dip.utils.ExceptionUtils;
 import com.google.common.primitives.Doubles;
@@ -130,7 +132,9 @@ public class TableauExporter implements CustomExporter  {
         processParameters.put("log_file_size_limit", "100M");
         processParameters.put("log_config", "");
 
-        new File(System.getenv("DIP_HOME"), "plugins/installed/tableau-hyper-export/java-lib/hyper/hyperd").setExecutable(true);
+
+        IPluginsRegistryService pluginsService = SpringUtils.getBean(IPluginsRegistryService.class);
+        new File(pluginsService.getPluginJavalibFolder("tableau-hyper-export"), "hyper/hyperd").setExecutable(true);
 
         this.process = new HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU, "dataiku", processParameters);
 
