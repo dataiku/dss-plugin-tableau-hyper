@@ -130,6 +130,8 @@ public class TableauExporter implements CustomExporter  {
         processParameters.put("log_file_size_limit", "100M");
         processParameters.put("log_config", "");
 
+        new File(System.getenv("DIP_HOME"), "plugins/installed/tableau-hyper-export/java-lib/hyper/hyperd").setExecutable(true);
+
         this.process = new HyperProcess(Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU, "dataiku", processParameters);
 
         try {
