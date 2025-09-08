@@ -5,7 +5,7 @@ pipeline {
    agent { label 'dss-plugin-tests'}
    environment {
         PLUGIN_INTEGRATION_TEST_INSTANCE="$HOME/instance_config.json"
-        DKU_INSTALL_DIR = "${WORKSPACE}/dataiku-dss-14.1.0"
+        DKUINSTALLDIR = "${WORKSPACE}/dataiku-dss-14.1.0"
         JAVA_HOME = "/usr/lib/jvm/java-17-openjdk"
         PATH = "${JAVA_HOME}/bin:${PATH}"
    }
@@ -22,7 +22,7 @@ pipeline {
                echo "Extracting DSS"
                tar -xzf dataiku-dss.tar.gz
                
-               echo "DSS installed in: ${DKU_INSTALL_DIR}"
+               echo "DSS installed in: ${DKUINSTALLDIR}"
             '''
             sh 'echo "Done downloading DSS"'
          }
