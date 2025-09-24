@@ -1,8 +1,9 @@
 # Changelog
 
-## [Version 0.4.0](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.4.0) - Feature release - 2025-08
+## [Version 1.0.0](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v1.0.0) - Feature release - 2025-08
 
 - New exporter working only on linux to speed up export time
+- DSS Geometries are now exported as Tableau Geography. :warning: This is a breaking change. Before, DSS geometries were exported as String. If you had a Tableau dashboard or a Flow manipulating a string column coming from a DSS geometry column, this tableau or flow will break and will need to be edited. 
 
 ## [Version 0.3.0](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v0.3.0) - Bugfix release - 2025-03-17
 
