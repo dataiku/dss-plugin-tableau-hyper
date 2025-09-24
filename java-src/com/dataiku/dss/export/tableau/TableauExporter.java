@@ -262,12 +262,14 @@ public class TableauExporter implements CustomExporter  {
 
     private void addValueToInserter(Inserter inserter, String value, Type type) {
         switch (type) {
-            case GEOMETRY:
             case ARRAY:
             case MAP:
             case OBJECT:
             case STRING:
+                inserter.add(value);
+                break;
             case GEOPOINT:
+            case GEOMETRY:
                 String geoValue = convertGeoValueToLowercase(value);
                 inserter.add(geoValue);
                 break;
