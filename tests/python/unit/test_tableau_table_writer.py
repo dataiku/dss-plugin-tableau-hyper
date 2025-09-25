@@ -34,7 +34,7 @@ class TableauHyperExporter(object):
         self.plugin_config = plugin_config
         schema_name = self.config.get("schema_name", "Extract")
         table_name = self.config.get("table_name", "Extract")
-        self.writer = TableauTableWriter(config=config, schema_name=schema_name, table_name=table_name)
+        self.writer = TableauTableWriter(config=config, schema_name=schema_name, table_name=table_name, plugin_config=plugin_config)
         self.writer.batch_size = 10
         self.output_file = None
 
@@ -229,16 +229,64 @@ class TestTableauTableWriter(TestCase):
 
         os.remove(destination_file_path)
 
-    def test_export_geometry_values(self):
+    def test_export_geometry_values_with_export_as_geography_true(self):
         """
-        Test the export of geometry values (DSS geometry storage type)
+        Test the export of geometry values when export_as_geography is True (geography type)
         :return:
         """
         nan = float("nan")
 
         # ===> Define parameters input from DSS for exporter
         config = {}
-        plugin_config = {}
+        plugin_config = {"export_as_geography": True}
+        schema = {'columns': [{'name': 'id', 'type': 'bigint'}, {'name': 'name', 'type': 'string'},
+                              {'name': 'area', 'type': 'geometry'}], 'userModified': True}
+        rows = [
+            (1, 'Complex Area', 'MULTIPOLYGON(((0 0,4 0,4 4,0 4,0 0),(1 1,2 1,2 2,1 2,1 1)))'),
+            (2, 'Simple Area', 'POLYGON((0 0,3 0,3 3,0 3,0 0))'),
+            (3, 'No Area', nan)
+        ]
+        # <===
+
+        # ===> Create a DSS-like exporter
+        exporter = TableauHyperExporter(config, plugin_config)
+        exporter.writer.batch_size = 1
+        output_file_name = get_random_alphanumeric_string(10) + '.hyper'
+        destination_file_path = os.path.join(self.output_path, output_file_name)
+        exporter.open_to_file(schema, destination_file_path)
+        for row in rows:
+            exporter.write_row(row)
+        exporter.close()
+
+        with get_hyper_process() as hyper:
+            with Connection(endpoint=hyper.endpoint, database=destination_file_path) as connection:
+                with connection.execute_query(query=f"SELECT * FROM {TableName('Extract', 'Extract')}") as result:
+                    rows_from_hyper = list(result)
+
+        assert len(rows) == len(rows_from_hyper)
+
+        count = 0
+        valid = 0
+        for i in range(len(rows)):
+            row_dss, row_hyper = rows[i], rows_from_hyper[i]
+            for j in range(len(row_dss)):
+                a, b = row_dss[j], row_hyper[j]
+                if (pd.isna(a) and pd.isna(b)) or (a == b):
+                    valid += 1
+                count += 1
+
+        os.remove(destination_file_path)
+        
+    def test_export_geometry_values_with_export_as_geography_false(self):
+        """
+        Test the export of geometry values when export_as_geography is False (text type)
+        :return:
+        """
+        nan = float("nan")
+
+        # ===> Define parameters input from DSS for exporter
+        config = {}
+        plugin_config = {"export_as_geography": False}
         schema = {'columns': [{'name': 'id', 'type': 'bigint'}, {'name': 'name', 'type': 'string'},
                               {'name': 'area', 'type': 'geometry'}], 'userModified': True}
         rows = [

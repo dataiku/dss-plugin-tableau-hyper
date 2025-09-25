@@ -10,5 +10,15 @@
         "licenseInfo": "Apache Software License",
         "url": "https://www.dataiku.com/product/plugins/tableau-hyper-export",
         "tags": ["Visualization", "Format"]
-    }
+    },
+    "params": [
+        {
+            "name": "export_as_geography",
+            "label": "Export DSS Geometry columns as Tableau Geography type",
+            "description": "Select whether to use the geography format when exporting geometry columns to Tableau using the legacy exporter. By default, geometries are exported as text strings.",
+            "type": "BOOLEAN",
+            "defaultValue": false
+        }
+        ]
+        
 }
