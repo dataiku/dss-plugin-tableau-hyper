@@ -13,9 +13,9 @@
     },
     "params": [
         {
-            "name": "export_geometry_as_string_legacy",
-            "label": "Export DSS geometries as string (legacy)",
-            "description": "Select whether to export the geometry format as string when using the legacy exporter. By default, geometries are exported as geography.",
+            "name": "export_geometry_as_string",
+            "label": "Export DSS geometries as string",
+            "description": "Select whether to export the geometry format as string. By default, geometries are exported as geography.",
             "type": "BOOLEAN",
             "defaultValue": false
         }

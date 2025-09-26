@@ -55,10 +55,10 @@ class SchemaConversion:
         """
         Class handling the conversion of the schema between Tableau Hyper and DSS
         """
-        export_geometry_as_string_legacy = False
+        export_geometry_as_string = False
         if plugin_config:
-            export_geometry_as_string_legacy = plugin_config.get("export_geometry_as_string_legacy", False)
-        self.type_converter = TypeConversion(config, export_geometry_as_string_legacy)
+            export_geometry_as_string = plugin_config.get("export_geometry_as_string", False)
+        self.type_converter = TypeConversion(config, export_geometry_as_string)
         self.dss_storage_types = []
         self.hyper_storage_types = []
 

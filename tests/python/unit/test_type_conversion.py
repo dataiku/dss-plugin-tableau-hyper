@@ -48,12 +48,12 @@ class TestTypeConversion(TestCase):
         assert dss_value == "POINT(-90 80)"
         return True
 
-    def test_dss_geometry_to_hyper_with_export_geometry_as_string_legacy_false(self):
+    def test_dss_geometry_to_hyper_with_export_geometry_as_string_false(self):
         type_converter = TypeConversion(None, False)
         hyper_value = type_converter.dss_value_to_hyper("MULTIPOLYGON(((0 0,4 0,4 4,0 4,0 0),(1 1,2 1,2 2,1 2,1 1)))", 'geometry')
         assert hyper_value == "multipolygon(((0 0,4 0,4 4,0 4,0 0),(1 1,2 1,2 2,1 2,1 1)))"
         
-    def test_dss_geometry_to_hyper_with_export_geometry_as_string_legacy_true(self):
+    def test_dss_geometry_to_hyper_with_export_geometry_as_string_true(self):
         type_converter = TypeConversion(None, True)
         hyper_value = type_converter.dss_value_to_hyper("MULTIPOLYGON(((0 0,4 0,4 4,0 4,0 0),(1 1,2 1,2 2,1 2,1 1)))", 'geometry')
         assert hyper_value == "MULTIPOLYGON(((0 0,4 0,4 4,0 4,0 0),(1 1,2 1,2 2,1 2,1 1)))"
@@ -63,12 +63,12 @@ class TestTypeConversion(TestCase):
         dss_value = type_converter.hyper_value_to_dss("multipolygon(((0 0,4 0,4 4,0 4,0 0)))", TypeTag.GEOGRAPHY)
         assert dss_value == "MULTIPOLYGON(((0 0,4 0,4 4,0 4,0 0)))"
 
-    def test_dss_geometry_type_mapping_with_export_geometry_as_string_legacy_false(self):
+    def test_dss_geometry_type_mapping_with_export_geometry_as_string_false(self):
         type_converter = TypeConversion(None, False)
         hyper_type = type_converter.dss_type_to_hyper('geometry')
         assert str(hyper_type.tag) == 'TypeTag.GEOGRAPHY'
         
-    def test_dss_geometry_type_mapping_with_export_geometry_as_string_legacy_true(self):
+    def test_dss_geometry_type_mapping_with_export_geometry_as_string_true(self):
         type_converter = TypeConversion(None, True)
         hyper_type = type_converter.dss_type_to_hyper('geometry')
         assert str(hyper_type.tag) == 'TypeTag.TEXT'

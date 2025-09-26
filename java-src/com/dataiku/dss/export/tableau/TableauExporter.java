@@ -54,6 +54,7 @@ public class TableauExporter implements CustomExporter  {
     private boolean isGeoTable = false;
     private List<Column> columns;
     private List<Type> types;
+    private boolean exportGeometryAsString = false;
 
 
     private final DateTimeFormatter[] dateTimeNoTZFormatters = new DateTimeFormatter[]{
@@ -81,8 +82,9 @@ public class TableauExporter implements CustomExporter  {
         case DATEONLY:
             return SqlType.date();
         case GEOPOINT:
-        case GEOMETRY:
             return SqlType.geography();
+        case GEOMETRY:
+            return exportGeometryAsString ? SqlType.text() : SqlType.geography();
         case DOUBLE:
         case FLOAT:
             return SqlType.doublePrecision();
@@ -103,7 +105,8 @@ public class TableauExporter implements CustomExporter  {
     public void initialize(JsonObject config, JsonObject pluginSettings, Schema schema, ColumnFactory cf, File destinationFile) throws Exception {
         this.cf = cf;
         this.schema = schema;
-        this.isGeoTable = schema.getColumns().stream().anyMatch(col -> col.getType() == Type.GEOPOINT || col.getType() == Type.GEOMETRY);
+        this.exportGeometryAsString = pluginSettings != null && pluginSettings.has("export_geometry_as_string") && pluginSettings.get("export_geometry_as_string").getAsBoolean();
+        this.isGeoTable = schema.getColumns().stream().anyMatch(col -> col.getType() == Type.GEOPOINT || (col.getType() == Type.GEOMETRY && !exportGeometryAsString));
 
         Thread.currentThread().setContextClassLoader(TableauExporter.class.getClassLoader());
 
@@ -120,7 +123,7 @@ public class TableauExporter implements CustomExporter  {
         if (this.isGeoTable) {
             List<TableDefinition.Column> tempColumns = schema.getColumns().stream()
                     .map(dssColumn -> {
-                        SqlType type = (dssColumn.getType() == Type.GEOPOINT || dssColumn.getType() == Type.GEOMETRY) ? SqlType.text() : getTableauType(dssColumn);
+                        SqlType type = (dssColumn.getType() == Type.GEOPOINT || (dssColumn.getType() == Type.GEOMETRY && !exportGeometryAsString)) ? SqlType.text() : getTableauType(dssColumn);
                         return new TableDefinition.Column(dssColumn.getName(), type, Nullability.NULLABLE);
                     })
                     .collect(Collectors.toList());
@@ -224,7 +227,7 @@ public class TableauExporter implements CustomExporter  {
         List<String> selectColumns = new ArrayList<>();
         
         for (SchemaColumn dssColumn : this.schema.getColumns()) {
-            if (dssColumn.getType() == Type.GEOPOINT || dssColumn.getType() == Type.GEOMETRY) {
+            if (dssColumn.getType() == Type.GEOPOINT || (dssColumn.getType() == Type.GEOMETRY && !exportGeometryAsString)) {
                 selectColumns.add(String.format("CAST(\"%s\" AS TABLEAU.TABGEOGRAPHY)", dssColumn.getName()));
             } else {
                 selectColumns.add(String.format("\"%s\"", dssColumn.getName()));
@@ -269,9 +272,16 @@ public class TableauExporter implements CustomExporter  {
                 inserter.add(value);
                 break;
             case GEOPOINT:
-            case GEOMETRY:
                 String geoValue = convertGeoValueToLowercase(value);
                 inserter.add(geoValue);
+                break;
+            case GEOMETRY:
+                if (exportGeometryAsString) {
+                    inserter.add(value);
+                } else {
+                    String geoValueGeom = convertGeoValueToLowercase(value);
+                    inserter.add(geoValueGeom);
+                }
                 break;
             case DATE:
                 OffsetDateTime offsetDateTime = parseWithMultipleFormatters(value, offsetDateTimeFormatters, OffsetDateTime::parse);
