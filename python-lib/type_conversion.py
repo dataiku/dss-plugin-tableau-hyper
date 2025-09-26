@@ -84,7 +84,7 @@ def to_hyper_geography(dss_geopoint):
 
 class TypeConversion(object):
 
-    def __init__(self, config, plugin_config=None):
+    def __init__(self, config, export_geometry_as_string_legacy=False):
 
         self.config = config 
 
@@ -94,10 +94,6 @@ class TypeConversion(object):
         handle_null = lambda f: lambda x: None if pd.isna(x) else f(x)
 
         # Mapping DSS to Tableau Hyper types
-        export_geometry_as_string_legacy = False
-        if plugin_config:
-            export_geometry_as_string_legacy = plugin_config.get("export_geometry_as_string_legacy", False)
-            logger.info("plugin config: {}".format(plugin_config))
 
         logger.info(f"Exporting geometry as string (legacy): {export_geometry_as_string_legacy}")
         
