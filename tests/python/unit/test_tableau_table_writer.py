@@ -34,7 +34,10 @@ class TableauHyperExporter(object):
         self.plugin_config = plugin_config
         schema_name = self.config.get("schema_name", "Extract")
         table_name = self.config.get("table_name", "Extract")
-        self.writer = TableauTableWriter(config=config, schema_name=schema_name, table_name=table_name, plugin_config=plugin_config)
+        export_geometry_as_string = False
+        if plugin_config:
+            export_geometry_as_string = plugin_config.get("export_geometry_as_string", False)
+        self.writer = TableauTableWriter(config=config, schema_name=schema_name, table_name=table_name, export_geometry_as_string=export_geometry_as_string)
         self.writer.batch_size = 10
         self.output_file = None
 

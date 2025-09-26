@@ -83,7 +83,10 @@ class TableauHyperExporter(Exporter):
             self.output_file_name, self.project_name, self.schema_name, self.table_name))
 
         # Instantiate Tableau Writer wrapper
-        self.writer = TableauTableWriter(config=config, schema_name=self.schema_name, table_name=self.table_name, plugin_config=plugin_config)
+        export_geometry_as_string = False
+        if plugin_config:
+            export_geometry_as_string = plugin_config.get("export_geometry_as_string", False)
+        self.writer = TableauTableWriter(config=config, schema_name=self.schema_name, table_name=self.table_name, export_geometry_as_string=export_geometry_as_string)
         # Open connection to Tableau Server
         if auth_type == "pta-preset":
             self.tableau_auth = tsc.PersonalAccessTokenAuth(username, password, site_id=site_name)

@@ -51,13 +51,10 @@ def geo_to_text(dss_schema):
 
 class SchemaConversion:
 
-    def __init__(self, config, plugin_config=None):
+    def __init__(self, config, export_geometry_as_string=False):
         """
         Class handling the conversion of the schema between Tableau Hyper and DSS
         """
-        export_geometry_as_string = False
-        if plugin_config:
-            export_geometry_as_string = plugin_config.get("export_geometry_as_string", False)
         self.type_converter = TypeConversion(config, export_geometry_as_string)
         self.dss_storage_types = []
         self.hyper_storage_types = []

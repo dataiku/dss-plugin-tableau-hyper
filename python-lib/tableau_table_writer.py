@@ -29,7 +29,7 @@ class TableauTableWriter(object):
     Wrapper class for writing a Tableau Hyper file from a DSS dataset.
     """
 
-    def __init__(self, config, schema_name, table_name, plugin_config=None):
+    def __init__(self, config, schema_name, table_name, export_geometry_as_string=False):
         """
         :param schema_name: name of the target schema
         :param table_name: name of the target table
@@ -44,7 +44,7 @@ class TableauTableWriter(object):
         self.output_file = None
         self.is_geo_table = False
 
-        self.schema_converter = SchemaConversion(config, plugin_config)
+        self.schema_converter = SchemaConversion(config, export_geometry_as_string)
 
         # Tableau Hyper related objects
         self.hyper = None
