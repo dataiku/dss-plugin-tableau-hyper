@@ -1,0 +1,37 @@
+{
+    "meta" : {
+        "label": "To Hyper Extract - Java exporter",
+        "description": "This exporter produces hyper (Tableau extract) files which you can then download to your local machine"
+
+    },
+
+    "exporterClass": "com.dataiku.dss.export.tableau.TableauExporter",
+    "exportBehavior": "OUTPUT_TO_FILE",
+
+    "mime" : {
+        "mimeType" : "application/hyper",
+        "extension": ".hyper"
+    },
+
+    "exportOptions": [
+         {
+            "label" : "Tableau HyperExtract (.hyper) - Java exporter",
+            "compression" : "NONE"
+        }
+    ],
+
+    "params": [
+       {
+            "name": "schema_name",
+            "label": "Schema name",
+            "type": "STRING",
+            "defaultValue": "Extract"
+        },
+        {
+            "name": "table_name",
+            "label":"Table name",
+            "type": "STRING",
+            "defaultValue": "Extract"
+        }
+    ]
+}

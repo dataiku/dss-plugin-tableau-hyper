@@ -19,6 +19,16 @@ This plugin offers the ability to interact with the Tableau Hyper format from a 
 This plugin requires DSS 6.X or higher. The installation setup for this plugin follows the standard Dataiku code environment creation procedure. This plugin requires the [Tableau Server Client](https://tableau.github.io/server-client-python/) and 
 [Tableau Hyper API](https://help.tableau.com/current/api/hyper_api/en-us/index.html) Python modules. They will be installed automatically through Pip. Note that the Tableau Hyper API is compatible with Python 3.6 or Python 3.7 but not with older versions of Python.
 
+## Third party notice
+
+This repository contains a copy of the Tableau Hyper API for Java. The Tableau Hyper API for Java is Copyright (c) 2016 - 2023, Salesforce, Inc. and its licensors. All rights reserved. Protected by U.S. Patents and Trademarks as noted at http://www.tableau.com/ip; Patents pending.
+
+The Tableau Hyper API for Java is distributed and used under the terms of the Apache License Version 2.0
+
+The Tableau Hyper API for Java itself includes third-party dependencies, listed in the HYPER_API_OSS_disclosure.txt file
+
+The current version of the Tableau Hyper API for Java included in the repository is 0.0.21408.rf5a406c0
+
 ## How it works  
 
 Once the plugin is successfully installed, the flow contains two exporters, available in the standard "Export" dialog of DSS, a file format component allowing creation of Dataiku dataset from Hyper files, and a plugin preset enabling Tableau Server or Tableau Online credentials to be accessible to selected users of the DSS instance containing the preset.

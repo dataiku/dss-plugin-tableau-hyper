@@ -30,7 +30,10 @@ class TableauHyperExporter(Exporter):
         logger.info("Detected table_name: {}".format(table_name))
 
         # Instantiate the Tableau custom writer
-        self.writer = TableauTableWriter(config=config, schema_name=schema_name, table_name=table_name)
+        export_geometry_as_string = False
+        if plugin_config:
+            export_geometry_as_string = plugin_config.get("export_geometry_as_string", False)
+        self.writer = TableauTableWriter(config=config, schema_name=schema_name, table_name=table_name, export_geometry_as_string=export_geometry_as_string)
 
         self.output_file = None
 

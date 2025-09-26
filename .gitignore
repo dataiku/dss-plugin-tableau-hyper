@@ -3,6 +3,7 @@
 .wlock
 .ts
 .git
+/java-lib/hyper/hyperd
 **/*.pyc
 .coverage
 .htmlcov
@@ -14,3 +15,5 @@ env
 dist
 tests/allure_report
 unit.xml
+java-build/
+java-lib/dss-plugin-tableau-hyper-export.jar

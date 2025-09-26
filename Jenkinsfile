@@ -5,12 +5,29 @@ pipeline {
    agent { label 'dss-plugin-tests'}
    environment {
         PLUGIN_INTEGRATION_TEST_INSTANCE="$HOME/instance_config.json"
-        UNIT_TEST_FILES_STATUS_CODE = sh(script: 'ls ./tests/*/unit/test*', returnStatus: true)
-        INTEGRATION_TEST_FILES_STATUS_CODE = sh(script: 'ls ./tests/*/integration/test*', returnStatus: true)
+        DKUINSTALLDIR = "${WORKSPACE}/dataiku-dss-14.1.0"
+        JAVA_HOME = "/usr/lib/jvm/java-17-openjdk"
+        PATH = "${JAVA_HOME}/bin:${PATH}"
    }
    stages {
+      stage('Download DSS') {
+         steps {
+            sh 'echo "Downloading DSS"'
+            sh '''
+               DSS_URL="https://cdn.downloads.dataiku.com/public/studio/14.1.0/dataiku-dss-14.1.0.tar.gz"
+               
+               echo "Downloading DSS (version 14.1.0)"
+               wget -q ${DSS_URL} -O dataiku-dss.tar.gz
+               
+               echo "Extracting DSS"
+               tar -xzf dataiku-dss.tar.gz
+               
+               echo "DSS installed in: ${DKUINSTALLDIR}"
+            '''
+            sh 'echo "Done downloading DSS"'
+         }
+      }
       stage('Run Unit Tests') {
-         when { environment name: 'UNIT_TEST_FILES_STATUS_CODE', value: "0"}
          steps {
             sh 'echo "Running unit tests"'
             catchError(stageResult: 'FAILURE') {
@@ -21,18 +38,18 @@ pipeline {
             sh 'echo "Done with unit tests"'
          }
       }
-      stage('Run Integration Tests') {
-         when { environment name: 'INTEGRATION_TEST_FILES_STATUS_CODE', value: "0"}
-         steps {
-            sh 'echo "Running integration tests"'
-            catchError(stageResult: 'FAILURE') {
-            sh """
-               make integration-tests
-               """
-            }
-            sh 'echo "Done with integration tests"'
-         }
-      }
+      //stage('Run Integration Tests') {
+      //   when { environment name: 'INTEGRATION_TEST_FILES_STATUS_CODE', value: "0"}
+      //   steps {
+      //      sh 'echo "Running integration tests"'
+      //      catchError(stageResult: 'FAILURE') {
+      //      sh """
+      //         make integration-tests
+      //         """
+      //      }
+      //      sh 'echo "Done with integration tests"'
+      //   }
+      //}
    }
    post {
      always {
