@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "meta": {
         "label": "Tableau Hyper format",
-        "description": "Export datasets to Tableau .hyper format.",
+        "description": "Export datasets to Tableau .hyper format. ⚠️ Starting from 1.0.0, DSS geometry columns are now exported as Geography.",
         "author": "Dataiku (Thibault DESFONTAINES)",
         "icon": "icon-tableau",
         "supportLevel": "TIER2_SUPPORT",
