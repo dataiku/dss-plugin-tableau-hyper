@@ -94,12 +94,12 @@ class TypeConversion(object):
         handle_null = lambda f: lambda x: None if pd.isna(x) else f(x)
 
         # Mapping DSS to Tableau Hyper types
-        export_as_geography = False
+        export_geometry_as_string_legacy = False
         if plugin_config:
-            export_as_geography = plugin_config.get("export_as_geography", False)
+            export_geometry_as_string_legacy = plugin_config.get("export_geometry_as_string_legacy", False)
             logger.info("plugin config: {}".format(plugin_config))
 
-        logger.info(f"Exporting geometry as geography: {export_as_geography}")
+        logger.info(f"Exporting geometry as string (legacy): {export_geometry_as_string_legacy}")
         
         self.mapping_dss_to_hyper = {
             'array': (SqlType.text(), handle_null(str)),
@@ -109,7 +109,7 @@ class TypeConversion(object):
             'datetimenotz': (SqlType.timestamp(), handle_null(to_hyper_timestamp)),
             'double': (SqlType.double(), handle_null(float)),
             'float': (SqlType.double(), handle_null(float)),
-            'geometry': (SqlType.geography(), handle_null(to_hyper_geography)) if export_as_geography else (SqlType.text(), handle_null(str)),
+            'geometry': (SqlType.text(), handle_null(str)) if export_geometry_as_string_legacy else (SqlType.geography(), handle_null(to_hyper_geography)),
             'geopoint': (SqlType.geography(), handle_null(to_hyper_geography)),
             'int': (SqlType.int(), handle_null(int)),
             'map': (SqlType.text(), handle_null(str)),

@@ -229,16 +229,16 @@ class TestTableauTableWriter(TestCase):
 
         os.remove(destination_file_path)
 
-    def test_export_geometry_values_with_export_as_geography_true(self):
+    def test_export_geometry_values_with_export_geometry_as_string_legacy_false(self):
         """
-        Test the export of geometry values when export_as_geography is True (geography type)
+        Test the export of geometry values when export_geometry_as_string_legacy is False (geography type)
         :return:
         """
         nan = float("nan")
 
         # ===> Define parameters input from DSS for exporter
         config = {}
-        plugin_config = {"export_as_geography": True}
+        plugin_config = {"export_geometry_as_string_legacy": False}
         schema = {'columns': [{'name': 'id', 'type': 'bigint'}, {'name': 'name', 'type': 'string'},
                               {'name': 'area', 'type': 'geometry'}], 'userModified': True}
         rows = [
@@ -277,16 +277,16 @@ class TestTableauTableWriter(TestCase):
 
         os.remove(destination_file_path)
         
-    def test_export_geometry_values_with_export_as_geography_false(self):
+    def test_export_geometry_values_with_export_geometry_as_string_legacy_true(self):
         """
-        Test the export of geometry values when export_as_geography is False (text type)
+        Test the export of geometry values when export_geometry_as_string_legacy is True (text type)
         :return:
         """
         nan = float("nan")
 
         # ===> Define parameters input from DSS for exporter
         config = {}
-        plugin_config = {"export_as_geography": False}
+        plugin_config = {"export_geometry_as_string_legacy": True}
         schema = {'columns': [{'name': 'id', 'type': 'bigint'}, {'name': 'name', 'type': 'string'},
                               {'name': 'area', 'type': 'geometry'}], 'userModified': True}
         rows = [
