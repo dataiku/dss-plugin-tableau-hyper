@@ -1,7 +1,7 @@
 Current Version: 0.1.6 <br>
 Compatible with DSS version: 6.X and higher<br>
 
-:warning: Verison 1.1.0 of the plugin are only compatible with DSS14.4+
+:warning: Version 1.1.0 of the plugin is only compatible with DSS14.4+
 
 ## Plugin information
 
