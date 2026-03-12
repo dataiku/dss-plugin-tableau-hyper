@@ -1,6 +1,6 @@
 # Changelog
 
-## [Version 1.1.0](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v1.0.0) - Bugfix release - 2026-03
+## [Version 1.1.0](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v1.1.0) - Bugfix release - 2026-03
 
 - Fixed NoSuchMethodError: 'java.lang.String com.dataiku.dip.code.CodeEnvSelector.selectForCustomPythonRecipe' when using the java exporter with DSS14.4+
 
