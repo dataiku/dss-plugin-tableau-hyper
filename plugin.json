@@ -1,6 +1,6 @@
 {
     "id": "tableau-hyper-export",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "meta": {
         "label": "Tableau Hyper format",
         "description": "Export datasets to Tableau .hyper format. ⚠️ Starting from 1.0.0, DSS geometry columns are now exported as Geography.",
@@ -9,7 +9,7 @@
         "supportLevel": "TIER2_SUPPORT",
         "licenseInfo": "Apache Software License",
         "url": "https://www.dataiku.com/product/plugins/tableau-hyper-export",
-        "tags": ["Visualization", "Format"]
+        "tags": ["Visualization", "Connector", "BI"]
     },
     "params": [
         {

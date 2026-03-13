@@ -76,7 +76,7 @@ public class TableauUploadExporter extends TableauExporter  {
         this.config = config;
         this.pluginSettings = pluginSettings;
         this.destinationFile = destinationFile;
-        this.envName = new CodeEnvSelector().selectForCustomPythonRecipe("tableau-hyper-export");
+        this.envName = new CodeEnvSelector().getCodeEnvNameForPlugin("tableau-hyper-export");
     }
 
     private void initializeServices() throws Exception {
