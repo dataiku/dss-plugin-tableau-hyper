@@ -9,7 +9,7 @@
         "supportLevel": "TIER2_SUPPORT",
         "licenseInfo": "Apache Software License",
         "url": "https://www.dataiku.com/product/plugins/tableau-hyper-export",
-        "tags": ["Visualization", "Format"]
+        "tags": ["Visualization", "Connector", "BI"]
     },
     "params": [
         {
