@@ -17,3 +17,5 @@ tests/allure_report
 unit.xml
 java-build/
 java-lib/dss-plugin-tableau-hyper-export.jar
+java-lib/java-lib/junit-4.13.2.jar
+java-lib/java-lib/hamcrest-core-1.3.jar
