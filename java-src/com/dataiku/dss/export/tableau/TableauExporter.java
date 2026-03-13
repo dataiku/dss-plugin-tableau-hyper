@@ -180,13 +180,6 @@ public class TableauExporter implements CustomExporter  {
 
     @Override
     public void stream(RowInputStream stream) throws Exception {
-        this.columns = new ArrayList<>();
-        this.types = new ArrayList<>();
-        for (SchemaColumn sc : this.schema.getColumns()) {
-            this.columns.add(this.cf.getColumn(sc.getName()));
-            this.types.add(sc.getType());
-        }
-
         if (this.isGeoTable) {
             streamWithGeoProcessing(stream);
         } else {
@@ -209,6 +202,21 @@ public class TableauExporter implements CustomExporter  {
     }
 
     private void insertRows(Inserter inserter, RowInputStream stream) throws Exception {
+        Row firstRow = stream.next();
+        if (firstRow == null) {
+            return;
+        }
+
+        // Resolves columns after the first row is available, ensuring the input
+        // thread has registered all columns in the shared ColumnFactory.
+        this.columns = new ArrayList<>();
+        this.types = new ArrayList<>();
+        for (SchemaColumn sc : this.schema.getColumns()) {
+            this.columns.add(this.cf.getColumn(sc.getName()));
+            this.types.add(sc.getType());
+        }
+
+        addRowToInserter(inserter, firstRow);
         for (Row r; (r = stream.next()) != null; ) {
             addRowToInserter(inserter, r);
         }
