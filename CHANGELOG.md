@@ -2,7 +2,7 @@
 
 ## [Version 1.0.1](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v1.0.1) - Bugfix release - 2026-03
 
-- Fixed a race condition in TableauExporter where column resolution happened before the input thread had registered columns in the shared ColumnFactory
+- Fixed a race condition in the Java Tableau exporter that caused export jobs to fail randomly on slow data sources.
 
 ## [Version 1.0.0](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v1.0.0) - Feature release - 2025-08
 
