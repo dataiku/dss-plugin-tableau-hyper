@@ -182,8 +182,9 @@ public class TableauExporter implements CustomExporter  {
     public void stream(RowInputStream stream) throws Exception {
         this.columns = new ArrayList<>();
         this.types = new ArrayList<>();
+        // Ensures schema columns exist in the shared ColumnFactory before streaming rows.
         for (SchemaColumn sc : this.schema.getColumns()) {
-            this.columns.add(this.cf.getColumn(sc.getName()));
+            this.columns.add(this.cf.column(sc.getName()));
             this.types.add(sc.getType());
         }
 
