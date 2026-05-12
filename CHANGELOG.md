@@ -1,5 +1,9 @@
 # Changelog
 
+## [Version 1.0.2](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v1.0.2) - Bugfix release - 2026-05
+
+- Fixed Python code environment by upgrading `tableauhyperapi` to `0.0.25080`.
+
 ## [Version 1.0.1](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v1.0.1) - Bugfix release - 2026-03
 
 - Fixed a race condition in the Java Tableau exporter that caused export jobs to fail randomly on slow data sources.

@@ -44,7 +44,7 @@ class TestTypeConversion(TestCase):
 
     def test_hyper_value_to_dss(self):
         type_converter = TypeConversion(None)
-        dss_value = type_converter.hyper_value_to_dss("point(-90 80)", TypeTag.GEOGRAPHY)
+        dss_value = type_converter.hyper_value_to_dss("point(-90 80)", TypeTag.TABGEOGRAPHY)
         assert dss_value == "POINT(-90 80)"
         return True
 
@@ -60,13 +60,13 @@ class TestTypeConversion(TestCase):
 
     def test_hyper_geometry_to_dss(self):
         type_converter = TypeConversion(None)
-        dss_value = type_converter.hyper_value_to_dss("multipolygon(((0 0,4 0,4 4,0 4,0 0)))", TypeTag.GEOGRAPHY)
+        dss_value = type_converter.hyper_value_to_dss("multipolygon(((0 0,4 0,4 4,0 4,0 0)))", TypeTag.TABGEOGRAPHY)
         assert dss_value == "MULTIPOLYGON(((0 0,4 0,4 4,0 4,0 0)))"
 
     def test_dss_geometry_type_mapping_with_export_geometry_as_string_false(self):
         type_converter = TypeConversion(None, False)
         hyper_type = type_converter.dss_type_to_hyper('geometry')
-        assert str(hyper_type.tag) == 'TypeTag.GEOGRAPHY'
+        assert hyper_type.tag == TypeTag.TABGEOGRAPHY
         
     def test_dss_geometry_type_mapping_with_export_geometry_as_string_true(self):
         type_converter = TypeConversion(None, True)
@@ -76,7 +76,7 @@ class TestTypeConversion(TestCase):
     def test_dss_geometry_type_mapping_default(self):
         type_converter = TypeConversion(None)
         hyper_type = type_converter.dss_type_to_hyper('geometry')
-        assert str(hyper_type.tag) == 'TypeTag.GEOGRAPHY'
+        assert hyper_type.tag == TypeTag.TABGEOGRAPHY
 
     def test_dss_date_formats_to_hyper(self):
         type_converter = TypeConversion(None)
