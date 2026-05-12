@@ -14,6 +14,7 @@ from tableauhyperapi import Telemetry
 from tableauhyperapi import Connection
 from tableauhyperapi import TableName
 from tableauhyperapi import HyperException
+from tableauhyperapi import TypeTag
 from tableau_server_utils import get_hyper_process
 
 
@@ -38,7 +39,7 @@ def build_query(columns):
     query_columns = ''
     for column in columns:
         query_columns += str(column.name)
-        if str(column.type) == 'GEOGRAPHY':
+        if column.type.tag == TypeTag.TABGEOGRAPHY:
             query_columns += ':: text'
         query_columns += ', '
     return query_columns[:-2]
