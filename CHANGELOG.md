@@ -1,4 +1,9 @@
 # Changelog
+## Version 1.2.0 - Enhancement release - 2026-09-09
+
+- Added supported Python versions: 3.12, 3.13, 3.14
+- Makefile cleanup: release_info.json lines removed
+
 ## [Version 1.1.2](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v1.1.2) - Bugfix release - 2026-05
 
 - Fixed Python code environment by upgrading `tableauhyperapi` to `0.0.25080`.
