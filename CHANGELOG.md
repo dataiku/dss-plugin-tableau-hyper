@@ -3,6 +3,7 @@
 
 - Added supported Python versions: 3.12, 3.13, 3.14
 - Makefile cleanup: release_info.json lines removed
+- Fixes dependency issue with setuptools<82.0.0
 
 ## [Version 1.1.2](https://github.com/dataiku/dss-plugin-tableau-hyper/releases/tag/v1.1.2) - Bugfix release - 2026-05
 
