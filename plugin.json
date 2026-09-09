@@ -1,24 +1,27 @@
 {
-    "id": "tableau-hyper-export",
-    "version": "1.1.2",
-    "meta": {
-        "label": "Tableau Hyper format",
-        "description": "Export datasets to Tableau .hyper format. ⚠️ Starting from 1.0.0, DSS geometry columns are now exported as Geography.",
-        "author": "Dataiku (Thibault DESFONTAINES)",
-        "icon": "icon-tableau",
-        "supportLevel": "TIER2_SUPPORT",
-        "licenseInfo": "Apache Software License",
-        "url": "https://www.dataiku.com/product/plugins/tableau-hyper-export",
-        "tags": ["Visualization", "Connector", "BI"]
-    },
-    "params": [
-        {
-            "name": "export_geometry_as_string",
-            "label": "Export DSS geometries as string",
-            "description": "Select whether to export the geometry format as string. By default, geometries are exported as geography.",
-            "type": "BOOLEAN",
-            "defaultValue": false
-        }
-        ]
-        
+  "id": "tableau-hyper-export",
+  "version": "1.2.0",
+  "meta": {
+    "label": "Tableau Hyper format",
+    "description": "Export datasets to Tableau .hyper format. ⚠️ Starting from 1.0.0, DSS geometry columns are now exported as Geography.",
+    "author": "Dataiku (Thibault DESFONTAINES)",
+    "icon": "icon-tableau",
+    "supportLevel": "TIER2_SUPPORT",
+    "licenseInfo": "Apache Software License",
+    "url": "https://www.dataiku.com/product/plugins/tableau-hyper-export",
+    "tags": [
+      "Visualization",
+      "Connector",
+      "BI"
+    ]
+  },
+  "params": [
+    {
+      "name": "export_geometry_as_string",
+      "label": "Export DSS geometries as string",
+      "description": "Select whether to export the geometry format as string. By default, geometries are exported as geography.",
+      "type": "BOOLEAN",
+      "defaultValue": false
+    }
+  ]
 }
