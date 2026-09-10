@@ -4,8 +4,6 @@
 plugin_id=`cat plugin.json | python3 -c "import sys, json; print(str(json.load(sys.stdin)['id']).replace('/',''))"`
 plugin_version=`cat plugin.json | python3 -c "import sys, json; print(str(json.load(sys.stdin)['version']).replace('/',''))"`
 archive_file_name="dss-plugin-${plugin_id}-${plugin_version}.zip"
-remote_url=`git config --get remote.origin.url`
-last_commit_id=`git rev-parse HEAD`
 
 
 HYPER_API_ZIP_URL := https://downloads.tableau.com/tssoftware//tableauhyperapi-java-linux-x86_64-release-main.0.0.22502.r99d1cc31.zip
@@ -36,13 +34,10 @@ plugin: $(HYPERD_TARGET_BINARY) build
 	@echo "[START] Archiving plugin to dist/ folder..."
 	@rm -rf dist
 	@mkdir dist
-	@echo "{\"remote_url\":\"${remote_url}\",\"last_commit_id\":\"${last_commit_id}\"}" > release_info.json
 	
 	@zip -r -9 dist/$(archive_file_name) . -x ".git/*" "dist/*" "env/*" "tmp_unzip/*" "tests/*" "data/*" "*.zip" ".idea/*" "*.DS_Store" "Makefile" "build.xml" "Jenkinsfile" ".gitignore"
 	
-	@zip -g -j dist/$(archive_file_name) release_info.json
 	
-	@rm release_info.json
 	@echo "[SUCCESS] Archiving plugin to dist/ folder: Done!"
 
 unit-tests: java-unit-tests python-unit-tests
