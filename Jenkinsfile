@@ -2,7 +2,7 @@ pipeline {
    options {
         disableConcurrentBuilds()
    }
-   agent { label 'dss-plugin-tests'}
+   agent { label 'dss-plugin-tests2'}
    environment {
         PLUGIN_INTEGRATION_TEST_INSTANCE="$HOME/instance_config.json"
         DKUINSTALLDIR = "${WORKSPACE}/dataiku-dss-14.1.0"
