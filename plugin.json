@@ -17,6 +17,13 @@
   },
   "params": [
     {
+      "name": "temporary_directory",
+      "label": "Temporary directory",
+      "description": "Existing absolute directory for temporary Hyper import and server-upload files. Must be writable by the processes running the plugin. Uses import/ and export/ subdirectories. Leave empty to use the default locations.",
+      "type": "STRING",
+      "mandatory": false
+    },
+    {
       "name": "export_geometry_as_string",
       "label": "Export DSS geometries as string",
       "description": "Select whether to export the geometry format as string. By default, geometries are exported as geography.",

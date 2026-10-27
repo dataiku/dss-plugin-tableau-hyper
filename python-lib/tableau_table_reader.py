@@ -16,6 +16,7 @@ from tableauhyperapi import TableName
 from tableauhyperapi import HyperException
 from tableauhyperapi import TypeTag
 from tableau_server_utils import get_hyper_process
+from temporary_directory import get_temporary_directory
 
 
 logger = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ def build_query(columns):
 
 class TableauTableReader(object):
 
-    def __init__(self, config, schema_name, table_name):
+    def __init__(self, config, schema_name, table_name, plugin_config=None):
         """
         Wrapper for the Tableau Hyper formatter
 
@@ -68,6 +69,7 @@ class TableauTableReader(object):
         self.row_index = 0
 
         self.path_to_hyper = None
+        self.temporary_directory = get_temporary_directory(plugin_config, "import")
 
         self.hyper = None
         self.connection = None
@@ -84,7 +86,8 @@ class TableauTableReader(object):
         Create a temporary file to store the streaming buffer
         """
         # Sets the delete parameter to False imperatively to avoid early deletion
-        self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=False).name
+        self.path_to_hyper = tempfile.NamedTemporaryFile(suffix=".hyper", prefix="tmp_hyper_file_", delete=False,
+                                                       dir=self.temporary_directory).name
         logger.info("Created temporary file to store future buffer stream from Hyper: {} ".format(self.path_to_hyper))
 
     def read_buffer(self, stream):
