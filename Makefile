@@ -48,6 +48,7 @@ java-unit-tests:
 	@ant test
 	@echo "[SUCCESS] Java unit tests: Done!"
 
+python-unit-tests: DSS_PYTHON_PATH ?= $(DKUINSTALLDIR)/python
 python-unit-tests:
 	@echo "[START] Running Python unit tests..."
 	@( \
@@ -61,7 +62,7 @@ python-unit-tests:
 		pip3 install --upgrade pip; \
 		pip install --no-cache-dir -r tests/python/unit/requirements.txt; \
 		pip install --no-cache-dir -r code-env/python/spec/requirements.txt; \
-		export PYTHONPATH="$(PYTHONPATH):$(PWD)/python-lib"; \
+		export PYTHONPATH="$(PYTHONPATH):$(PWD)/python-lib:$(PWD)/python-exporters/tableau-hyper_upload:$(DSS_PYTHON_PATH)"; \
 		pytest tests/python/unit --alluredir=tests/allure_report || ret=$$?; exit $$ret \
 	)
 	@echo "[SUCCESS] Python unit tests: Done!"

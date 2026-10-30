@@ -10,6 +10,7 @@ from tableau_table_writer import TableauTableWriter
 from tableau_server_utils import get_project_from_name, get_full_list_of_projects, get_tableau_server_connection
 import tempfile
 from custom_exceptions import InvalidPluginParameter
+from temporary_directory import get_temporary_directory
 
 import tableauserverclient as tsc
 
@@ -117,7 +118,7 @@ class TableauHyperExporter(Exporter):
         logger.info("Call to open method in upload exporter ...")
         
         # Defines a file path using the given output_file_name and inside a newly created temporary directory
-        self.tmp_output_dir = tempfile.TemporaryDirectory()
+        self.tmp_output_dir = tempfile.TemporaryDirectory(dir=get_temporary_directory(self.plugin_config, "export"))
         self.output_file = os.path.join(self.tmp_output_dir.name, self.output_file_name + ".hyper")
 
         self.writer.schema_converter.set_dss_storage_types(schema)

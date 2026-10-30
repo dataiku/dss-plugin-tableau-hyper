@@ -19,7 +19,7 @@
     {
       "name": "temporary_directory",
       "label": "Temporary directory",
-      "description": "Existing absolute directory for temporary Hyper import and server-upload files. Must be writable by the processes running the plugin. Uses import/ and export/ subdirectories. Leave empty to use the default locations.",
+      "description": "Temporary directory for Hyper imports and Python uploads to Tableau Server. Use an existing, writable absolute path. Leave empty for default locations. Does not apply to Java exporters.",
       "type": "STRING",
       "mandatory": false
     },
